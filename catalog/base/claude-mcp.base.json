@@ -1,0 +1,22 @@
+{
+ "meta": {
+  "version": "2.1.327",
+  "source": "Claude Code 2.1.327 程序内置的 MCP 服务器配置定义（stdio / http / sse / ws），手工整理",
+  "generatedAt": "2026-11-18"
+ },
+ "items": [
+  { "key": "mcpServers", "type": "record", "en": "MCP servers available to Claude Code, keyed by server name." },
+  { "key": "mcpServers.*.type", "type": "enum", "enum": [{ "value": "stdio" }, { "value": "http" }, { "value": "sse" }, { "value": "ws" }], "en": "Transport type. Omit for a local stdio server." },
+  { "key": "mcpServers.*.command", "type": "string", "en": "Command that starts a local (stdio) server." },
+  { "key": "mcpServers.*.args", "type": "string[]", "en": "Arguments passed to the command." },
+  { "key": "mcpServers.*.env", "type": "map", "en": "Environment variables for the server process." },
+  { "key": "mcpServers.*.url", "type": "string", "en": "URL of a remote (http / sse / ws) server." },
+  { "key": "mcpServers.*.headers", "type": "map", "en": "HTTP headers sent to a remote server." },
+  { "key": "mcpServers.*.headersHelper", "type": "string", "en": "Command that prints additional request headers as JSON." },
+  { "key": "mcpServers.*.oauth.clientId", "type": "string", "en": "Pre-registered OAuth client ID." },
+  { "key": "mcpServers.*.oauth.callbackPort", "type": "integer", "en": "Fixed local port for the OAuth callback." },
+  { "key": "mcpServers.*.oauth.scopes", "type": "string", "en": "OAuth scopes to request." },
+  { "key": "mcpServers.*.timeout", "type": "integer", "en": "Request timeout in milliseconds." },
+  { "key": "mcpServers.*.alwaysLoad", "type": "boolean", "en": "When true, all tools from this server are always included in the prompt and never deferred behind tool search." }
+ ]
+}

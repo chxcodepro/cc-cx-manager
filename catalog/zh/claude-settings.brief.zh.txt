@@ -1,0 +1,82 @@
+# Claude Code settings.json 一句话说明：改这个参数有什么效果（显示在界面「?」的第一行）
+# 格式：key | 说明（尽量 30 字以内，最多 40 字）
+env | 给 Claude Code 设置环境变量，在「环境变量」页逐项编辑
+language | Claude 用什么语言回复你，如 chinese
+outputStyle | 回复风格，如 Explanatory 会多讲解原理
+model | Claude Code 默认使用的模型，如 opus、sonnet
+fallbackModel | 主模型不可用时，依次改用这些模型
+availableModels | 只能选择这些模型；不设置则都能用
+enforceAvailableModels | 开启后默认模型也必须在白名单里
+availableModelsMatch | 白名单按前缀匹配（含新版本）还是精确匹配
+deniedModels | 这些模型一律不能选择
+modelOverrides | 把模型 ID 换成服务商专用 ID（企业用）
+modelPicker.options | 自定义 /model 选择器里显示的模型
+modelPicker.replaceBuiltInOptions | 开启后 /model 只显示你自定义的模型
+modelPricing.multiplier | 费用估算按这个倍率折算，如 0.8 为八折
+modelPricing.overrides | 按模型自定义价格，用于费用估算
+effortLevel | 思考强度：越高越仔细，但更慢、更费 token
+maxEffortLevel | 思考强度上限，超过的一律降到这个值
+modelSettings | 为不同模型分别设置思考强度和压缩窗口
+modelSettings.*.maxEffortLevel | 这个模型的思考强度上限
+modelSettings.*.autoCompactWindow | 这个模型用到多少 token 时自动压缩上下文
+alwaysThinkingEnabled | 关闭后模型不再先思考再回答
+showThinkingSummaries | 开启后显示模型思考过程的摘要
+fastMode | 开启后输出更快，但费用更高
+fastModePerSessionOptIn | 开启后每个新会话都从关闭快速模式开始
+promptCacheTtl | 提示缓存保留 5 分钟还是 1 小时，影响费用
+subagentPromptCacheTtl | 子代理等后台请求的提示缓存时长
+switchModelsOnFlag | 消息被安全机制拦截时，自动换模型继续
+autoContinueAtUsageLimit | 额度用完后，等额度重置自动继续任务
+permissions.allow | 这些操作不用确认，直接执行
+permissions.deny | 这些操作一律禁止，优先级最高
+permissions.defaultMode | 启动时的权限模式，决定哪些操作要你确认
+permissions.disableBypassPermissionsMode | 设为 disable 后无法跳过权限确认
+permissions.blockReadsOutsideWorkingDirectories | 开启后不能读取项目目录以外的文件
+permissions.blockWritesOutsideWorkingDirectories | 开启后不能修改项目目录以外的文件
+permissions.blockFileToolReadsOutsideWorkingDirectories | 仅供宿主程序通过 --settings 传入，写在这里无效
+permissions.blockReadsExemptPaths | 禁止外部读取时仍可读的路径（仅 --settings 有效）
+permissions.workingDirectoriesAsGiven | 宿主程序专用，写在设置文件中无效
+permissions.denyInsteadOfPrompting | 需要确认时直接拒绝，适合无人值守
+permissions.additionalDirectories | 额外允许 Claude 访问的目录
+skipDangerousModePermissionPrompt | 不再弹出跳过权限模式的警告（自动写入）
+skipAutoPermissionPrompt | 不再弹出自动模式的说明（自动写入）
+useAutoModeDuringPlan | 规划模式下也用自动模式判断权限
+disableAutoMode | 设为 disable 后不能使用自动权限模式
+autoMode.allow | 告诉自动模式哪些操作可以直接放行
+autoMode.soft_deny | 自动模式默认拦截、你明确要求时才放行的操作
+autoMode.hard_deny | 自动模式无论如何都会拦截的操作
+autoMode.environment | 告诉自动模式哪些仓库、域名是可信的
+autoMode.classifyAllShell | 开启后每条命令都由自动模式判断，更安全
+sandbox.enabled | 开启后命令在隔离环境中运行，更安全
+sandbox.failIfUnavailable | 沙箱启动失败时直接退出，而不是照常运行
+sandbox.autoAllowBashIfSandboxed | 沙箱内运行的命令不再逐条确认
+sandbox.allowUnsandboxedCommands | 关闭后所有命令都必须在沙箱内运行
+sandbox.network.allowedDomains | 沙箱内可以直接访问的域名
+sandbox.network.deniedDomains | 沙箱内禁止访问的域名
+sandbox.network.strictAllowlist | 开启后白名单外的域名直接拒绝，不再询问
+sandbox.network.allowManagedDomainsOnly | 只认管理员设置的域名白名单
+sandbox.network.allowUnixSockets | 允许沙箱访问的 Unix 套接字，如 Docker（仅 macOS）
+sandbox.network.allowAllUnixSockets | 允许访问所有 Unix 套接字，会削弱隔离
+sandbox.network.allowLocalBinding | 允许沙箱内启动本地服务端口（仅 macOS）
+sandbox.network.allowMachLookup | 允许访问的系统服务，如 iOS 模拟器（仅 macOS）
+sandbox.network.httpProxyPort | 改用你自己的 HTTP 代理转发沙箱流量
+sandbox.network.socksProxyPort | 改用你自己的 SOCKS5 代理转发沙箱流量
+sandbox.filesystem.allowWrite | 沙箱内额外允许写入的路径
+sandbox.filesystem.denyWrite | 沙箱内禁止写入的路径
+sandbox.filesystem.denyRead | 沙箱内禁止读取的路径，如 ~/.ssh
+sandbox.filesystem.allowRead | 在禁止读取的范围内重新放行的路径
+sandbox.filesystem.allowManagedReadPathsOnly | 只认管理员设置的可读路径
+sandbox.filesystem.disabled | 关闭文件隔离，只保留网络隔离
+sandbox.credentials.files | 保护凭据文件：禁止读取，或替换成假值
+sandbox.credentials.envVars | 保护环境变量里的密钥：删除或替换成假值
+sandbox.credentials.allowPlaintextInject | 允许经明文 HTTP 注入真实凭据，不安全
+sandbox.credentials.awsPairs | 指定哪些变量组成一组 AWS 凭据
+sandbox.windows.backend | Windows 沙箱用哪种方式实现
+sandbox.ignoreViolations | 这些命令触发的沙箱违规不再提示
+sandbox.enableWeakerNestedSandbox | 让沙箱能在 Docker 容器里运行，安全性降低（仅 Linux）
+sandbox.allowNestedUserNamespaces | 允许 Chromium 等程序在沙箱内运行，安全性降低
+sandbox.enableWeakerNetworkIsolation | 让 gh、gcloud 等工具能校验代理证书（仅 macOS）
+sandbox.allowAppleEvents | 允许沙箱内用 open、osascript 打开程序（仅 macOS）
+sandbox.excludedCommands | 这些命令不进沙箱，直接运行
+sandbox.bwrapPath | 指定 bubblewrap 程序的位置（管理员设置）
+sandbox.socatPath | 指定 socat 程序的位置（管理员设置）

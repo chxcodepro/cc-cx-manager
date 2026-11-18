@@ -1,0 +1,443 @@
+# Codex config.toml 中文叠加层（对应 Codex CLI 0.170.0，来源 openai/codex 官方 config.schema.json 与 Configuration Reference）
+# 适用文件：~/.codex/config.toml（Windows 为 %USERPROFILE%\.codex\config.toml，可用 CODEX_HOME 改变位置）、<项目>/.codex/config.toml
+
+@category model | 模型与推理 | 10 | 模型、推理强度、推理摘要、服务等级
+@category provider | 模型提供商 | 20 | 内置与自定义模型提供商（OpenAI 兼容接口、本地模型）
+@category auth | 认证与登录 | 30 | 登录方式、凭据存储
+@category sandbox | 沙箱与审批 | 40 | 审批策略、沙箱模式、权限配置档
+@category shell | Shell 与执行 | 50 | 命令执行环境、登录 Shell、后台终端
+@category instructions | 指令与上下文注入 | 60 | 开发者指令、AGENTS.md、注入的上下文块
+@category context | 上下文与压缩 | 70 | 上下文窗口、自动压缩、工具输出上限
+@category mcp | MCP 服务器 | 80 | MCP 服务器定义与 OAuth
+@category tools | 工具 | 90 | 网页搜索、浏览器、电脑操作、工具建议
+@category agents | 多代理与自动审查 | 100 | 子代理、目标、自动审查（Guardian）
+@category plugins | 插件、技能与应用 | 110 | 插件、插件市场、技能、Apps
+@category hooks | Hooks | 120 | 生命周期钩子
+@category memories | 记忆 | 130 | 跨会话记忆
+@category history | 历史、日志与存储 | 140 | 历史记录、日志目录、SQLite 位置
+@category profiles | 配置档（Profiles） | 150 | 用 --profile 快速切换的成套配置
+@category projects | 项目与信任 | 160 | 项目信任级别与项目根目录识别
+@category notice | 通知与提示 | 170 | 外部通知命令与已确认的提示记录
+@category telemetry | 遥测与反馈 | 180 | OpenTelemetry、分析与反馈
+@category realtime | 实时语音 | 190 | 实时语音对话（实验性）
+@category desktop | 桌面端 App | 200 | Codex 桌面端写入的设置
+@category windows | Windows 专属 | 210 | Windows 沙箱
+@category experimental | 实验性 | 220 | 标注为 Experimental / do not use 的选项
+@category other | 其他 | 230
+
+@prefix agents. => agents
+@prefix analytics => telemetry
+@prefix apps => plugins
+@prefix audio => realtime
+@prefix auto_review => agents
+@prefix browser_use => tools
+@prefix cloud => plugins
+@prefix computer_use => tools
+@prefix experimental_ => experimental
+@prefix feedback => telemetry
+@prefix ghost_snapshot => other
+@prefix goals => agents
+@prefix history => history
+@prefix hooks => hooks
+@prefix marketplaces => plugins
+@prefix mcp_ => mcp
+@prefix memories => memories
+@prefix model_providers => provider
+@prefix notice => notice
+@prefix orchestrator => plugins
+@prefix otel => telemetry
+@prefix plugins => plugins
+@prefix projects => projects
+@prefix realtime => realtime
+@prefix sandbox_workspace_write => sandbox
+@prefix shell_environment_policy => shell
+@prefix skills => plugins
+@prefix tool_suggest => tools
+@prefix tools => tools
+@prefix windows => windows
+
+# ---------------- 模型与推理 ----------------
+model | 模型 | model | 使用的模型，例如 gpt-5.5、gpt-5.5-codex 等（以 /model 中可选的为准）；使用自定义提供商时填写其模型名。 | | 一般在 Codex 中用 /model 选择即可 | ex="gpt-5.5"
+model_reasoning_effort | 推理强度 | model | 推理强度，可选值由所选模型决定，常见为 low、medium、high、xhigh、max、ultra。越高思考越充分，但更慢、更费额度。 | "high" | 写代码时质量与速度的平衡点；复杂问题可在会话中临时调高 | type=enum ;; enum=minimal:最低,low:低,medium:中,high:高,xhigh:超高,max:最高,ultra:极限
+plan_mode_reasoning_effort | 规划模式推理强度 | model | 规划（Plan）模式专用的推理强度，不设置时使用规划模式内置的默认值。 | | | ;; type=enum ;; enum=minimal:最低,low:低,medium:中,high:高,xhigh:超高,max:最高,ultra:极限
+model_reasoning_summary | 推理摘要 | model | 是否以及如何输出模型推理过程的摘要：auto 自动、concise 简洁、detailed 详细、none 不输出。 | | | ;; enum=auto:自动,concise:简洁,detailed:详细,none:不输出
+model_verbosity | 回复详略 | model | GPT-5 系列 Responses API 的 text.verbosity：low 简短、medium 适中、high 详细。不设置时使用模型或预设默认值。 | | | ;; enum=low:简短,medium:适中,high:详细
+service_tier | 服务等级 | model | 新回合请求的服务等级：default 标准；fast（对应请求值 priority）更快但消耗更多额度；flex 更便宜但可能更慢。可用值以当前模型支持的为准。 | | | ;; type=enum ;; enum=default:标准,fast:快速（priority）,flex:弹性,priority:优先
+review_model | /review 使用的模型 | model | /review 代码审查功能使用的模型，不设置则用当前模型。 | | | ;; ex="gpt-5.5"
+personality | 个性（旧） | model | 已弃用：friendly 和 pragmatic 不再选择风格；none 会从模型指令中省略内置的 Personality 段落。 | | | ;; dep=friendly / pragmatic 已无效果 ;; enum=none:不加个性段落,friendly:友好（无效）,pragmatic:务实（无效）
+model_catalog_json | 模型目录文件 | model | 自定义 JSON 模型目录文件的路径（仅启动时读取），可让 /model 列出自定义的模型及其能力。 | | | ;; tags=advanced ;; ex="~/.codex/models.json"
+daybreak | Daybreak 偏好 | model | 新线程与非交互回合的 Daybreak 默认偏好（访问计划相关的内部功能）。 | | | ;; tags=internal
+
+# ---------------- 模型提供商 ----------------
+model_provider | 模型提供商 | provider | 使用 model_providers 中的哪个提供商（填其 ID）。内置 openai；也可以填你在 [model_providers.xxx] 中定义的 ID。 | | 用第三方接口时，先在 model_providers 中添加，再在这里选择 | ex="openai"
+openai_base_url | OpenAI 接口地址 | provider | 覆盖内置 openai 提供商的接口地址。 | | | ;; ph=<YOUR_BASE_URL>
+chatgpt_base_url | ChatGPT 接口地址 | provider | ChatGPT 请求（而非 OpenAI API）使用的地址。 | | | ;; tags=advanced ;; ph=<YOUR_BASE_URL>
+oss_provider | 本地模型提供方 | provider | 使用 --oss 本地模型时首选的提供方，例如 lmstudio 或 ollama。 | | | ;; type=enum ;; enum=ollama:Ollama,lmstudio:LM Studio
+model_providers | 自定义模型提供商 | provider | 自定义的模型提供商，扩展内置列表（不能覆盖内置 ID）。每个条目对应一个 [model_providers.<ID>] 表，常用于接入 OpenAI 兼容的第三方服务、企业网关或 Azure。 | | | ;; ex={"myapi":{"name":"My API","base_url":"<YOUR_BASE_URL>","env_key":"MY_API_KEY","wire_api":"responses"}}
+model_providers.*.name | 显示名称 | provider | 提供商的友好显示名称。 | | | ;; ex="My API"
+model_providers.*.base_url | 接口地址 | provider | 提供商 OpenAI 兼容 API 的基础地址（通常以 /v1 结尾）。 | | | ;; ph=<YOUR_BASE_URL>
+model_providers.*.env_key | API Key 环境变量 | provider | 保存该提供商 API Key 的环境变量名。Codex 启动时从环境（含 ~/.codex/.env）读取。 | | 推荐用它配合 .env 保存密钥，而不是把密钥直接写进 config.toml | ex="MY_API_KEY"
+model_providers.*.env_key_instructions | 获取 Key 的说明 | provider | 帮助用户获取并设置该环境变量的说明文字。 | | |
+model_providers.*.wire_api | 接口协议 | provider | 提供商使用的协议。0.170.0 起只支持 responses（Responses API），也是默认值；旧的 chat 已不再支持。 | | | ;; enum=responses:Responses API
+model_providers.*.requires_openai_auth | 需要 OpenAI 登录 | provider | 该提供商是否需要 OpenAI API Key 或 ChatGPT 登录令牌。为 true 时首次运行会显示登录界面。 | | | ;; def=false
+model_providers.*.experimental_bearer_token | Bearer 令牌（不推荐） | provider | 直接写在配置里的 Authorization: Bearer 令牌。出于安全考虑不推荐，优先使用 env_key。 | | | ;; s ;; tags=security ;; ph=<YOUR_API_KEY>
+model_providers.*.http_headers | 附加请求头 | provider | 发往该提供商的额外 HTTP 请求头（名称 → 值）。 | | | ;; ex={"X-Team":"platform"}
+model_providers.*.env_http_headers | 环境变量请求头 | provider | 值取自环境变量的请求头（名称 → 环境变量名），变量不存在时不发送该头。 | | | ;; ex={"X-Api-Org":"MY_ORG_ID"}
+model_providers.*.query_params | 附加查询参数 | provider | 追加到接口地址后的查询参数，例如 Azure 的 api-version。 | | | ;; ex={"api-version":"2025-04-01-preview"}
+model_providers.*.request_max_retries | 请求重试次数 | provider | 对该提供商失败的 HTTP 请求最多重试几次。 | | | ;; ex=4
+model_providers.*.stream_max_retries | 流重连次数 | provider | 流式响应中断后最多重连几次。 | | | ;; ex=5
+model_providers.*.stream_idle_timeout_ms | 流空闲超时 | provider | 流式响应无活动多久（毫秒）视为连接丢失。 | | 中转服务响应慢、经常断流时可调大到 300000 | u=ms
+model_providers.*.supports_websockets | 支持 WebSocket | provider | 该提供商是否支持 Responses API 的 WebSocket 传输。 | | | ;; def=false
+model_providers.*.websocket_connect_timeout_ms | WebSocket 连接超时 | provider | WebSocket 连接尝试的最长等待时间（毫秒）。 | | | ;; u=ms
+model_providers.*.supports_standalone_web_search | 支持独立网页搜索 | provider | 该提供商是否支持独立的网页搜索接口。 | | | ;; def=false
+model_providers.*.model_catalog_url | 模型目录地址 | provider | Codex 原生模型目录的完整 URL。不设置时 OpenAI 的模型发现使用 Codex 后端（除非 base_url 覆盖了推理地址）。 | | | ;; tags=advanced
+model_providers.*.credential_file | Google 凭据文件 | provider | Google ADC 凭据文件的绝对路径，只在认证命令的环境中覆盖 GOOGLE_APPLICATION_CREDENTIALS。 | | | ;; tags=advanced
+model_providers.*.project_id | GCP 项目 ID | provider | 内置 GCP 提供商使用的 Google Cloud 项目 ID，优先于 GOOGLE_CLOUD_PROJECT。 | | |
+model_providers.*.location | GCP 位置 | provider | 内置 GCP 提供商的 Google Cloud 位置，优先于 GOOGLE_CLOUD_LOCATION，都不设置时为 global。 | | | ;; ex="global"
+model_providers.*.gateway_oauth | 网关 OAuth | provider | 通过 OAuth 或凭据导出命令获取的网关访问令牌配置。 | | | ;; tags=enterprise ;; ex={}
+model_providers.*.auth | 命令获取令牌 | provider | 通过运行命令获取 Bearer 令牌（适合需要动态令牌的企业网关）。
+model_providers.*.auth.command | 令牌命令 | provider | 输出令牌的命令，裸命令名按 PATH 查找，路径按 cwd 解析。 | | | ;; ex="get-token"
+model_providers.*.auth.args | 命令参数 | provider | 令牌命令的参数。 | | | ;; ex=["--audience","codex"]
+model_providers.*.auth.cwd | 工作目录 | provider | 运行令牌命令的工作目录。 | | |
+model_providers.*.auth.refresh_interval_ms | 令牌刷新间隔 | provider | 缓存的令牌超过多久（毫秒）重新运行命令，默认 300000。设为 0 只在 401 重试时刷新。 | | | ;; u=ms ;; def=300000
+model_providers.*.auth.timeout_ms | 命令超时 | provider | 等待令牌命令成功退出的最长时间（毫秒，默认 5000）。 | | | ;; u=ms ;; def=5000
+model_providers.*.aws | AWS SigV4 认证 | provider | 该提供商的 AWS SigV4 签名认证配置（如 Amazon Bedrock）。
+model_providers.*.aws.profile | AWS 配置档 | provider | 使用的 AWS profile 名称，不设置时由 AWS SDK 默认凭据链决定。 | | |
+model_providers.*.aws.region | AWS 区域 | provider | 提供商专用接口使用的 AWS 区域。 | | | ;; ex="us-east-1"
+model_providers.*.aws.auth_refresh | 认证刷新命令 | provider | AWS 认证失败（可刷新）后重新认证的命令。
+model_providers.*.aws.auth_refresh.command | 刷新命令 | provider | 直接执行（不经 Shell）的可执行文件。 | | | ;; ex="aws"
+model_providers.*.aws.auth_refresh.args | 刷新参数 | provider | 传给刷新命令的参数。 | | | ;; ex=["sso","login"]
+model_providers.*.aws.auth_refresh.timeout_ms | 刷新超时 | provider | 等待刷新命令完成的最长时间（毫秒，默认 300000）。 | | | ;; u=ms ;; def=300000
+model_providers.*.aws.credential_export | 凭据导出命令 | provider | 用命令导出的凭据替代 AWS SDK 凭据链。
+model_providers.*.aws.credential_export.command | 导出命令 | provider | 直接执行（不经 Shell）的可执行文件。 | | |
+model_providers.*.aws.credential_export.args | 导出参数 | provider | 传给凭据导出命令的参数。 | | |
+model_providers.*.aws.credential_export.timeout_ms | 导出超时 | provider | 等待凭据导出命令完成的最长时间（毫秒，默认 30000）。 | | | ;; u=ms ;; def=30000
+model_providers.*.capabilities | 能力覆盖 | provider | 为自定义的 Responses 兼容提供商覆盖 API 能力，未指定的保持默认。
+model_providers.*.capabilities.cyber_access_programs | 接受访问计划选择 | provider | 提供商是否接受显式的 access_programs.cyber 选择。内置 OpenAI 默认开启，其他默认关闭。 | | | ;; tags=advanced
+model_providers.*.capabilities.external_web_access | 允许实时上网搜索 | provider | 托管的网页搜索是否可以访问实时网络。 | | |
+model_providers.*.capabilities.remote_compaction | 远程压缩协议 | provider | 远程上下文压缩协议：unsupported 不支持，v2 支持；省略则保持提供商默认。 | | | ;; enum=unsupported:不支持,v2:v2
+
+# ---------------- 认证与登录 ----------------
+forced_login_method | 强制登录方式 | auth | 限制可用的登录方式：chatgpt（ChatGPT 账号）或 api（API Key）。 | | | ;; enum=chatgpt:ChatGPT 账号,api:API Key ;; tags=enterprise
+forced_chatgpt_workspace_id | 限定 ChatGPT 工作区 | auth | 只允许登录到指定的 ChatGPT 工作区（UUID，可写一个字符串或数组）。 | | | ;; tags=enterprise ;; ex="00000000-0000-0000-0000-000000000000"
+cli_auth_credentials_store | 登录凭据存储位置 | auth | CLI 登录凭据的存储方式：file（默认）存在 CODEX_HOME 下的 auth.json；keyring 存在系统钥匙串；auto 有钥匙串就用、否则用文件；ephemeral 只保存在内存中。 | "auto" | 建议存入系统钥匙串，避免令牌明文保存；用切号工具时保持 file | enum=file:文件 auth.json,keyring:系统钥匙串,auto:自动,ephemeral:仅内存 ;; tags=security
+mcp_oauth_credentials_store | MCP OAuth 凭据存储 | auth | MCP OAuth 凭据的存储方式：auto（默认）有钥匙串就用；file 存在文件；keyring 系统钥匙串。 | | | ;; enum=auto:自动,file:文件,keyring:系统钥匙串
+check_for_update_on_startup | 启动时检查更新 | other | 启动时检查 Codex 更新并提示。只有集中管理更新时才设为 false。默认 true。 | | | ;; def=true
+
+# ---------------- 沙箱与审批 ----------------
+approval_policy | 审批策略 | sandbox | 什么时候暂停让你批准命令：on-request 由模型在需要越过沙箱时请求批准（交互使用推荐）；never 从不询问（失败直接返回给模型，适合非交互运行）。也可以写 { granular = { … } } 按类别精细控制（请用「原始文本」编辑）。untrusted 已不再支持，on-failure 已弃用。 | "on-request" | 交互使用时既安全又不会频繁打扰 | type=enum ;; enum=on-request:按需请求,never:从不询问,on-failure:失败时询问（已弃用）,untrusted:不信任（已不支持） ;; enumd.never=命令不会弹出审批；配合 workspace-write 沙箱使用，危险操作会被沙箱拦截 ;; tags=security
+approvals_reviewer | 审批由谁审核 | sandbox | 在 on-request 或 granular 策略下，升级的审批请求交给谁：user（默认）由你审核；auto_review 由审查子代理自动审核；guardian_subagent 为旧名称。 | | | ;; enum=user:由我审核,auto_review:自动审查,guardian_subagent:Guardian 子代理（旧） ;; def="user"
+sandbox_mode | 沙箱模式 | sandbox | 命令执行的沙箱：read-only 只读；workspace-write 可写当前工作区（默认禁止联网）；danger-full-access 不使用沙箱（危险）。 | "workspace-write" | 允许修改项目文件、禁止越界写入，是日常开发最均衡的选择 | enum=read-only:只读,workspace-write:可写工作区,danger-full-access:完全访问（危险） ;; tags=security
+sandbox_workspace_write | 可写工作区沙箱设置 | sandbox | sandbox_mode 为 workspace-write 时的附加设置。
+sandbox_workspace_write.network_access | 允许联网 | sandbox | 是否允许沙箱内的命令访问网络（默认 false）。安装依赖、拉取代码等需要联网的命令需要开启。 | | 常要 npm install、pip install 时开启，否则需要批准 | def=false ;; tags=security
+sandbox_workspace_write.writable_roots | 额外可写目录 | sandbox | 除工作区外额外允许写入的目录列表。 | | | ;; ex=["~/.cache","/tmp/build"] ;; pn.windows=Windows 路径例如 D:/cache
+sandbox_workspace_write.exclude_tmpdir_env_var | 不可写 $TMPDIR | sandbox | 为 true 时不把 $TMPDIR 指向的目录加入可写范围（默认 false）。 | | | ;; def=false
+sandbox_workspace_write.exclude_slash_tmp | 不可写 /tmp | sandbox | 为 true 时不把 /tmp 加入可写范围（默认 false）。 | | | ;; def=false ;; p=macos,linux
+default_permissions | 默认权限配置档 | sandbox | 应用到沙箱工具调用的默认权限配置档名称。内置 :read-only、:workspace、:danger-full-access；自定义名称需有对应的 [permissions.<名称>] 表。不要与 sandbox_mode 或 [sandbox_workspace_write] 同时使用。 | | 新的权限模型；用了它就不要再设 sandbox_mode | ex=":workspace"
+permissions | 权限配置档 | sandbox | 命名的权限配置档（新权限模型），每个 [permissions.<名称>] 定义文件系统与网络等访问规则，通过 default_permissions 选用。名称不能以 : 开头，也不能叫 filesystem。 | | | ;; tags=advanced ;; ex={"strict":{"filesystem":{"write":["."]},"network":{"enabled":false}}}
+allow_symlinked_codex_home | 允许 CODEX_HOME 软链接 | sandbox | 允许 macOS 沙箱中位于 CODEX_HOME 内或之下的可写根目录跟随软链接。只在启动时从用户配置读取，默认 false。 | | | ;; p=macos ;; tags=advanced,security
+
+# ---------------- Windows ----------------
+windows | Windows 设置 | windows | Windows 专属配置。 | | | ;; p=windows
+windows.sandbox | Windows 沙箱实现 | windows | 原生 Windows 沙箱的实现方式：mxc（Windows 隔离容器，设备与策略支持时推荐）、elevated（需管理员完成一次初始化的提权沙箱）、unelevated（无需提权、隔离较弱）。显式选择 mxc 但不可用时会失败；想自动选 MXC 并回退，可用 elevated 搭配 features.prefer_mxc。 | | | ;; p=windows ;; rp.windows="elevated" ;; enum=mxc:MXC 隔离容器,elevated:提权沙箱,unelevated:非提权沙箱 ;; enumd.unelevated=仅在无法完成提权初始化且组织策略允许时使用
+windows.allow_mxc | 允许 MXC | windows | 为 false 时同时禁止显式配置 MXC 和自动选择 MXC。 | | | ;; p=windows
+
+# ---------------- Shell 与执行 ----------------
+shell_environment_policy | 命令环境变量策略 | shell | 控制 Codex 通过 Shell 类工具启动进程时传递哪些环境变量。默认会排除名字包含 KEY、SECRET、TOKEN 的变量。
+shell_environment_policy.inherit | 继承范围 | shell | 从 Codex 进程继承哪些环境变量：all 全部、core 只保留核心变量（HOME、PATH、USER 等）、none 不继承。 | | 担心密钥泄露给命令时可改为 core | enum=all:全部,core:核心变量,none:不继承
+shell_environment_policy.ignore_default_excludes | 不使用默认排除 | shell | 为 true 时不再自动排除名字包含 KEY / SECRET / TOKEN 的变量。 | | 保持默认（false）更安全 | tags=security
+shell_environment_policy.exclude | 排除的变量（正则） | shell | 要排除的环境变量名正则列表（旧写法，仍可用）。 | | | ;; ex=["^AWS_","PASSWORD"]
+shell_environment_policy.include_only | 只包含的变量（正则） | shell | 只保留匹配这些正则的环境变量（旧写法）。 | | | ;; ex=["^PATH$","^HOME$"]
+shell_environment_policy.set | 强制设置的变量 | shell | 为命令额外设置（或覆盖）的环境变量。 | | | ;; ex={"CI":"1","PAGER":"cat"}
+shell_environment_policy.filters | 过滤规则（新写法） | shell | 新的规范表写法：模式 → 动作。普通配置仍兼容旧的数组写法，requirements 只接受这种形式。 | | | ;; tags=advanced ;; ex={"^AWS_":"exclude"}
+shell_environment_policy.experimental_use_profile | 加载 Shell 配置文件（实验） | shell | 实验选项：启动命令时加载用户的 Shell profile。 | | | ;; tags=experimental
+allow_login_shell | 允许登录 Shell | shell | 是否允许模型为 Shell 类工具请求登录 Shell（login = true）。默认 true；为 false 时一律使用非登录 Shell。 | | | ;; def=true
+background_terminal_max_timeout | 后台终端轮询窗口 | shell | 后台终端输出（write_stdin）的最长轮询时间（毫秒），默认 300000（5 分钟）。 | | | ;; u=ms ;; def=300000
+experimental_use_unified_exec_tool | 统一执行工具（旧） | shell | 旧的功能开关写法，请改用 [features] 中的 unified_exec。 | | | ;; dep=请改用 features.unified_exec ;; by=features.unified_exec
+
+# ---------------- 指令与上下文注入 ----------------
+developer_instructions | 开发者指令 | instructions | 以 developer 角色消息插入的额外指令，适合放全局偏好（如「回复使用中文」）。项目级规范更适合写在 AGENTS.md。 | | | ;; ex="请使用简体中文回复，代码注释也使用中文。"
+instructions | 系统指令 | instructions | 系统指令文本。 | | | ;; tags=advanced
+model_instructions_file | 模型指令文件 | instructions | 一个文件路径，其内容会替换所选模型的内置指令。官方强烈不建议使用，偏离内置指令可能明显降低效果。 | | 强烈不建议修改 | tags=advanced
+compact_prompt | 压缩提示词 | instructions | 压缩历史对话时使用的提示词。 | | | ;; tags=advanced
+experimental_compact_prompt_file | 压缩提示词文件（实验） | experimental | 从文件读取压缩提示词（绝对路径）。 | | | ;; tags=experimental
+project_doc_max_bytes | AGENTS.md 最大字节数 | instructions | 所有选中环境中项目指令（AGENTS.md 等）内容的总字节上限，默认 32768。 | | AGENTS.md 较长被截断时可调到 65536 | u=字节 ;; def=32768
+project_doc_fallback_filenames | AGENTS.md 备用文件名 | instructions | 找不到 AGENTS.md 时依次尝试的备用文件名，例如兼容其他工具的说明文件。 | | | ;; ex=["CLAUDE.md","CONTRIBUTING.md"]
+include_apps_instructions | 注入 Apps 指令块 | instructions | 是否注入 <apps_instructions> 开发者块。 | | | ;; tags=advanced
+include_collaboration_mode_instructions | 注入协作模式块 | instructions | 是否注入 <collaboration_mode> 开发者块。 | | | ;; tags=advanced
+include_environment_context | 注入环境上下文 | instructions | 是否注入 <environment_context> 用户块（工作目录、沙箱等信息）。 | | | ;; tags=advanced
+include_environment_context_time | 环境上下文含时间 | instructions | 环境上下文中是否包含当前日期与时区。 | | | ;; tags=advanced
+include_permissions_instructions | 注入权限说明块 | instructions | 是否注入 <permissions instructions> 开发者块。 | | | ;; tags=advanced
+
+# ---------------- 上下文与压缩 ----------------
+model_context_window | 上下文窗口 | context | 模型的上下文窗口大小（token）。使用自定义提供商或 Codex 不认识的模型时，用它告诉 Codex 实际窗口大小。 | | | ;; u=tokens ;; ex=272000
+model_auto_compact_token_limit | 自动压缩阈值 | context | token 用量达到多少时自动压缩对话历史。 | | 一般保持默认；上下文窗口很大但想控制成本时可调低 | u=tokens
+model_auto_compact_token_limit_scope | 压缩阈值计算范围 | context | 自动压缩阈值作用于完整上下文（total），还是只计算当前压缩窗口中前缀之后的 token（body_after_prefix）。 | | | ;; enum=total:完整上下文,body_after_prefix:前缀之后
+model_post_turn_compact_threshold_percent | 回合结束压缩阈值 | context | 最终回复后，可用上下文用到百分之多少触发压缩（0~100）。不设置或 0 表示不在回合结束时压缩。 | | | ;; u=% ;; min=0 ;; max=100
+tool_output_token_limit | 工具输出 token 上限 | context | 工具 / 函数输出存入上下文时的 token 预算。 | | | ;; u=tokens
+thread_unload_delay_secs | 线程卸载延迟 | context | app-server 中线程无订阅且无活动多少秒后卸载，默认 60，0 表示立即卸载。 | | | ;; u=秒 ;; def=60 ;; tags=advanced
+
+# ---------------- MCP 服务器 ----------------
+mcp_servers | MCP 服务器 | mcp | Codex 可调用工具的 MCP 服务器。每个条目对应 [mcp_servers.<名称>] 表：本地服务器用 command / args 启动（stdio），远程服务器用 url（Streamable HTTP）。也可以用 codex mcp add 命令添加。 | | | ;; ex={"context7":{"command":"npx","args":["-y","@upstash/context7-mcp"]}}
+mcp_servers.*.command | 启动命令 | mcp | 本地（stdio）MCP 服务器的启动命令。 | | | ;; ex="npx" ;; pn.windows=Windows 上 npx 等命令有时需写成 npx.cmd，或用 cmd 加 /c 参数启动
+mcp_servers.*.args | 命令参数 | mcp | 启动命令的参数。 | | | ;; ex=["-y","@upstash/context7-mcp"]
+mcp_servers.*.env | 环境变量 | mcp | 传给服务器进程的环境变量。 | | | ;; ex={"API_KEY":"<YOUR_API_KEY>"}
+mcp_servers.*.env_vars | 透传的环境变量 | mcp | 从 Codex 环境中透传给服务器的变量名列表（或更详细的对象形式）。 | | | ;; ex=["GITHUB_TOKEN"]
+mcp_servers.*.cwd | 工作目录 | mcp | 启动服务器进程的工作目录。 | | |
+mcp_servers.*.url | 服务器地址 | mcp | 远程 MCP 服务器（Streamable HTTP）的地址。 | | | ;; ph=https://mcp.example.com/mcp
+mcp_servers.*.bearer_token_env_var | 令牌环境变量 | mcp | 远程服务器的 Bearer 令牌所在的环境变量名。 | | | ;; ex="MY_MCP_TOKEN"
+mcp_servers.*.http_headers | 请求头 | mcp | 发往远程服务器的固定请求头。 | | | ;; ex={"X-Client":"codex"}
+mcp_servers.*.env_http_headers | 环境变量请求头 | mcp | 值取自环境变量的请求头（名称 → 环境变量名）。 | | | ;; ex={"Authorization":"MY_MCP_AUTH"}
+mcp_servers.*.http_headers_helper | 请求头生成命令 | mcp | 输出请求头 JSON 的命令，用于动态令牌。 | | | ;; tags=advanced
+mcp_servers.*.auth | 认证方式 | mcp | HTTP MCP 服务器的认证流程：oauth、chatgpt 或 ema_auth（企业托管认证）。 | | | ;; enum=oauth:OAuth,chatgpt:ChatGPT 账号,ema_auth:企业托管认证
+mcp_servers.*.oauth | OAuth 客户端设置 | mcp | MCP OAuth 登录或企业令牌交换的客户端设置。
+mcp_servers.*.oauth.client_id | 客户端 ID | mcp | 授权与令牌交换时使用的 OAuth 客户端 ID。 | | |
+mcp_servers.*.oauth.client_secret | 客户端密钥 | mcp | 预注册客户端交换令牌使用的 OAuth 客户端密钥。 | | | ;; s
+mcp_servers.*.oauth.callback_port | 回调端口 | mcp | 此服务器的固定回调端口，优先于全局 mcp_oauth_callback_port。 | | |
+mcp_servers.*.oauth.callback_url | 回调地址 | mcp | 与该 OAuth 客户端关联的注册回调地址。 | | |
+mcp_servers.*.oauth.authorization_server_issuer | 授权服务器颁发者 | mcp | 企业令牌交换时期望的资源授权服务器 issuer。 | | | ;; tags=enterprise
+mcp_servers.*.oauth.token_endpoint_auth_method | 令牌端点认证方式 | mcp | 企业托管认证客户端的认证方式，设置了密钥时默认 client_secret_basic。 | | | ;; enum=client_secret_basic:Basic,client_secret_post:POST ;; tags=enterprise
+mcp_servers.*.oauth_resource | OAuth 资源 | mcp | OAuth 授权请求中的 resource 参数。 | | | ;; tags=advanced
+mcp_servers.*.scopes | OAuth 权限范围 | mcp | 请求的 OAuth scopes。 | | |
+mcp_servers.*.enabled | 启用 | mcp | 设为 false 可临时禁用该服务器而不删除配置。 | | |
+mcp_servers.*.required | 必需 | mcp | 为 true 时该服务器启动失败会导致 Codex 报错，而不是忽略。 | | |
+mcp_servers.*.startup_timeout_sec | 启动超时（秒） | mcp | 等待服务器启动并完成初始化的秒数（默认约 10 秒）。 | | 用 npx 启动、首次需要下载时可调到 30~60 | u=秒
+mcp_servers.*.startup_timeout_ms | 启动超时（毫秒） | mcp | 以毫秒表示的启动超时。 | | | ;; u=ms
+mcp_servers.*.startup_readiness | 启动就绪条件 | mcp | 启动时要求实时连接（connection），还是可以使用有效的缓存工具目录（catalog）。 | | | ;; enum=connection:实时连接,catalog:可用缓存目录
+mcp_servers.*.tool_timeout_sec | 工具调用超时 | mcp | 单次工具调用的超时秒数（默认约 60 秒）。 | | 工具运行较久（如浏览器自动化）时调大 | u=秒
+mcp_servers.*.enabled_tools | 只启用这些工具 | mcp | 工具白名单，只暴露列出的工具。 | | | ;; ex=["search","fetch"]
+mcp_servers.*.disabled_tools | 禁用这些工具 | mcp | 工具黑名单。 | | | ;; ex=["delete_file"]
+mcp_servers.*.default_tools_approval_mode | 工具默认审批 | mcp | 该服务器工具的默认审批方式：auto 自动、prompt 每次询问、writes 仅写操作询问、approve 直接批准。 | | | ;; enum=auto:自动,prompt:每次询问,writes:写操作询问,approve:直接批准
+mcp_servers.*.tools | 按工具设置 | mcp | 按工具名分别设置审批方式和输出上限。
+mcp_servers.*.tools.*.approval_mode | 审批方式 | mcp | 此工具的审批方式。 | | | ;; enum=auto:自动,prompt:每次询问,writes:写操作询问,approve:直接批准
+mcp_servers.*.tools.*.output_token_limit | 输出 token 上限 | mcp | 此工具输出的 token 预算。 | | | ;; u=tokens
+mcp_servers.*.supports_parallel_tool_calls | 支持并行调用 | mcp | 服务器是否支持并行的工具调用。 | | |
+mcp_servers.*.tool_input_schema_max_bytes | 工具输入 schema 上限 | mcp | 压缩每个工具输入 schema 的字节阈值（默认 5000）。 | | | ;; u=字节 ;; tags=advanced
+mcp_servers.*.omit_tools_from | 从这些模式中省略工具 | mcp | 在 code_mode、deferred、direct 等工具呈现方式中省略该服务器的工具。 | | | ;; tags=advanced
+mcp_servers.*.environment_id | 环境 ID | mcp | 服务器所属的执行环境 ID。 | | | ;; tags=advanced
+mcp_servers.*.name | 名称（旧） | mcp | 为向后兼容保留的显示名称字段。 | | | ;; dep=使用表名作为名称即可
+mcp_oauth_callback_port | MCP OAuth 回调端口 | mcp | MCP OAuth 登录时本地回调服务器使用的固定端口，不设置则由系统随机分配。 | | |
+mcp_oauth_callback_url | MCP OAuth 回调地址 | mcp | MCP OAuth 登录使用的重定向 URI（本地监听仍绑定 127.0.0.1）。 | | | ;; tags=advanced
+mcp_optional_startup_grace_ms | 可选 MCP 启动宽限 | mcp | 构建初始工具目录时等待可选 MCP 服务器的毫秒数（默认 1000），设为 0 则等待各服务器自己的启动超时。 | | | ;; u=ms ;; def=1000
+mcp_enterprise_managed_auth | 企业托管认证 | mcp | 支持企业托管认证（EMA）的 MCP 服务器与插件共享的可信企业 IdP。 | | | ;; tags=enterprise
+mcp_enterprise_managed_auth.idp | 企业 IdP | mcp | 共享的企业授权配置，独立于 Codex 账号凭据。 | | | ;; tags=enterprise
+mcp_enterprise_managed_auth.idp.issuer | Issuer | mcp | 企业 OAuth 发现与身份校验使用的 issuer。 | | | ;; tags=enterprise
+mcp_enterprise_managed_auth.idp.client_id | 客户端 ID | mcp | 在企业 IdP 注册的 OAuth 客户端。 | | | ;; tags=enterprise
+mcp_enterprise_managed_auth.idp.client_secret | 客户端密钥 | mcp | 机密客户端登录与令牌交换使用的密钥，公共客户端省略。 | | | ;; s ;; tags=enterprise
+mcp_enterprise_managed_auth.idp.token_endpoint_auth_method | 认证方式 | mcp | EMA 客户端认证方式，设置了密钥时默认 client_secret_basic。 | | | ;; enum=client_secret_basic:Basic,client_secret_post:POST ;; tags=enterprise
+
+# ---------------- 工具 ----------------
+web_search | 网页搜索模式 | tools | 网页搜索工具模式：disabled 关闭；cached 使用 OpenAI 缓存的索引（更安全，结果可能不是最新）；indexed 使用索引搜索；live 实时联网搜索（最新，但会接触更多不可信内容）。 | | 需要最新信息（新版本文档等）时用 live，否则 cached 更稳妥 | enum=disabled:关闭,cached:缓存索引,indexed:索引搜索,live:实时搜索
+tools | 工具设置 | tools | 嵌套的工具设置。
+tools.client_search_provider | 搜索提供方偏好 | tools | 模型没有指定时客户端使用的搜索提供方：standalone 或 search_mcp。 | | | ;; enum=standalone:独立搜索,search_mcp:搜索 MCP
+tools.web_search | 网页搜索参数 | tools | 网页搜索工具的细节参数。
+tools.web_search.context_size | 搜索上下文大小 | tools | 搜索结果提供给模型的上下文量：low、medium、high。 | | | ;; enum=low:少,medium:中,high:多
+tools.web_search.allowed_domains | 限定搜索域名 | tools | 只在这些域名内搜索。 | | | ;; ex=["docs.python.org","developer.mozilla.org"]
+tools.web_search.location | 搜索地理位置 | tools | 用于本地化搜索结果的大致位置。
+tools.web_search.location.country | 国家 | tools | 国家代码，例如 CN、US。 | | | ;; ex="CN"
+tools.web_search.location.region | 地区 | tools | 省 / 州等地区。 | | | ;; ex="Shanghai"
+tools.web_search.location.city | 城市 | tools | 城市名。 | | | ;; ex="Shanghai"
+tools.web_search.location.timezone | 时区 | tools | IANA 时区，例如 Asia/Shanghai。 | | | ;; ex="Asia/Shanghai"
+tools.experimental_request_user_input | 向用户提问工具 | tools | 实验性的 request_user_input 工具（让模型向你提问）。
+tools.experimental_request_user_input.enabled | 启用 | tools | 是否启用向用户提问工具（默认 true）。 | | | ;; def=true
+tools.update_plan | 更新计划工具 | tools | update_plan 工具设置。
+tools.update_plan.enabled | 启用 | tools | 是否启用 update_plan 工具（默认 false）。 | | | ;; def=false
+tool_suggest | 工具推荐 | tools | 可以推荐安装的额外工具。
+tool_suggest.discoverables | 可发现的工具 | tools | 可以被推荐安装的工具列表。 | | | ;; ex=[]
+tool_suggest.disabled_tools | 不推荐的工具 | tools | 不再推荐的工具列表。 | | | ;; ex=[]
+browser_use | 浏览器操作 | tools | 浏览器操作（Browser Use）的访问策略。
+browser_use.allow_history_access | 允许读取浏览历史 | tools | 是否允许浏览器操作读取浏览历史。 | | | ;; tags=security
+browser_use.default_origin_policy | 默认站点策略 | tools | 未单独配置的站点使用的默认策略。
+browser_use.default_origin_policy.access | 访问 | tools | 是否允许访问站点。 | | | ;; enum=allow:允许,deny:拒绝
+browser_use.default_origin_policy.downloads | 下载 | tools | 是否允许下载文件。 | | | ;; enum=allow:允许,deny:拒绝
+browser_use.default_origin_policy.uploads | 上传 | tools | 是否允许上传文件。 | | | ;; enum=allow:允许,deny:拒绝
+browser_use.default_origin_policy.full_cdp_access | 完整 CDP 访问 | tools | 是否允许完整的 Chrome DevTools 协议访问。 | | | ;; enum=allow:允许,deny:拒绝 ;; tags=security
+browser_use.origins | 按站点策略 | tools | 按站点设置策略，键为 <协议>://<主机模式>[:端口]，支持 *.example.com（仅子域）和 **.example.com（含主域）。TOML 中需加引号，如 [browser_use.origins."https://**.example.com"]。 | | | ;; ex={"https://**.example.com":{"access":"allow"}}
+browser_use.origins.*.access | 访问 | tools | 是否允许访问该站点。 | | | ;; enum=allow:允许,deny:拒绝
+browser_use.origins.*.downloads | 下载 | tools | 是否允许从该站点下载。 | | | ;; enum=allow:允许,deny:拒绝
+browser_use.origins.*.uploads | 上传 | tools | 是否允许向该站点上传。 | | | ;; enum=allow:允许,deny:拒绝
+browser_use.origins.*.full_cdp_access | 完整 CDP 访问 | tools | 是否允许对该站点使用完整 CDP。 | | | ;; enum=allow:允许,deny:拒绝
+computer_use | 电脑操作 | tools | 电脑操作（Computer Use）的应用访问控制。
+computer_use.default_app_access | 默认应用访问 | tools | 未单独配置的应用是否允许被操作。 | | | ;; enum=allow:允许,deny:拒绝 ;; tags=security
+computer_use.macos | macOS 应用 | tools | macOS 上按 Bundle ID 配置应用访问。 | | | ;; p=macos
+computer_use.macos.bundle_ids | Bundle ID 规则 | tools | 应用 Bundle ID 到 allow / deny 的映射。 | | | ;; p=macos ;; ex={"com.apple.Terminal":"deny"}
+computer_use.windows | Windows 应用 | tools | Windows 上按 AUMID 或可执行文件配置应用访问。 | | | ;; p=windows
+computer_use.windows.aumids | AUMID 规则 | tools | 应用 AUMID 到 allow / deny 的映射。 | | | ;; p=windows ;; ex={"Microsoft.WindowsTerminal_8wekyb3d8bbwe!App":"deny"}
+computer_use.windows.exes | 可执行文件规则 | tools | 按可执行文件配置应用访问。 | | | ;; p=windows ;; ex={"notepad.exe":"allow"}
+
+# ---------------- 多代理与自动审查 ----------------
+agents | 多代理 | agents | 子代理（多代理）相关设置。
+agents.enabled | 启用多代理工具 | agents | 是否启用多代理工具，默认 true。features.multi_agent_v2 开启时以它为准。 | | | ;; def=true
+agents.default_subagent_model | 子代理默认模型 | agents | 创建子代理时未指定模型则使用此模型。 | | 想节省额度时可设为更便宜的模型 | ex="gpt-5.5-mini"
+agents.default_subagent_reasoning_effort | 子代理默认推理强度 | agents | 创建子代理时未指定推理强度则使用此值。 | | | ;; type=enum ;; enum=low:低,medium:中,high:高,xhigh:超高
+agents.max_concurrent_threads_per_session | 并发子代理上限 | agents | 每个会话可同时打开的子代理线程数上限，不设置则使用后端默认值。 | | |
+agents.max_depth | 子代理嵌套深度 | agents | V1 子代理线程的最大嵌套深度（V2 忽略）。 | | |
+agents.interrupt_message | 记录中断消息 | agents | 代理回合被中断时是否记录一条模型可见的消息，默认 true。 | | | ;; def=true
+goals | 目标 | agents | 目标（Goals）相关设置。
+goals.max_goal_token_budget | 目标 token 预算上限 | agents | 单个目标允许的最大 token 预算，也是新目标的默认预算。 | | | ;; u=tokens
+auto_review | 自动审查 | agents | 自动审查器（Guardian）的策略设置，配合 approvals_reviewer = "auto_review" 使用。
+auto_review.policy | 审查策略 | agents | 插入审查器提示中的额外策略说明，例如「禁止修改 .github 目录」。 | | | ;; ex="不允许删除仓库外的任何文件"
+auto_review.timeout_ms | 审查超时 | agents | 一次审查的总预算（毫秒，含准备与重试），默认 90000，0 表示不设审查截止时间。 | | | ;; u=ms ;; def=90000
+auto_review.circuit_break_action | 熔断行为 | agents | 熔断中断时是否写入结构化错误：default 或 strict（旧客户端读取共享历史时可能不认识）。 | | | ;; enum=default:默认,strict:严格 ;; def="default"
+auto_review.conversation_history_max_output_tokens | 历史工具输出上限 | agents | 审查器读取对话历史时每次响应的 token 上限（默认 4000）。 | | | ;; u=tokens ;; def=4000
+auto_review.experimental_conversation_history_prompt | 历史读取提示（实验） | agents | 实验性：替换历史检索说明的提示词，留空使用内置提示。 | | | ;; tags=experimental
+
+# ---------------- 插件、技能与应用 ----------------
+plugins | 插件 | plugins | 插件默认设置与按插件设置，键为精确的「插件@市场」ID。 | | | type=record ;; ex={"my-plugin@my-market":{"enabled":true}}
+plugins._default | 插件默认值 | plugins | 已安装插件的默认启用设置。显式的插件设置会覆盖它，但不能启用被来源禁用的插件。
+plugins._default.enabled | 默认启用插件 | plugins | 已安装插件默认是否启用（默认 true）。 | | | ;; def=true
+plugins.*.enabled | 启用 | plugins | 关闭后 Codex 不加载这个插件 | | | type=boolean
+marketplaces | 插件市场 | plugins | 用户级插件市场条目，以市场名为键。通常由 codex plugin 命令自动维护。 | | | ;; ex={"my-market":{"source_type":"git","source":"https://github.com/me/codex-plugins.git"}}
+marketplaces.*.source_type | 来源类型 | plugins | 市场来源类型：git 或 local。 | | | ;; enum=git:Git 仓库,local:本地目录
+marketplaces.*.source | 来源地址 | plugins | 添加市场时使用的来源（Git 地址或本地路径）。 | | |
+marketplaces.*.ref | Git 引用 | plugins | source_type 为 git 时检出的分支 / 标签 / 提交。 | | | ;; ex="main"
+marketplaces.*.sparse_paths | 稀疏检出路径 | plugins | source_type 为 git 时的稀疏检出路径。 | | |
+marketplaces.*.last_revision | 最后版本（自动） | plugins | Codex 最后成功启用的 Git 版本，由程序自动记录。 | | | ;; tags=internal
+marketplaces.*.last_updated | 最后更新时间（自动） | plugins | 最后成功添加或刷新市场的时间，由程序自动记录。 | | | ;; tags=internal
+skills | 技能 | plugins | 用户级技能配置。
+skills.bundled | 内置技能 | plugins | 内置技能设置。
+skills.bundled.enabled | 启用内置技能 | plugins | 是否启用 Codex 自带的技能（默认 true）。 | | | ;; def=true
+skills.config | 技能配置 | plugins | 按 SKILL.md 路径设置的技能配置条目。 | | | ;; ex=[]
+skills.include_instructions | 注入技能说明 | plugins | 每个回合是否注入自动的技能说明块。 | | |
+skills.max_context_tokens | 技能目录 token 上限 | plugins | 可用技能目录最多占用的 token，默认为上下文窗口的 2%，设置时上限 10000。 | | | ;; u=tokens
+apps | Apps | plugins | Apps（连接器）相关控制。
+apps._default | Apps 默认设置 | plugins | 所有 App 的默认设置。
+apps._default.enabled | 启用 Apps | plugins | 为 false 时除非单独开启，否则禁用所有 App（默认 true）。 | | | ;; def=true
+apps._default.approvals_reviewer | 审批审核者 | plugins | App 审批请求默认由谁审核。 | | | ;; enum=user:由我审核,auto_review:自动审查,guardian_subagent:Guardian 子代理（旧）
+apps._default.default_tools_approval_mode | 工具默认审批 | plugins | App 工具的默认审批方式。 | | | ;; enum=auto:自动,prompt:每次询问,writes:写操作询问,approve:直接批准
+apps._default.destructive_enabled | 允许破坏性工具 | plugins | 是否默认允许标记为 destructive 的工具。 | | | ;; tags=security
+apps._default.open_world_enabled | 允许开放世界工具 | plugins | 是否默认允许标记为 open_world 的工具（会访问外部世界）。 | | |
+apps_mcp_product_sku | Apps MCP 产品 SKU | plugins | 宿主托管的 Codex Apps MCP 请求附带的产品 SKU。 | | | ;; tags=internal
+cloud | 云端功能 | plugins | 云端功能设置。
+cloud.skills | 云端技能 | plugins | 云端技能默认允许，需要宿主提供云提供方。
+cloud.skills.enabled | 启用云端技能 | plugins | 是否启用云端技能。 | | |
+orchestrator | 编排器 | plugins | 编排器相关功能设置。 | | | ;; tags=internal
+orchestrator.mcp | 编排器 MCP | plugins | 编排器 MCP 功能。 | | | ;; tags=internal
+orchestrator.mcp.enabled | 启用 | plugins | 是否启用编排器 MCP。 | | | ;; tags=internal
+orchestrator.skills | 编排器技能（旧） | plugins | 为兼容保留的无效设置，请用 cloud.skills。 | | | ;; dep=请改用 cloud.skills ;; by=cloud.skills
+orchestrator.skills.enabled | 启用（旧） | plugins | 无效设置，请用 cloud.skills.enabled。 | | | ;; dep=请改用 cloud.skills.enabled ;; by=cloud.skills.enabled
+
+# ---------------- Hooks ----------------
+hooks | Hooks 钩子 | hooks | 生命周期钩子：在 TOML 中内联配置，或写在 hooks.json 中（需要 features.hooks 开启，0.170.0 默认开启）。每个事件是「匹配器 + 命令」列表，结构与 Claude Code hooks 类似。 | | hooks 会以你的身份执行命令，只添加信任的脚本 | tags=security
+hooks.SessionStart | 会话开始 | hooks | 会话开始时运行。 | | | ;; ex=[{"hooks":[{"type":"command","command":"echo session started"}]}]
+hooks.SessionEnd | 会话结束 | hooks | 会话结束时运行。 | | | ;; ex=[{"hooks":[{"type":"command","command":"echo bye"}]}]
+hooks.UserPromptSubmit | 提交提示 | hooks | 用户提交提示后、模型处理前运行，可用于检查或补充提示。 | | | ;; ex=[{"hooks":[{"type":"command","command":"python3 ~/.codex/hooks/check_prompt.py"}]}]
+hooks.PreToolUse | 工具调用前 | hooks | 工具调用前运行，可据此拦截危险操作。 | | | ;; ex=[{"matcher":"shell","hooks":[{"type":"command","command":"python3 ~/.codex/hooks/guard.py"}]}]
+hooks.PostToolUse | 工具调用后 | hooks | 工具调用完成后运行，例如自动格式化改动的文件。 | | | ;; ex=[{"matcher":"apply_patch","hooks":[{"type":"command","command":"npx prettier --write ."}]}]
+hooks.PermissionRequest | 权限请求 | hooks | 出现权限 / 审批请求时运行。 | | | ;; ex=[{"hooks":[{"type":"command","command":"notify-send Codex 需要审批"}]}]
+hooks.PreModelRequest | 模型请求前 | hooks | 每次向模型发送请求前运行。 | | | ;; ex=[]
+hooks.PostModelRequest | 模型请求后 | hooks | 每次模型请求完成后运行。 | | | ;; ex=[]
+hooks.PreCompact | 压缩前 | hooks | 上下文压缩前运行。 | | | ;; ex=[]
+hooks.PostCompact | 压缩后 | hooks | 上下文压缩后运行。 | | | ;; ex=[]
+hooks.Stop | 回合结束 | hooks | 代理完成回合时运行，可用于发送完成通知。 | | | ;; ex=[{"hooks":[{"type":"command","command":"echo done"}]}]
+hooks.SubagentStart | 子代理开始 | hooks | 子代理启动时运行。 | | | ;; ex=[]
+hooks.SubagentStop | 子代理结束 | hooks | 子代理结束时运行。 | | | ;; ex=[]
+hooks.Interrupt | 中断 | hooks | 回合被中断时运行。 | | | ;; ex=[]
+hooks.state | Hook 信任状态 | hooks | 记录各 hook（含插件 hook）的启用与信任状态，由 Codex 在你确认信任后自动写入。 | | | ;; tags=internal
+hooks.state.*.enabled | 启用 | hooks | 该 hook 是否启用。 | | | ;; tags=internal
+hooks.state.*.trusted_hash | 信任哈希 | hooks | 已信任的 hook 内容哈希。 | | | ;; tags=internal
+hooks.state.*.trusted_content_hash | 信任内容哈希 | hooks | 已批准的插件内容哈希。 | | | ;; tags=internal
+
+# ---------------- 记忆 ----------------
+memories | 记忆 | memories | 跨会话记忆子系统设置（需要 features.memories 开启）。
+memories.generate_memories | 生成记忆 | memories | 为 false 时新线程以 memory_mode = disabled 保存，不再从中生成记忆。 | | |
+memories.use_memories | 使用记忆 | memories | 为 false 时不在开发者提示中注入记忆使用说明。 | | |
+memories.version | 记忆流程版本 | memories | 选择记忆流程：v1 或 v2。新配置在启用记忆时默认 v2。 | | | ;; enum=v1:v1,v2:v2
+memories.dual_write | 双写 | memories | 选择 v1 时同时生成两种版本；切换后只运行 v2。 | | | ;; tags=advanced
+memories.extract_model | 摘要模型 | memories | 线程摘要使用的模型。 | | |
+memories.consolidation_model | 整理模型 | memories | 记忆整理使用的模型。 | | |
+memories.consolidation_service_tier | 整理服务等级 | memories | 记忆整理的服务等级，默认 default（标准）。 | | | ;; ex="flex"
+memories.dedicated_tools | 专用记忆工具 | memories | 为 true 时通过扩展工具暴露专用的记忆工具。 | | |
+memories.disable_on_external_context | 外部上下文时停用 | memories | 为 true 时，引入外部上下文的线程会被标记为 polluted，不用于记忆。 | | | ;; tags=security
+memories.max_raw_memories_for_consolidation | 整理保留条数 | memories | 全局整理时保留的最近原始记忆条数上限。 | | |
+memories.max_rollout_age_days | 线程最大天数 | memories | 用于生成记忆的线程最大年龄（天）。 | | | ;; u=天
+memories.max_rollouts_per_startup | 每次处理线程数 | memories | 每轮处理的线程候选数上限。 | | |
+memories.max_unused_days | 记忆过期天数 | memories | 记忆多少天未被使用后不再参与选择。 | | | ;; u=天
+memories.min_rate_limit_remaining_percent | 额度剩余下限 | memories | Codex 额度窗口剩余百分比低于此值时不运行记忆任务，避免占用额度。 | | | ;; u=%
+memories.min_rollout_idle_hours | 线程空闲时长 | memories | 线程最后活动后至少空闲多少小时才生成记忆（建议大于 12 小时）。 | | | ;; u=小时
+
+# ---------------- 历史、日志与存储 ----------------
+history | 历史记录 | history | 控制是否以及如何写入 ~/.codex/history.jsonl。
+history.persistence | 保存历史 | history | save-all 保存所有提示历史（默认）；none 不写入磁盘。 | | | ;; enum=save-all:全部保存,none:不保存 ;; def="save-all"
+history.max_bytes | 历史文件上限 | history | 历史文件的最大字节数，超出后丢弃最旧的条目。 | | 长期使用历史文件会持续增长，可设 10485760（10MB） | u=字节
+log_dir | 日志目录 | history | 日志目录。显式设置后 SQLite 日志库也放在这里，并启用纯文本的 codex-tui.log。不设置时为 $CODEX_HOME/log。 | | 排查问题时临时设置 | ex="./.codex-log"
+sqlite_home | SQLite 目录 | history | Codex 保存 SQLite 状态数据库的目录，默认为 $CODEX_SQLITE_HOME，否则为 $CODEX_HOME。 | | | ;; tags=advanced
+
+# ---------------- 配置档 ----------------
+profile | 默认配置档 | profiles | 默认使用 profiles 中的哪个配置档；命令行 --profile 优先。 | | | ;; ex="fast"
+profiles | 配置档 | profiles | 命名的配置档，每个 [profiles.<名称>] 可覆盖 model、model_provider、approval_policy、sandbox_mode、推理强度等常用项，用 codex --profile <名称> 切换。 | | | ;; ex={"fast":{"model":"gpt-5.5","model_reasoning_effort":"low"},"deep":{"model_reasoning_effort":"xhigh"}}
+
+# ---------------- 项目与信任 ----------------
+projects | 项目信任 | projects | 按项目路径记录信任级别，键为项目的绝对路径。首次在目录中运行 Codex 并选择信任时自动写入。 | | | ;; ex={"D:/work/app":{"trust_level":"trusted"}}
+projects.*.trust_level | 信任级别 | projects | trusted 信任（可使用项目的 .codex 配置等）；untrusted 不信任。 | | | ;; enum=trusted:信任,untrusted:不信任 ;; tags=security
+project_root_markers | 项目根目录标记 | projects | 向上查找 .codex 目录时用来识别项目根目录的标记文件，默认 [".git"]。 | | | ;; ex=[".git",".hg","package.json"]
+
+# ---------------- 通知与提示 ----------------
+notify | 通知命令 | notice | 需要通知时执行的外部命令（数组形式），会收到包含事件信息的 JSON 参数，常用于桌面通知。 | | | ;; ex=["python3","/Users/me/.codex/notify.py"] ;; pn.windows=例如 ["powershell","-NoProfile","-File","C:/Users/me/.codex/notify.ps1"] ;; pn.linux=例如 ["notify-send","Codex"]
+notice | 已确认的提示 | notice | 记录你已确认或关闭的各种产品内提示（与通知不同），通常由 Codex 自动写入。 | | | ;; tags=internal
+notice.hide_full_access_warning | 已确认完全访问警告 | notice | 已确认过「完全访问」模式的警告。 | | | ;; tags=internal
+notice.hide_world_writable_warning | 已确认可写目录警告 | notice | 已确认过 Windows 全局可写目录的警告。 | | | ;; tags=internal ;; p=windows
+notice.hide_rate_limit_model_nudge | 关闭限额换模型提醒 | notice | 不再显示「触发限额时切换模型」的提醒。 | | |
+notice.hide_gov_cloud_guidance | 已确认 GovCloud 指引 | notice | 已确认过 AWS GovCloud 指引。 | | | ;; tags=internal
+notice.hide_gpt5_1_migration_prompt | 已看过模型迁移提示 | notice | 已看过模型迁移提示。 | | | ;; tags=internal
+notice.hide_gpt-5.1-codex-max_migration_prompt | 已看过 codex-max 迁移提示 | notice | 已看过 gpt-5.1-codex-max 迁移提示。 | | | ;; tags=internal
+notice.fast_default_opt_out | 不使用快速默认值 | notice | 记录你是否选择不使用 Codex 管理的快速默认设置。 | | | ;; tags=internal
+notice.model_migrations | 已确认的模型迁移 | notice | 已确认的模型迁移记录（旧模型 → 新模型）。 | | | ;; tags=internal
+notice.external_config_migration_prompts | 外部配置迁移提示 | notice | 记录在哪些范围内不再提示迁移外部配置。 | | | ;; tags=internal
+notice.external_config_migration_prompts.home | 主目录不再提示 | notice | 是否隐藏主目录级的外部配置迁移提示。 | | | ;; tags=internal
+notice.external_config_migration_prompts.home_last_prompted_at | 主目录上次提示时间 | notice | 上次显示主目录级迁移提示的时间。 | | | ;; tags=internal
+notice.external_config_migration_prompts.project_last_prompted_at | 项目上次提示时间 | notice | 上次显示各项目迁移提示的时间。 | | | ;; tags=internal
+notice.external_config_migration_prompts.projects | 不再提示的项目 | notice | 选择不再提示迁移的项目路径。 | | | ;; tags=internal
+
+# ---------------- 遥测与反馈 ----------------
+analytics | 分析数据 | telemetry | OpenAI 分析数据设置。自定义的 OTLP 指标导出由 otel.metrics_exporter 控制。
+analytics.enabled | 启用分析数据 | telemetry | 为 false 时在本机关闭 Codex 各产品的 OpenAI 分析数据。自定义 OTLP 导出不受影响。 | false | 保护隐私，不影响任何功能
+feedback | 反馈 | telemetry | 反馈收集设置。
+feedback.enabled | 启用反馈上传 | telemetry | 为 false 时关闭反馈上传与后台 Guardian 审查记录保留，本地导出仍可用。 | | |
+otel | OpenTelemetry | telemetry | OpenTelemetry 导出配置（日志、追踪、指标）。默认不导出到你的收集器。
+otel.environment | 环境标签 | telemetry | 为追踪标注环境（dev、staging、prod、test），默认 dev。 | | | ;; ex="dev"
+otel.exporter | 日志导出器 | telemetry | 日志导出器，例如 none，或 { otlp-http = { endpoint = "…", protocol = "binary" } }。 | | | ;; ex={"otlp-http":{"endpoint":"<YOUR_OTLP_ENDPOINT>","protocol":"binary"}}
+otel.trace_exporter | 追踪导出器 | telemetry | 追踪导出器，格式同 otel.exporter。 | | | ;; ex={"otlp-grpc":{"endpoint":"<YOUR_OTLP_ENDPOINT>"}}
+otel.metrics_exporter | 指标导出器 | telemetry | 指标导出器，默认 statsig（跟随 analytics.enabled）；none 关闭指标导出；也可配置 OTLP。 | | | ;; ex="none"
+otel.log_user_prompt | 记录用户提示 | telemetry | 是否在追踪中记录用户提示内容。 | | | ;; tags=security
+otel.log_agent_responses | 记录代理回复 | telemetry | 是否把主代理与子代理的最终回复写入 OTLP 日志（默认 false，最多 64KiB）。 | | | ;; tags=security
+otel.log_guardian_assessments | 记录审查结论 | telemetry | 是否把完成的 Guardian 审查结论写入 OTLP 日志（默认 false）。 | | |
+otel.log_sse_deltas | 记录流式增量事件 | telemetry | 是否记录以 .delta 结尾的成功 SSE 事件（默认 true），关闭后仍保留错误、完成事件和指标。 | | | ;; def=true
+otel.tool_result | 工具结果日志 | telemetry | 工具结果写入日志的字节上限设置。
+otel.tool_result.max_bytes | 工具结果最大字节 | telemetry | 工具结果日志在截断提示前的最大 UTF-8 字节数（默认 2048）。 | | | ;; u=字节 ;; def=2048
+otel.span_attributes | 追踪附加属性 | telemetry | 添加到每个导出 span 的属性。 | | | ;; ex={"team":"platform"}
+otel.tracestate | tracestate 字段 | telemetry | 要写入 W3C tracestate 的 key:value 字段（分号分隔）。 | | | ;; tags=advanced ;; ex="vendor:value"
+otel.headers_helper | 请求头生成命令 | telemetry | 为 OTLP HTTP 导出器输出请求头 JSON 的命令，在 CODEX_HOME 下运行。仓库内的配置不能设置 OTel 选项。 | | | ;; tags=advanced
+otel.headers_helper_refresh_interval_ms | 请求头刷新间隔 | telemetry | 请求头命令的执行间隔（毫秒，默认 29 分钟）。 | | | ;; u=ms
+
+# ---------------- 实时语音 ----------------
+realtime | 实时会话 | realtime | 实验性的实时语音会话选择：version 控制 v1/v2/v3，type 控制对话或转写。 | | | ;; tags=experimental
+realtime.version | 版本 | realtime | 实时会话协议版本。 | | | ;; enum=v1:v1,v2:v2,v3:v3 ;; tags=experimental
+realtime.type | 类型 | realtime | conversational 语音对话；transcription 语音转写。 | | | ;; enum=conversational:对话,transcription:转写 ;; tags=experimental
+realtime.transport | 传输方式 | realtime | webrtc 或 websocket。 | | | ;; enum=webrtc:WebRTC,websocket:WebSocket ;; tags=experimental
+realtime.voice | 语音音色 | realtime | 实时语音使用的音色。 | | | ;; tags=experimental
+audio | 音频设备 | realtime | 本机实时语音的音频设备偏好。
+audio.microphone | 麦克风 | realtime | 使用的麦克风设备名称。 | | |
+audio.speaker | 扬声器 | realtime | 使用的扬声器设备名称。 | | |
+audio.microphone_channel | 麦克风声道 | realtime | 要混合的麦克风声道（从 1 开始），不设置则混合所有输入声道。 | | | ;; ex=[1]
+experimental_realtime_ws_base_url | 实时 WebSocket 地址 | experimental | 实验 / 请勿使用：只覆盖实时对话 WebSocket（/v1/realtime）的基础地址。 | | | ;; tags=experimental
+experimental_realtime_webrtc_call_base_url | 实时 WebRTC 地址 | experimental | 实验 / 请勿使用：只覆盖 WebRTC 实时通话创建的基础地址。 | | | ;; tags=experimental
+experimental_realtime_ws_model | 实时模型 | experimental | 实验 / 请勿使用：实时 WebSocket 连接使用的模型。 | | | ;; tags=experimental
+experimental_realtime_ws_backend_prompt | 实时传输指令 | experimental | 实验 / 请勿使用：只覆盖实时对话 WebSocket 的传输指令。 | | | ;; tags=experimental
+experimental_realtime_ws_startup_context | 实时启动上下文 | experimental | 实验 / 请勿使用：替换实时会话的启动上下文，空字符串表示不注入。 | | | ;; tags=experimental
+experimental_realtime_start_instructions | 实时开始指令 | experimental | 实验 / 请勿使用：替换实时会话激活时插入的指令。 | | | ;; tags=experimental
+experimental_thread_store | 线程存储实现 | experimental | 实验 / 请勿使用：选择线程存储实现。 | | | ;; tags=experimental
+experimental_thread_store.type | 类型 | experimental | 目前只有 local。 | | | ;; enum=local:本地 ;; tags=experimental
+
+# ---------------- 其他 ----------------
+desktop | 桌面端设置 | desktop | Codex 桌面端 App 保存的界面设置（主题、外观、行为等），结构不公开，由桌面端自动读写。一般不需要手动编辑。 | | 请在桌面端 App 的设置界面中修改 | tags=desktop ;; ex={"appearanceTheme":"system"}
+file_opener | 文件链接打开方式 | tui | 模型输出中引用的文件会用此编辑器的 URI 生成可点击链接：vscode、vscode-insiders、windsurf、cursor 或 none。 | | | ;; enum=vscode:VS Code,vscode-insiders:VS Code Insiders,windsurf:Windsurf,cursor:Cursor,none:不生成链接
+hide_agent_reasoning | 隐藏推理过程 | tui | 为 true 时在界面和输出中隐藏代理推理事件，默认 false。 | | | ;; def=false
+show_raw_agent_reasoning | 显示原始推理内容 | tui | 为 true 时显示原始推理内容事件（模型提供时），默认 false。 | | | ;; def=false
+disable_paste_burst | 关闭粘贴突发检测（旧） | tui | 旧位置的 tui.disable_paste_burst，请改用 [tui] 中的设置。 | | | ;; by=tui.disable_paste_burst
+suppress_unstable_features_warning | 不提示不稳定功能 | other | 不再警告开启了不稳定（开发中）的功能。 | | |
+responses_api_metadata | 请求元数据 | other | 附加到每个 Responses API 请求的受限元数据（由产品维护）。 | | | ;; tags=internal
+ghost_snapshot | ghost_snapshot（旧） | other | 为兼容旧配置保留的设置，均已无效果。 | | | ;; dep=已无效果，可删除
+ghost_snapshot.disable_warnings | 关闭警告（旧） | other | 已无效果。 | | | ;; dep=已无效果
+ghost_snapshot.ignore_large_untracked_dirs | 忽略大目录（旧） | other | 已无效果。 | | | ;; dep=已无效果
+ghost_snapshot.ignore_large_untracked_files | 忽略大文件（旧） | other | 已无效果。 | | | ;; dep=已无效果

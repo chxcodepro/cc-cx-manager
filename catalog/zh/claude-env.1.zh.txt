@@ -1,0 +1,143 @@
+# Claude Code 环境变量中文叠加层（第 2 部分）
+
+# ---------------- 功能开关 ----------------
+CLAUDE_CODE_DISABLE_PERMISSION_PROMPT_NOTIFY_HOOKS | 权限请求不触发通知 Hook | features | 设为 1 后，在把权限请求转给 Agent SDK canUseTool 回调的会话（如 Claude Desktop）中，不再为未回答的权限请求运行 Notification hooks。 | | | ;; tags=advanced
+CLAUDE_CODE_DISABLE_POLICY_SKILLS | 不加载系统托管技能 | features | 设为 1 跳过加载系统级托管技能目录中的技能，适合不应加载运维预置技能的容器或 CI 会话。 | | |
+CLAUDE_CODE_DISABLE_POWERSHELL_CMD_RM_DENY | 关闭 PowerShell 删除保护 | sandbox | 设为 1 关闭 PowerShell 工具对系统路径（如盘符根目录、主目录）执行 cmd 内置 rd、rmdir、del、erase 的拦截。 | | 不建议开启 | p=windows ;; tags=security
+CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK | 关闭拦截后自动换模型 | model | 设为 1 关闭安全分类器标记请求时自动切换模型（即 switchModelsOnFlag 控制的行为）。 | | |
+CLAUDE_CODE_DISABLE_STRUCTURED_OUTPUTS | 不发送结构化输出参数 | network | 设为 1 不发送 output_config.format 结构化输出字段及配套的 beta 头，适用于上游会拒绝这些字段的 LLM 网关。 | | 中转服务报 output_config 相关错误时开启
+CLAUDE_CODE_DISABLE_SUBSTITUTION_RM_PROMPT | 关闭命令替换删除检查 | sandbox | 设为 1 关闭对 rm -rf "$(pwd)" 这类目标完全来自命令替换的递归删除检查，其他关键路径检查仍保留。 | | 不建议开启 | tags=security
+CLAUDE_CODE_DISABLE_TERMINAL_TITLE | 不改终端标题 | ui | 设为 1 关闭根据对话自动更新终端标题，同时跳过生成会话标题的后台小模型请求。 | | 想节省少量请求或固定终端标题时开启
+CLAUDE_CODE_DISABLE_THINKING | 不发送 thinking 参数 | thinking | 设为 1 完全不在请求中发送 thinking 参数，是针对拒绝该参数的代理或网关的兼容选项。默认会思考的模型也会因此不思考。 | | 只在中转服务报 thinking 参数错误时使用
+CLAUDE_CODE_DISABLE_ULTRAREVIEW_TRUST_CHECK | ultrareview 跳过信任检查 | features | 设为 1 后，claude ultrareview 在未信任的目录中（如 CI）不会因「Workspace not trusted」退出。需在启动 Claude Code 的环境中设置。 | | | ;; type=boolean ;; et=1
+CLAUDE_CODE_DISABLE_ULTRATHINK | 禁用 ultrathink 关键词 | thinking | 设为 1 关闭提示中的 ultrathink 关键词。需要 2.1.316 及以上。 | | |
+CLAUDE_CODE_DISABLE_UNKNOWN_MODEL_WINDOW_ENFORCEMENT | 未知模型不主动压缩 | context | 设为 1 后，遇到不认识的模型 ID（如网关别名）时不按假定的上下文窗口提前自动压缩。 | | 中转模型名不标准、过早触发压缩时可开启
+CLAUDE_CODE_DISABLE_VIRTUAL_SCROLL | 关闭虚拟滚动 | ui | 设为 1 在全屏渲染中关闭虚拟滚动，渲染全部消息。全屏模式滚动时出现空白区域时使用。 | | |
+CLAUDE_CODE_DISABLE_WEB_FETCH | 禁用 WebFetch | tools | 设为 1 关闭 WebFetch 工具（WebSearch 仍可用）。需要 2.1.285 及以上。 | | |
+CLAUDE_CODE_DISABLE_WINDOWS_SHELL_LAUNCHER | PowerShell 不经 cmd 启动 | tools | 设为 1 在 Windows 上直接启动 PowerShell 工具命令，而不是经 cmd.exe 启动器（启动器能让后台 PowerShell 命令延续到下一个进程）。 | | | ;; p=windows ;; tags=advanced
+CLAUDE_CODE_DISABLE_WORKFLOWS | 禁用工作流 | agents | 设为 1 禁用 Workflows，等同于 disableWorkflows 设置。 | | |
+CLAUDE_CODE_DROP_UNAVAILABLE_DEFERRED_TOOL | 丢弃不可用的延迟工具调用 | agents | 设为 1 后，用 -p 恢复会话时丢弃工具已不可用的延迟调用，否则该调用会一直挂起导致新提示无法送达。需要 2.1.319 及以上。 | | | ;; tags=sdk
+CLAUDE_CODE_EFFORT_LEVEL | 推理强度 | thinking | 设置支持模型的推理强度：low、medium、high、xhigh 或 max（可用级别取决于模型）。优先于 --effort、/effort 以及 settings 中的 effortLevel。 | | 建议改用设置项 effortLevel；用变量会锁定，/effort 无法调整 | type=enum ;; enum=low:低,medium:中,high:高,xhigh:超高,max:最高
+CLAUDE_CODE_EMIT_SESSION_STATE_EVENTS | 输出会话状态事件 | agents | 设为 1 在消息流中加入 session_state_changed 消息。需要 Agent SDK，或 --print + --output-format stream-json + --verbose。 | | | ;; tags=sdk
+CLAUDE_CODE_ENABLE_AUTO_MODE | 启用自动模式（旧） | features | 为兼容旧版本保留，现在无效果：自动模式在所有提供方上默认可用。 | | | ;; dep=已无效果，可删除
+CLAUDE_CODE_ENABLE_AWAY_SUMMARY | 离开回来摘要 | ui | 设为 0 强制关闭会话回顾（无论 /config 开关），设为 1 在 awaySummaryEnabled 为 false 时强制开启。 | | | ;; ef=0
+CLAUDE_CODE_ENABLE_BACKGROUND_PLUGIN_REFRESH | 后台刷新插件 | features | 设为 1 在非交互模式下后台安装完成后，于回合边界刷新插件状态。默认关闭，因为会改变系统提示导致提示缓存失效。 | | |
+CLAUDE_CODE_ENABLE_CFC | 启用 Chrome 集成 | features | 设为 1 让 CLI 会话启动时开启 Claude in Chrome 集成，设为 0 则关闭。--chrome / --no-chrome 参数优先。 | | | ;; ef=0
+CLAUDE_CODE_ENABLE_FEEDBACK_SURVEY_FOR_OTEL | 调查结果发往 OTel | telemetry | 设为 1 在阻止发往 Anthropic 的非必要流量时，把会话质量调查结果作为 OTel 事件发送到你自己的收集器。 | | | ;; tags=enterprise
+CLAUDE_CODE_ENABLE_FINE_GRAINED_TOOL_STREAMING | 工具参数流式传输 | features | 控制工具调用参数是否在生成时就流式传输。关闭时，大的工具输入（如长文件写入）要等全部生成完才到达，看起来像卡住。 | | | ;; ef=0
+CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY | 从网关发现模型 | model | 设为 1 后，当 ANTHROPIC_BASE_URL 指向兼容 Anthropic 的网关（LiteLLM、Kong、内部代理等）时，用网关的 /v1/models 接口填充 /model 选择器。 | | 中转支持 /v1/models 时开启，可直接在 /model 里选
+CLAUDE_CODE_ENABLE_OPUS_4_7_FAST_MODE | Opus 4.7 快速模式（旧） | model | 已在 2.1.142 移除（快速模式默认模型已改为 Opus 4.7）。 | | | ;; dep=已无效果，可删除
+CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION | 提示建议 | ui | 设为 false 关闭输入框中的灰色提示预测，优先于 promptSuggestionEnabled 设置。 | | | ;; type=enum ;; enum=false:关闭,true:开启
+CLAUDE_CODE_ENABLE_SHARE_BUNDLE | /share 保存到本地 | privacy | 设为 1 让 /share 把报告和完整会话记录保存到 ~/.claude/feedback-bundles/ 下的本地归档，而不是发送给 Anthropic。 | | |
+CLAUDE_CODE_ENABLE_TASKS | 任务工具类型 | features | 选择任务跟踪工具：默认提供 TaskCreate、TaskUpdate、TaskGet、TaskList；设为 0 使用旧的 TodoWrite 工具。 | | | ;; type=enum ;; enum=0:旧版 TodoWrite,1:Task 工具
+CLAUDE_CODE_ENABLE_TELEMETRY | 启用 OpenTelemetry | telemetry | 设为 1 启用 OpenTelemetry 指标与日志采集，是配置 OTel 导出器的前提。只在 Shell、用户设置或托管设置中生效，项目和本地设置中无效。 | | | ;; doc=https://code.claude.com/docs/en/monitoring-usage
+CLAUDE_CODE_ENABLE_TODO_TOOLS | 所有模型启用任务工具 | features | 设为 1 在所有模型上提供任务跟踪工具（默认只在列出的模型上提供）。 | | |
+CLAUDE_CODE_EVEN_MORE_DANGEROUSLY_SKIP_PERMISSIONS | 危险删除也不确认 | sandbox | 设为 1 后在 bypassPermissions 模式下执行危险 rm 命令也不再确认，移除了破坏性删除的最后一道保护。需在启动 Claude Code 的环境中设置。 | | 强烈不建议开启 | tags=security
+CLAUDE_CODE_EXIT_AFTER_STOP_DELAY | 空闲后自动退出 | agents | 查询循环空闲后等待多少毫秒自动退出，适合自动化脚本与 SDK 模式。 | | | ;; u=ms ;; tags=sdk
+CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS | 代理团队（实验） | agents | 设为 1 启用代理团队（多个 Claude 实例协作），实验功能，默认关闭。 | | | ;; tags=experimental
+CLAUDE_CODE_EXPERIMENTAL_CODE_MODE | Code Mode（实验） | features | 设为 1 以 Code Mode 启动会话（实验功能），设为 0 保持关闭；在托管设置中可为组织禁用。 | | | ;; tags=experimental ;; ef=0
+CLAUDE_CODE_EXTRA_BODY | 额外请求体参数 | network | 合并到模型请求体顶层的 JSON 对象（/model 检查等会话外请求除外），用于传递 Claude Code 没有直接提供的提供方专用参数。 | | | ;; tags=advanced ;; ex="{\"service_tier\":\"auto\"}"
+CLAUDE_CODE_FILE_READ_MAX_OUTPUT_TOKENS | 文件读取 token 上限 | tools | 覆盖文件读取的默认 token 上限（25000）。需要完整读取更大的文件时调大。 | | 经常读大文件时可调到 50000，但会消耗更多上下文 | u=tokens ;; def="25000"
+CLAUDE_CODE_FORCE_SESSION_PERSISTENCE | 嵌套启动也保存会话 | agents | 设为 1 后，即使在另一个 Claude Code 会话内启动 claude，也保存会话记录、提示历史并注册到 claude agents。 | | |
+CLAUDE_CODE_FORCE_STRIKETHROUGH | 强制删除线 | ui | 设为 1 在终端支持但未被检测到时（如 SSH 未转发 TERM_PROGRAM）强制渲染 ~~删除线~~。 | | |
+CLAUDE_CODE_FORCE_SYNC_OUTPUT | 强制同步输出 | ui | 设为 1 在终端支持但未被检测到时强制启用同步输出（DEC 2026），可减少闪烁，例如 Emacs eat。 | | |
+CLAUDE_CODE_FORCE_TERMINAL_IMAGES | 强制显示图片 | ui | 设为 1 在终端支持 kitty 图形协议的 Unicode 占位方式、却仍显示图片替代文字时，强制把图片画出来。 | | |
+CLAUDE_CODE_FORK_SUBAGENT | Fork 模式 | agents | 控制 fork 模式（默认开启，Claude 可自行创建分叉）。开启时交互会话中 Claude 不能等待子代理。设为 0 关闭。 | | | ;; type=enum ;; enum=0:关闭,1:开启
+CLAUDE_CODE_FORWARD_SUBAGENT_TEXT | 输出子代理文本 | agents | 设为 1 在 claude -p --output-format stream-json 输出中包含子代理的文本和思考块，等同于 --forward-subagent-text。 | | | ;; tags=sdk
+CLAUDE_CODE_GATEWAY_HINT_HEADERS | 网关提示请求头 | network | 设为 1 在自定义代理或第三方平台上也发送 x-claude-code-request-class 等网关提示头，设为 0 则不发送。 | | | ;; ef=0 ;; tags=advanced
+CLAUDE_CODE_GATEWAY_MODEL_DISCOVERY_TIMEOUT_MS | 网关模型发现超时 | model | 网关模型发现请求的超时（毫秒，默认 3000）。网关响应 /v1/models 较慢时调大。 | | | ;; u=ms ;; def="3000"
+CLAUDE_CODE_GIT_BASH_PATH | Git Bash 路径 | paths | 仅 Windows：Git Bash 可执行文件（bash.exe）的路径，Git Bash 已安装但不在 PATH 中时使用。路径不存在或文件名不是 bash.exe / sh.exe / bash / sh 时会被忽略。 | | Claude Code 提示找不到 Git Bash 时设置 | p=windows ;; ex="C:\\Program Files\\Git\\bin\\bash.exe"
+CLAUDE_CODE_GLOB_HIDDEN | Glob 包含隐藏文件 | tools | 设为 false 让 Glob 工具结果排除点开头的隐藏文件（默认包含）。不影响 @ 补全、ls、Grep 和 Read。 | | | ;; type=enum ;; enum=false:排除隐藏文件
+CLAUDE_CODE_GLOB_NO_IGNORE | Glob 忽略 .gitignore | tools | 设为 false 让 Glob 工具遵循 .gitignore（默认返回所有匹配文件，包括被忽略的）。 | | 仓库里有大量构建产物时设为 false 可减少噪音 | type=enum ;; enum=false:遵循 .gitignore
+CLAUDE_CODE_GLOB_TIMEOUT_SECONDS | 搜索超时 | tools | Glob 和 Grep 搜索的超时秒数，大多数平台默认 20 秒，WSL 默认 60 秒。 | | 超大仓库搜索经常超时时调大 | u=秒
+CLAUDE_CODE_GOAL_CHECKIN_MINUTES | 目标检查间隔 | agents | 后台工作让活动目标等待多少分钟后，Claude Code 提醒 Claude 检查进度。默认 30，设为 0 关闭，最大 10080（一周）。 | | | ;; type=integer ;; u=分钟 ;; def="30"
+CLAUDE_CODE_GZIP_REQUEST_BODIES | 请求体 gzip 压缩 | network | 设为 0 关闭发往 api.anthropic.com 的请求体 gzip 压缩。默认在直连时压缩较大的请求体。 | | | ;; type=enum ;; enum=0:关闭压缩
+CLAUDE_CODE_HIDE_CWD | 隐藏启动画面中的目录 | privacy | 设为 1 在启动 Logo 中隐藏工作目录，适合屏幕共享或录屏（路径可能暴露系统用户名）。 | | 经常录屏或直播时开启
+CLAUDE_CODE_IDE_HOST_OVERRIDE | IDE 连接地址 | ide | 覆盖连接 IDE 插件使用的主机地址。默认自动检测（包括 WSL 到 Windows 的路由）。 | | |
+CLAUDE_CODE_IDE_SKIP_AUTO_INSTALL | 不自动安装 IDE 插件 | ide | 设为 1 阻止 /ide 自动安装 IDE 插件，等同于 autoInstallIdeExtension 为 false。 | | |
+CLAUDE_CODE_IDE_SKIP_VALID_CHECK | 跳过 IDE 锁文件校验 | ide | 设为 1 在连接时跳过 IDE 锁文件校验。IDE 已运行但自动连接找不到时使用。 | | |
+CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS | 空闲压缩起点 | context | 上下文达到多少 token 时空闲压缩才生效（默认 200000，低于 100000 会被提升到 100000）。 | | | ;; type=integer ;; u=tokens ;; def="200000"
+CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS | 并发子代理上限 | agents | 一个会话中同时运行的子代理数量上限（默认 20），超过后 Agent 工具拒绝创建新的子代理。 | | 想控制 token 消耗速度时可调低 | type=integer ;; def="20"
+CLAUDE_CODE_MAX_CONTEXT_TOKENS | 假定上下文窗口 | context | 覆盖 Claude Code 为当前模型假定的上下文窗口大小。网关别名或自定义模型 ID 的窗口与实际不符时使用。 | | 中转模型的实际上下文与 Claude Code 判断不一致时设置 | type=integer ;; u=tokens ;; ex="200000"
+CLAUDE_CODE_MAX_MCP_DESCRIPTION_LENGTH | MCP 描述长度上限 | mcp | 发给模型的 MCP 工具描述和服务器说明的最大字符数，替换默认的 4096（及部分工具的 16384）。 | | | ;; type=integer ;; u=字符
+CLAUDE_CODE_MAX_OUTPUT_TOKENS | 最大输出 token | thinking | 大多数请求的最大输出 token 数。默认值和上限因模型而异，超过模型上限会被降到上限。 | | 生成长文件经常被截断时调大，例如 64000 | u=tokens ;; ex="64000"
+CLAUDE_CODE_MAX_RETRIES | 请求重试次数 | network | 失败的 API 请求重试次数（默认 10）。遇到 529 过载错误时可能提前停止。 | | 网络不稳定或中转偶发错误时可调大 | type=integer ;; def="10"
+CLAUDE_CODE_MAX_SUBAGENTS_PER_SESSION | 每会话子代理总数（旧） | agents | 已在 2.1.224 移除，现在无效。 | | | ;; dep=已无效果，可删除
+CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH | 子代理嵌套层数 | agents | 主对话下允许的子代理层数（默认 3）。设为 1 关闭嵌套（子代理不能再创建子代理）。 | | | ;; type=integer ;; def="3"
+CLAUDE_CODE_MAX_TURNS | 最大回合数 | agents | 未指定时的智能体回合数上限，等同于 --max-turns（参数优先）。必须是正整数。 | | | ;; type=integer
+CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION | 每会话搜索次数上限 | tools | 每个会话 WebSearch 调用次数上限（默认 200），达到后 Claude 会基于已有信息继续。 | | | ;; type=integer ;; def="200"
+CLAUDE_CODE_MCP_ALLOWLIST_ENV | MCP 最小环境变量 | mcp | 设为 1 后 stdio MCP 服务器只获得安全的基础环境变量加上其配置的 env，不再继承你的整个 Shell 环境。 | | 防止 MCP 服务器拿到 Shell 中的各种密钥 | tags=security
+CLAUDE_CODE_MCP_AUTO_BACKGROUND_MS | MCP 调用转后台时间 | mcp | 仍在运行的 MCP 工具调用多久后转为后台任务（毫秒，默认 120000）。设为 0 关闭自动转后台。 | | | ;; u=ms ;; def="120000"
+CLAUDE_CODE_MCP_STARTUP_WAIT_MS | MCP 启动等待 | mcp | 非交互会话第一回合等待仍在连接中的 MCP 服务器的时间（毫秒）。 | | | ;; u=ms
+CLAUDE_CODE_MCP_TOOL_IDLE_TIMEOUT | MCP 调用空闲超时 | mcp | MCP 工具调用的空闲超时（毫秒）：服务器在此期间没有任何响应或进度通知时，调用以错误中止。 | | | ;; u=ms
+CLAUDE_CODE_MESSAGING_SOCKET | 消息套接字（自动） | other | 由 Claude Code 自动设置：会话绑定收件箱套接字时导出给 hooks 和 Bash 命令的套接字路径。不要手动设置。 | | 由 Claude Code 自动设置 | tags=internal
+CLAUDE_CODE_MESSAGING_TOKEN | 消息令牌（自动） | other | 由 Claude Code 自动设置：与 CLAUDE_CODE_MESSAGING_SOCKET 一起导出的会话令牌。不要手动设置。 | | 由 Claude Code 自动设置 | tags=internal ;; s
+CLAUDE_CODE_NATIVE_CURSOR | 使用终端原生光标 | ui | 设为 1 在输入位置显示终端自己的光标（遵循终端的闪烁、形状设置），而不是绘制的方块。 | | |
+CLAUDE_CODE_NEW_INIT | 交互式 /init | features | 设为 1 让 /init 进入交互式设置流程：先询问要生成哪些文件（CLAUDE.md、技能、hooks 等）再分析代码库。 | | 第一次在项目中初始化时体验更好
+CLAUDE_CODE_NONBLOCKING_STDOUT | 非阻塞输出 | ui | 设为 1 通过非阻塞文件描述符写终端输出，避免暂停的 tmux 控制模式窗格或卡住的 SSH 连接让 Claude Code 冻结。 | | 经常通过不稳定 SSH 使用时可开启
+CLAUDE_CODE_NONSTREAMING_TIMEOUT_RETRIES | 非流式超时重试次数 | network | 非流式请求超时后重发的次数上限，设为 0 则首次超时即失败。需要 2.1.285 及以上。 | | | ;; type=integer
+CLAUDE_CODE_NO_FLICKER | 无闪烁全屏渲染 | ui | 设为 1 启用全屏渲染（研究预览），减少闪烁并在长对话中保持内存平稳。覆盖 tui 设置，也可用 /tui fullscreen 切换。 | | 终端频繁闪烁时可开启
+CLAUDE_CODE_OAUTH_TOKEN | OAuth 访问令牌 | auth | claude.ai 认证的 OAuth 访问令牌，可代替 /login 用于 SDK 和自动化环境（用 claude setup-token 生成）。优先于钥匙串中的凭据。项目和本地设置中无效。 | | | ;; s ;; ph=<YOUR_OAUTH_TOKEN>
+CLAUDE_CODE_OAUTH_REFRESH_TOKEN | OAuth 刷新令牌 | auth | claude.ai 的 OAuth 刷新令牌，设置后 claude auth login 直接用它交换而不打开浏览器。需要同时设置 CLAUDE_CODE_OAUTH_SCOPES，令牌只能使用一次。 | | | ;; s ;; ph=<YOUR_REFRESH_TOKEN>
+CLAUDE_CODE_OAUTH_SCOPES | OAuth 权限范围 | auth | 刷新令牌签发时的权限范围（空格分隔），例如 "user:profile user:inference user:sessions:claude_code"。设置 CLAUDE_CODE_OAUTH_REFRESH_TOKEN 时必填。 | | |
+CLAUDE_CODE_OPUS_4_6_FAST_MODE_OVERRIDE | Opus 4.6 快速模式（旧） | model | 已在 2.1.160 移除，现在无效（Opus 4.6 不再支持快速模式）。 | | | ;; dep=已无效果，可删除
+CLAUDE_CODE_OTEL_CONTENT_MAX_LENGTH | OTel 内容长度上限 | telemetry | 含内容的 OpenTelemetry 属性（回复、工具内容、系统提示、原始请求体）的最大长度（UTF-16 码元，默认 61440 即 60KB）。 | | | ;; type=integer ;; def="61440"
+CLAUDE_CODE_OTEL_DIAG_STDERR | OTel 诊断输出到 stderr | telemetry | 设为 1 把 OpenTelemetry 导出器的诊断错误写到 stderr（默认只在 --debug 时显示），便于发现配置错误。 | | |
+CLAUDE_CODE_OTEL_FLUSH_TIMEOUT_MS | OTel 刷新超时 | telemetry | 刷新待发送 OpenTelemetry span 的超时（毫秒，默认 5000）。 | | | ;; u=ms ;; def="5000"
+CLAUDE_CODE_OTEL_HEADERS_HELPER_DEBOUNCE_MS | OTel 动态头刷新间隔 | telemetry | 刷新动态 OpenTelemetry 请求头（otelHeadersHelper）的间隔（毫秒，默认 1740000 即 29 分钟）。 | | | ;; u=ms ;; def="1740000"
+CLAUDE_CODE_OTEL_SHUTDOWN_TIMEOUT_MS | OTel 关闭超时 | telemetry | 退出时等待 OpenTelemetry 导出完成的超时（毫秒，默认 2000）。退出时丢失指标可调大。 | | | ;; u=ms ;; def="2000"
+CLAUDE_CODE_OVERLOADED_RETRY_BASE_DELAY_MS | 过载重试初始间隔 | network | API 返回 529 过载错误时重试退避的起始延迟（毫秒，默认 500）。 | | | ;; u=ms ;; def="500"
+CLAUDE_CODE_OVERLOADED_RETRY_MAX_DELAY_MS | 过载重试最大间隔 | network | 529 过载重试退避的最大延迟（毫秒，默认 32000）。 | | | ;; u=ms ;; def="32000"
+CLAUDE_CODE_PACKAGE_MANAGER_AUTO_UPDATE | 包管理器自动更新 | updates | 设为 1 在有新版本时后台运行包管理器的升级命令，适用于 Homebrew 和 WinGet 安装。 | | 用 Homebrew / WinGet 安装且希望自动更新时开启 | p=macos,windows,linux
+CLAUDE_CODE_PERFORCE_MODE | Perforce 写保护 | tools | 设为 1 启用 Perforce 感知的写保护：目标文件没有所有者写权限时，Edit、Write、NotebookEdit 失败并提示先 p4 edit。 | | 只有 Perforce 仓库需要
+CLAUDE_CODE_PLUGIN_CACHE_DIR | 插件根目录 | paths | 覆盖插件根目录（虽然叫 CACHE_DIR，实际是父目录，市场和插件缓存都在其子目录中）。默认 ~/.claude/plugins。 | | | ;; def="~/.claude/plugins"
+CLAUDE_CODE_PLUGIN_DIRS | 会话加载的插件目录 | paths | 本会话加载的插件目录，效果同 --plugin-dir。多个路径在 Unix 上用 : 分隔，在 Windows 上用 ; 分隔，每个路径须是绝对路径或以 ~ 开头。 | | | ;; pn.windows=多个路径用分号分隔，例如 D:/plugins/a;D:/plugins/b
+CLAUDE_CODE_PLUGIN_DIR_WATCH | 插件文件变化自动重载 | features | 控制 mod 文件变化时是否重新加载。默认技能目录中的 mod 会自动重载，--plugin-dir 中的仅在特定情况下重载。 | | | ;; ef=0
+CLAUDE_CODE_PLUGIN_GIT_TIMEOUT_MS | 插件市场克隆超时 | network | 克隆或刷新插件市场的超时（毫秒，默认 120000）。仓库大或网络慢时调大。 | | 网络访问 GitHub 慢时可调到 300000 | u=ms ;; def="120000"
+CLAUDE_CODE_PLUGIN_KEEP_MARKETPLACE_ON_FAILURE | 刷新失败保留市场 | features | 设为 1 后，市场刷新无法连接或认证远程时不再重新克隆，继续使用现有副本，适合离线或隔离网络。 | | 网络不稳定时开启可避免插件市场反复重新克隆
+CLAUDE_CODE_PLUGIN_PREFER_HTTPS | 插件用 HTTPS 克隆 | network | 设为 1 用 HTTPS 而不是 SSH 克隆 GitHub owner/repo 形式的插件来源，适合没有配置 SSH 密钥的 CI、容器等环境。 | | 没有配置 GitHub SSH 密钥时开启
+CLAUDE_CODE_PLUGIN_SEED_DIR | 插件预置目录 | paths | 一个或多个只读的插件预置目录（Unix 用 : 分隔，Windows 用 ; 分隔），用于在容器镜像中预装插件。 | | | ;; tags=advanced
+CLAUDE_CODE_POWERSHELL_RESPECT_EXECUTION_POLICY | 遵循 PowerShell 执行策略 | tools | 设为 1 后启动 PowerShell 时不再传入 -ExecutionPolicy Bypass，而是遵循本机生效的执行策略。 | | | ;; p=windows ;; tags=security
+CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS | -p 模式后台等待上限 | agents | 非交互（-p）模式最后一个回合后，等待子代理、工作流等后台工作的空闲时间上限（毫秒，默认 600000）。 | | | ;; u=ms ;; def="600000"
+CLAUDE_CODE_PROCESS_WRAPPER | 企业启动器前缀 | enterprise | 让 Claude Code 从自身程序启动的进程（如托管代理视图会话的后台服务）通过企业启动器运行，值为命令前缀，例如 /opt/corp/launcher。等同于 processWrapper 设置且优先。 | | | ;; tags=enterprise
+CLAUDE_CODE_PROJECT_DIR_NAME | 项目记录目录名 | paths | 与 CLAUDE_CONFIG_DIR 一起设置，指定本会话记录和自动记忆存放在 projects/ 下的目录名，代替根据工作目录推导的名字。 | | | ;; tags=advanced
+CLAUDE_CODE_PROMPT_CACHE_TTL | 主对话缓存时长 | model | 主对话的提示缓存时长，只接受 5m 或 1h，优先于 promptCacheTtl 设置。 | | | ;; type=enum ;; enum=5m:5 分钟,1h:1 小时
+CLAUDE_CODE_PROPAGATE_TRACEPARENT | 传递 W3C 追踪上下文 | telemetry | 设为 1 在 ANTHROPIC_BASE_URL 指向自定义代理时传递 W3C traceparent（模型与 HTTP MCP 请求头，以及 Bash 的 TRACEPARENT 变量）。 | | | ;; tags=advanced
+CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST | 提供方由宿主管理 | enterprise | 由嵌入 Claude Code 并代为管理模型提供方路由的宿主平台设置。设置后 Claude Code 忽略 CLAUDE_CODE_USE_BEDROCK、ANTHROPIC_BASE_URL 等提供方选择、地址和认证变量。 | | 普通用户不要设置 | tags=internal
+CLAUDE_CODE_PROXY_RESOLVES_HOSTS | 由代理解析域名 | network | 设为 1 允许由代理而不是本机进行 DNS 解析，适合只能由代理解析主机名的网络环境。 | | 本机 DNS 无法解析 api.anthropic.com、只能走代理时开启
+CLAUDE_CODE_REMOTE | 云端会话标识（自动） | remote | 在云端会话中自动设为 true，hook 或初始化脚本可据此判断是否运行在云端。 | | 由 Claude Code 自动设置 | tags=internal
+CLAUDE_CODE_REMOTE_SESSION_ID | 云端会话 ID（自动） | remote | 在云端会话中自动设为当前会话 ID，可用来生成回到会话记录的链接。 | | 由 Claude Code 自动设置 | tags=internal
+CLAUDE_CODE_RESTRICTED | 受限模式 | sandbox | 设为 1 以受限模式启动会话，等同于 --restricted。写在 settings 的 env 中无效，需在启动环境中设置。需要 2.1.248 及以上。 | | | ;; tags=security
+CLAUDE_CODE_RESUME_HINT_COMMAND | 恢复提示命令名 | other | 在启动 Claude Code 的包装脚本中设置为你输入的命令名（如 mytool），退出时会提示 mytool --resume <会话 ID>。 | | |
+CLAUDE_CODE_RESUME_INTERRUPTED_TURN | 自动续接中断的回合 | agents | 设为 1 在上次会话中途结束时自动续接（SDK 模式中无需重新发送提示）。设为 0 或不设置则关闭。 | | | ;; tags=sdk ;; ef=0
+CLAUDE_CODE_RESUME_INTERRUPTED_TURN_MAX_AGE_MS | 续接最长间隔 | agents | 允许自动续接的会话最后一条消息的最大时长（毫秒），超过则不续接。 | | | ;; u=ms ;; tags=sdk
+CLAUDE_CODE_RESUME_PROMPT | 续接提示语 | agents | 自动续接中断回合时发给 Claude 的继续消息，默认 "Continue from where you left off."。 | | | ;; ex="继续刚才的工作。"
+CLAUDE_CODE_RESUME_SHOWS_CUT_OFF_CALLS | 续接时保留中断的调用 | agents | 设为 1 在续接的回合中保留被中断的工具调用（标记为已截断），默认丢弃。 | | | ;; tags=sdk
+CLAUDE_CODE_RETRY_WATCHDOG | 无限重试容量错误 | network | 设为 1 用于无人值守场景（评测、CI、远程工作者）：429 和 529 容量错误无限重试，而不是重试 CLAUDE_CODE_MAX_RETRIES 次后失败。 | | 夜间跑长任务、中转服务高峰期经常 429 时可开启 | type=boolean ;; et=1
+CLAUDE_CODE_RETRY_WATCHDOG_MAX_WAIT_MS | 容量错误最长等待 | network | 开启 CLAUDE_CODE_RETRY_WATCHDOG 时，每个请求等待 429 / 529 错误恢复的最长时间（毫秒）。 | | | ;; u=ms
+CLAUDE_CODE_RETRY_WATCHDOG_USAGE_LIMIT_RECHECK_MS | 额度恢复检查间隔 | network | 开启 CLAUDE_CODE_RETRY_WATCHDOG 且等待用量额度重置时，两次检查额度是否已恢复的最小间隔（毫秒）。 | | | ;; u=ms
+CLAUDE_CODE_SAFE_MODE | 安全模式 | debug | 设为 1 以安全模式启动：不加载 CLAUDE.md、技能、插件、hooks、MCP 服务器、自定义命令与代理、输出风格、工作流、自定义主题与按键、状态栏等。用于排查配置问题。 | | 只在排查问题时临时使用
+CLAUDE_CODE_SCRIPT_CAPS | 脚本调用次数限制 | sandbox | 设置 CLAUDE_CODE_SUBPROCESS_ENV_SCRUB 时，限制特定脚本每会话可调用次数的 JSON 对象：键是匹配命令文本的子串，值是次数上限。 | | | ;; tags=advanced ;; ex="{\"deploy.sh\":1}"
+CLAUDE_CODE_SCROLL_SPEED | 滚轮速度倍率 | ui | 全屏渲染中鼠标滚轮的滚动倍率，可以是任意正数（最大 20），小于 1 可减慢触控板滚动。 | | | ;; ex="0.5"
+CLAUDE_CODE_SEND_FEEDBACK | 模型起草反馈 | privacy | 设为 0 关闭本会话的模型起草反馈；设为 1 在账号已有权限时开启。 | | | ;; ef=0
+CLAUDE_CODE_SESSIONEND_HOOKS_TIMEOUT_MS | SessionEnd Hook 超时 | hooks | SessionEnd hooks 的总时间预算（毫秒），也是未单独设置 timeout 的 hook 的超时。适用于退出、/clear 和切换会话。 | | | ;; u=ms
+CLAUDE_CODE_SESSION_ID | 会话 ID（自动） | other | 在 Bash、PowerShell 工具、hook 命令与 stdio MCP 服务器子进程中自动设为当前会话 ID。 | | 由 Claude Code 自动设置 | tags=internal
+CLAUDE_CODE_SHELL | Bash 工具使用的 Shell | paths | Bash 工具运行命令使用的 Shell，只接受 bash 或 zsh 的路径（如 /opt/homebrew/bin/bash），fish 等其他 Shell 不支持。 | | | ;; ex="/bin/zsh" ;; pn.windows=Windows 上一般使用 CLAUDE_CODE_GIT_BASH_PATH 指定 Git Bash
+CLAUDE_CODE_SHELL_PREFIX | 命令前缀 | tools | 包装 Claude Code 启动的 Shell 命令的前缀（Bash 工具调用、hook、状态栏命令、stdio MCP 服务器启动命令），常用于审计日志或包装器。 | | | ;; tags=advanced ;; ex="/usr/local/bin/audit-wrap"
+CLAUDE_CODE_SIMPLE | 极简模式 | features | 设为 1 以极简系统提示运行，只保留 Bash、文件读取和编辑工具（--mcp-config 的 MCP 工具仍可用），且不读取 OAuth 令牌和钥匙串凭据。 | | |
+CLAUDE_CODE_SIMPLE_SYSTEM_PROMPT | 精简系统提示 | features | 选择完整系统提示或工具描述更短的精简版。不设置时 Haiku 4.5、Sonnet 5、Opus 4.7 及更早模型默认用完整提示，更新的模型默认用精简提示。 | | | ;; type=enum ;; enum=0:完整提示,1:精简提示
+CLAUDE_CODE_SKIP_ANTHROPIC_AWS_AUTH | 跳过 AWS 平台认证 | provider | 跳过 Claude Platform on AWS 的客户端认证，适用于自行签名请求的网关。 | | | ;; type=boolean ;; et=1
+CLAUDE_CODE_SKIP_ANTHROPIC_GOOGLE_CLOUD_AUTH | 跳过 Google Cloud 托管版认证 | provider | 跳过「Google Cloud 上的 Claude 模型（Anthropic 托管）」的 Google 认证，适用于自行附加凭据的网关。 | | | ;; type=boolean ;; et=1
+CLAUDE_CODE_SKIP_AWS_CRED_CACHE | 不缓存 AWS 凭据 | provider | 设为 1 关闭 AWS 默认凭据链结果的进程内缓存，每个请求都重新解析凭据链。 | | | ;; tags=advanced
+CLAUDE_CODE_SKIP_BEDROCK_AUTH | 跳过 Bedrock 认证 | provider | 跳过 Amazon Bedrock 的 AWS 认证（例如经 LLM 网关转发时）。 | | | ;; type=boolean ;; et=1
+CLAUDE_CODE_SKIP_FAST_MODE_NETWORK_ERRORS | 快速模式检查失败视为可用 | network | 设为 1 在网络屏蔽了快速模式可用性检查（直连 api.anthropic.com）时，视为可用。组织禁用的响应仍会遵守。 | | |
+CLAUDE_CODE_SKIP_FAST_MODE_ORG_CHECK | 跳过快速模式检查 | network | 设为 1 跳过客户端的快速模式可用性检查，适用于会拦截该请求的代理。组织禁用时 API 仍会拒绝。 | | |
+CLAUDE_CODE_SKIP_FOUNDRY_AUTH | 跳过 Foundry 认证 | provider | 跳过 Microsoft Foundry 的 Azure 认证，适用于自行注入 Authorization 头的代理或网关。 | | | ;; type=boolean ;; et=1
+CLAUDE_CODE_SKIP_MANTLE_AUTH | 跳过 Mantle 认证 | provider | 跳过 Amazon Bedrock Mantle 的 AWS 认证（例如经 LLM 网关转发时）。 | | | ;; type=boolean ;; et=1
+CLAUDE_CODE_SKIP_MODEL_ACCESS_MEMORY | 不记忆无权限模型 | provider | Bedrock 和 Google Cloud 上的启动模型检查会在本机记住账号无权调用的模型（最长一天），设为 1 关闭此记忆。 | | |
+CLAUDE_CODE_SKIP_PROMPT_HISTORY | 不保存提示历史 | privacy | 设为 1 不把提示历史和会话记录写入磁盘，这些会话不会出现在 --resume、--continue 和上箭头历史中。适合一次性脚本会话。 | | |
+CLAUDE_CODE_SKIP_VERTEX_AUTH | 跳过 Vertex 认证 | provider | 跳过 Google Cloud Agent Platform 的 Google 认证（例如经 LLM 网关转发时）。 | | | ;; type=boolean ;; et=1
+CLAUDE_CODE_STARTUP_FAILURE_RESULTS | 启动失败输出结果消息 | debug | 设为 1 让 --output-format stream-json 会话在拒绝启动时输出一条说明原因的结果消息（否则只写 stderr）。 | | | ;; tags=sdk
+CLAUDE_CODE_STOP_HOOK_BLOCK_CAP | Stop Hook 连续阻止上限 | hooks | Stop / SubagentStop hook 连续阻止回合结束的最大次数（默认 8），超过后强制结束。设为 0 取消上限。 | | | ;; type=integer ;; def="8"
+CLAUDE_CODE_SUBAGENT_MODEL | 子代理默认模型 | model | 子代理、代理团队成员和工作流代理在没有其他方式指定模型时使用的默认模型，可写别名（如 haiku）或完整模型名。 | | 可设为 sonnet 省钱；用中转时必须填中转支持的模型名 | ex="sonnet"
+CLAUDE_CODE_SUBAGENT_MODEL_FORCE | 强制子代理模型 | model | 设为 1 强制所有子代理、队友和工作流代理使用同一个模型。需要 2.1.257 及以上。 | | |

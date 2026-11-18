@@ -1,0 +1,248 @@
+# Codex config.toml 的 [tui] 部分中文叠加层（对应 Codex CLI 0.170.0）
+
+@category tui | 终端界面（TUI） | 95 | 终端界面外观、通知、渲染、状态栏
+@category keymap | 快捷键（TUI keymap） | 250 | 按上下文重新绑定终端界面的快捷键
+
+@prefix tui. => tui
+@prefix tui.keymap => keymap
+@settype tui.keymap. => string[]
+
+tui | 终端界面 | tui | Codex 终端界面（TUI）专属设置，写在 [tui] 表中。
+tui.theme | 语法高亮主题 | tui | 语法高亮主题名称（kebab-case），设置后不再自动按亮 / 暗背景选择。可在 TUI 中用 /theme 预览选择，自定义主题放在 $CODEX_HOME/themes。 | | | ;; ex="github-dark"
+tui.notifications | 桌面通知 | tui | 启用 TUI 的桌面通知（默认 true）。也可以写成事件名数组只对部分事件通知，例如 ["agent-turn-complete","approval-requested"]。 | | 需要离开终端去做别的事时很有用 | def=true ;; ex=["agent-turn-complete","approval-requested"]
+tui.notification_method | 通知方式 | tui | 终端通知的发送方式：auto 自动；osc9（iTerm2、WezTerm、Windows Terminal 等支持）；osc777（部分 Linux 终端）；bel 终端响铃。 | | | ;; enum=auto:自动,osc9:OSC 9,osc777:OSC 777,bel:响铃 ;; def="auto"
+tui.notification_condition | 通知时机 | tui | unfocused 只在终端未获得焦点时通知（默认）；always 无论是否在前台都通知。 | | | ;; enum=unfocused:终端在后台时,always:总是 ;; def="unfocused"
+tui.animations | 动画效果 | tui | 启用欢迎画面、闪光、加载动画等动画效果（默认 true）。 | | | ;; def=true
+tui.effects | 视觉效果 | tui | 单独开关各项视觉效果（都需要 animations 开启）。
+tui.effects.effort | 推理强度动画 | tui | 推理强度变化时在输入框和页脚播放动画。 | | | ;; def=true
+tui.effects.progress | 进度动画 | tui | 活动项目符号和加载旋转动画。 | | | ;; def=true
+tui.effects.shimmer | 闪光效果 | tui | 状态与加载文字的闪光效果。 | | | ;; def=true
+tui.effects.starfield | 星空背景 | tui | 输入框的星空动画。 | | | ;; def=true
+tui.effects.title | 标题闪烁提示 | tui | 需要你操作时让终端标题的指示符闪烁。 | | | ;; def=true
+tui.effects.welcome | 欢迎动画 | tui | 欢迎画面的动画。 | | | ;; def=true
+tui.alternate_screen | 备用屏幕 | tui | 是否使用终端的备用屏幕缓冲区：auto（默认）、always 总是使用、never 从不使用（对话保留在终端原生滚动区，便于用终端自带的搜索与复制）。 | | 想用终端自带的滚动和搜索时设为 never | enum=auto:自动,always:总是,never:从不 ;; def="auto"
+tui.fullscreen_transcript | 全屏对话记录 | tui | 由 Codex 接管全屏对话记录的滚动、选择和搜索（默认 true）；受备用屏幕设置限制。 | | | ;; def=true
+tui.raw_output_mode | 原始输出模式 | tui | 以便于复制的原始滚动输出模式启动（默认 false）。 | | | ;; def=false
+tui.collapse_turn_details | 折叠回合详情 | tui | 在全屏记录中汇总工具调用并折叠已完成的回合（默认 false）。 | | 对话很长时开启更清爽 | def=false
+tui.auto_recap | 自动回顾 | tui | 终端失去焦点时自动生成对话回顾（默认 true）；关闭后仍可用 /recap 手动生成。 | | | ;; def=true
+tui.show_tooltips | 启动提示 | tui | 在欢迎界面显示使用提示（默认 true）。 | | | ;; def=true
+tui.show_server_version_notice | 服务版本提示 | tui | 显示连接的 app-server 版本差异提示（默认 true），不影响兼容性错误。 | | | ;; def=true
+tui.copy_on_select | 选中即复制 | tui | 松开鼠标时复制选中的记录、页脚或输入框文字：auto（默认，已知会冲突的终端中关闭）、always、never。 | | | ;; enum=auto:自动,always:总是,never:从不 ;; def="auto"
+tui.copy_on_select_clear_selection | 复制后取消选中 | tui | 选中即复制完成后取消只读文本的选中状态（默认 false）。 | | | ;; def=false
+tui.right_click_paste | 右键粘贴 | tui | 右键粘贴文字的后备方式：auto（默认，Windows / WSL / Linux 开启）、on（macOS 也开启）、off。SSH 和 VS Code 终端中不读取剪贴板。 | | | ;; enum=auto:自动,on:开启,off:关闭 ;; def="auto"
+tui.mouse_scroll_speed | 滚轮速度 | tui | 滚动记录时的鼠标滚轮速度倍率（每次事件滚动一行为基准，默认 1.0），小于 1 变慢。 | | | ;; ex=1.5
+tui.disable_paste_burst | 关闭粘贴突发检测 | tui | 为 true 时完全关闭快速粘贴检测，所有字符按收到的顺序直接插入，不做缓冲或占位。粘贴多行时出现异常可尝试开启。 | | |
+tui.vim_mode_default | 默认 Vim 模式 | tui | 输入框默认以 Vim（Normal）模式启动（默认 false）。 | | | ;; def=false
+tui.question_esc_back | Esc 返回输入框 | tui | 在异步问题中按 Esc 返回输入框并保留答案草稿（默认 true）。 | | | ;; def=true
+tui.status_line | 状态栏项目 | tui | 状态栏显示的项目标识列表（按顺序）。不设置时显示默认项目（模型等）。可在 TUI 中用 /statusline 交互配置。 | | | ;; ex=["model","context-remaining","git-branch"]
+tui.status_line_use_colors | 状态栏彩色 | tui | 用当前语法主题派生的颜色给状态栏项目着色（默认 true）。 | | | ;; def=true
+tui.terminal_title | 终端标题项目 | tui | 写入终端窗口 / 标签页标题的项目标识列表（按顺序）。 | | | ;; ex=["project","status"]
+tui.sidebar_width_percent | 侧边栏宽度 | tui | 停靠侧边栏占终端宽度的百分比，默认约三分之一。 | | | ;; u=% ;; ex=30
+tui.session_picker_view | 会话选择器布局 | tui | 恢复 / 分叉会话选择器的布局：comfortable 宽松、dense 紧凑。 | | | ;; enum=comfortable:宽松,dense:紧凑
+tui.resume_cwd | 恢复会话的目录 | tui | 恢复或分叉会话时使用的工作目录：current 当前目录、session 会话原目录。不设置时两者不同会询问。 | | | ;; enum=current:当前目录,session:会话原目录
+tui.agents_overview_grouping | 代理总览分组 | tui | 代理指挥中心上次选择的分组方式：project、status 或 model。由界面自动记录。 | | | ;; enum=project:按项目,status:按状态,model:按模型 ;; def="project"
+tui.terminal_resize_reflow_max_rows | 调整大小重排行数 | tui | 终端调整大小重排时，只重放最近渲染的这么多行。不设置时使用 Codex 针对终端的默认值。 | | | ;; tags=advanced
+tui.pet | 终端宠物 | tui | 终端宠物选择器中预选的宠物 ID；自定义宠物放在 CODEX_HOME/pets/<宠物ID>/pet.json。 | | |
+tui.pet_anchor | 宠物位置 | tui | 终端宠物的垂直锚定位置：composer 跟随输入框（默认）或 screen-bottom 屏幕底部。 | | | ;; enum=composer:跟随输入框,screen-bottom:屏幕底部 ;; def="composer"
+tui.presets | 快捷输入预设 | tui | 以单个数字（0~9）为键保存的常用输入，可通过快捷键快速填入。 | | | ;; ex={"1":{"label":"审查","input":"请审查当前改动并指出问题"}}
+tui.presets.*.input | 输入内容 | tui | 纯文本输入，最多 8000 字节。 | | |
+tui.presets.*.label | 名称 | tui | 在选择器和快捷键提示中显示的简短名称。 | | |
+tui.rendering | 富内容渲染 | tui | 富内容渲染开关，独立于动画与视觉效果。
+tui.rendering.tables | 表格 | tui | 渲染管道表格（包括 Markdown 代码块中的表格）。 | | | ;; def=true
+tui.rendering.lists | 列表符号 | tui | 把 Markdown 列表与任务列表标记渲染成 Unicode 符号。 | | | ;; def=true
+tui.rendering.math | 数学公式 | tui | 用 Unicode 符号渲染数学表达式。 | | | ;; def=true
+tui.rendering.mermaid | Mermaid 图 | tui | 把 Mermaid 代码块渲染成图。 | | | ;; def=true
+tui.default_hosts | 新对话默认主机 | tui | 新对话的首选运行主机（按项目和本地用户身份索引），只从用户配置读取，由界面自动记录。 | | | ;; tags=internal ;; ex={}
+tui.model_availability_nux | 模型可用性引导状态 | tui | TUI 保存的启动提示状态，由程序自动维护。 | | | ;; tags=internal ;; ex={}
+tui.screen_reader_detection_done | 已完成读屏检测 | tui | 记录一次性的屏幕阅读器检测已完成，任一值都会跳过检测。由程序自动写入。 | | | ;; tags=internal
+
+# ---------------- 快捷键 ----------------
+tui.keymap | 快捷键绑定 | keymap | 重新绑定 TUI 快捷键，可全局或按上下文设置，上下文绑定优先于 global。每个动作的值可以是单个按键字符串（如 "ctrl-a"、组合序列 "ctrl-x ctrl-s"），也可以是多个备选按键的列表；写空列表 [] 表示解除该动作的绑定。按键名使用 ctrl-a、shift-enter、page-down、minus 这类小写写法。
+tui.keymap.global | 全局 | keymap | 全局快捷键，在上下文未单独设置时使用。
+tui.keymap.global.submit | 提交 | | 提交当前输入框草稿。
+tui.keymap.global.queue | 排队发送 | | 任务运行中把当前草稿加入队列。
+tui.keymap.global.copy | 复制最后回复 | | 把最后一条代理回复复制到剪贴板。
+tui.keymap.global.clear_terminal | 清屏 | | 清空终端界面。
+tui.keymap.global.toggle_shortcuts | 快捷键面板 | | 显示或隐藏输入框快捷键面板。
+tui.keymap.global.toggle_vim_mode | 切换 Vim 模式 | | 切换输入框的 Vim 模式。
+tui.keymap.global.toggle_fast_mode | 切换快速模式 | | 开启或关闭 Fast 模式。
+tui.keymap.global.toggle_raw_output | 切换原始输出 | | 切换便于复制的原始滚动输出模式。
+tui.keymap.global.open_transcript | 打开记录 | | 打开对话记录浮层。
+tui.keymap.global.find_transcript | 搜索记录 | | 在完整对话记录中查找文字。
+tui.keymap.global.select_transcript | 选择记录 | | 进入键盘选择对话记录模式。
+tui.keymap.global.open_external_editor | 外部编辑器 | | 用外部编辑器编辑当前草稿。
+tui.keymap.global.open_agents | 代理总览 | | 打开共享的代理会话总览。
+tui.keymap.global.change_host | 切换运行主机 | | 更改新对话的运行位置。
+tui.keymap.global.leader | Leader 键 | | 持续的、随上下文变化的快捷菜单前缀键。
+tui.keymap.global.focus_activity | 聚焦活动组 | | 聚焦记录中的活动组以查看详情。
+tui.keymap.global.focus_main_composer | 聚焦主输入框 | | 聚焦主对话的输入框。
+tui.keymap.global.focus_pane_left | 聚焦父对话 | | 聚焦父对话窗格。
+tui.keymap.global.focus_pane_right | 聚焦侧边对话 | | 聚焦打开的侧边对话。
+tui.keymap.global.focus_sidebar_content | 聚焦侧边内容 | | 聚焦侧边对话，已聚焦时隐藏它。
+tui.keymap.global.focus_sidebar_tabs | 侧边栏标签选择 | | 打开侧边栏标签选择器。
+tui.keymap.global.toggle_side_conversation | 切换侧边对话 | | 在侧边对话与父对话之间切换，不关闭任何一方。
+tui.keymap.global.sidebar_down | 下一个侧边标签 | | 切换到下一个侧边栏标签。
+tui.keymap.global.sidebar_up | 上一个侧边标签 | | 切换到上一个侧边栏标签。
+tui.keymap.global.close_sidebar_tab | 关闭侧边标签 | | 关闭当前侧边栏标签。
+tui.keymap.global.hide_pane | 隐藏窗格 | | 隐藏聚焦的侧边窗格。
+tui.keymap.global.toggle_pane_zoom | 窗格缩放 | | 放大或还原聚焦的窗格。
+tui.keymap.global.resize_panes | 调整窗格大小 | | 进入键盘调整分隔线模式。
+tui.keymap.global.equalize_pane_widths | 均分窗格宽度 | | 让可见窗格宽度相等。
+tui.keymap.global.maximize_pane_width | 最大化窗格宽度 | | 最大化聚焦窗格的宽度。
+tui.keymap.global.minimize_pane_width | 最小化窗格宽度 | | 最小化聚焦窗格的宽度。
+tui.keymap.global.move_divider_left | 分隔线左移 | | 侧边窗格聚焦时把分隔线左移。
+tui.keymap.global.move_divider_right | 分隔线右移 | | 侧边窗格聚焦时把分隔线右移。
+tui.keymap.chat | 对话 | keymap | 对话上下文的快捷键。
+tui.keymap.chat.interrupt_turn | 中断回合 | | 中断正在进行的回合。
+tui.keymap.chat.increase_reasoning_effort | 提高推理强度 | | 提高当前推理强度。
+tui.keymap.chat.decrease_reasoning_effort | 降低推理强度 | | 降低当前推理强度。
+tui.keymap.chat.next_permission_mode | 下一个权限模式 | | 切换到下一个可用的权限模式。
+tui.keymap.chat.previous_permission_mode | 上一个权限模式 | | 切换到上一个可用的权限模式。
+tui.keymap.chat.open_presets | 打开预设 | | 打开保存的提示与斜杠命令。
+tui.keymap.chat.edit_queued_message | 编辑排队消息 | | 向上浏览待回答的异步问题，然后编辑最近排队的消息。
+tui.keymap.chat.prompt_stack_back | 返回输入框 | | 从待回答的异步问题向输入框方向返回。
+tui.keymap.chat.skip_question | 跳过问题 | | 跳过当前聚焦的问题。
+tui.keymap.chat.toggle_voice | 语音对话 | | 开始或结束语音对话。
+tui.keymap.chat.toggle_voice_mute | 麦克风静音 | | 在语音对话中切换麦克风静音。
+tui.keymap.composer | 输入框 | keymap | 输入框上下文的快捷键，会覆盖对应的 global 动作。
+tui.keymap.composer.submit | 提交 | | 提交当前草稿。
+tui.keymap.composer.queue | 排队发送 | | 任务运行中把草稿加入队列。
+tui.keymap.composer.history_search_previous | 历史搜索（上一个） | | 打开反向历史搜索或跳到上一个匹配。
+tui.keymap.composer.history_search_next | 历史搜索（下一个） | | 跳到反向历史搜索的下一个匹配。
+tui.keymap.composer.toggle_shortcuts | 快捷键面板 | | 显示或隐藏输入框快捷键面板。
+tui.keymap.editor | 文本编辑 | keymap | 文本框内编辑文字的快捷键。
+tui.keymap.editor.insert_newline | 插入换行 | | 在编辑器中插入换行（不提交）。
+tui.keymap.editor.delete_backward | 向左删除 | | 删除光标左侧一个字符。
+tui.keymap.editor.delete_forward | 向右删除 | | 删除光标右侧一个字符。
+tui.keymap.editor.delete_backward_word | 向左删除单词 | | 删除前一个单词。
+tui.keymap.editor.delete_forward_word | 向右删除单词 | | 删除后一个单词。
+tui.keymap.editor.kill_line_start | 剪切到行首 | | 剪切光标到行首的文字。
+tui.keymap.editor.kill_line_end | 剪切到行尾 | | 剪切光标到行尾的文字。
+tui.keymap.editor.kill_whole_line | 剪切整行 | | 剪切当前整行。
+tui.keymap.editor.yank | 粘贴剪切内容 | | 粘贴剪切缓冲区（yank）。
+tui.keymap.editor.move_left | 左移 | | 光标左移一个字符。
+tui.keymap.editor.move_right | 右移 | | 光标右移一个字符。
+tui.keymap.editor.move_up | 上移 | | 光标上移一个可视行。
+tui.keymap.editor.move_down | 下移 | | 光标下移一个可视行。
+tui.keymap.editor.move_word_left | 左移一个单词 | | 光标移到前一个单词开头。
+tui.keymap.editor.move_word_right | 右移一个单词 | | 光标移到下一个单词末尾。
+tui.keymap.editor.move_line_start | 行首 | | 光标移到行首。
+tui.keymap.editor.move_line_end | 行尾 | | 光标移到行尾。
+tui.keymap.approval | 审批 | keymap | 审批浮层的快捷键。
+tui.keymap.approval.approve | 批准 | | 批准主要选项。
+tui.keymap.approval.approve_for_session | 本会话都批准 | | 在有该选项时，本会话内同类操作都批准。
+tui.keymap.approval.approve_for_prefix | 按前缀批准 | | 在有该选项时，按执行策略前缀批准。
+tui.keymap.approval.deny | 拒绝 | | 拒绝且不提供后续指导。
+tui.keymap.approval.decline | 拒绝并说明 | | 拒绝并提供纠正指导。
+tui.keymap.approval.cancel | 取消 | | 取消信息请求（elicitation）。
+tui.keymap.approval.open_fullscreen | 全屏详情 | | 打开全屏审批详情。
+tui.keymap.approval.open_thread | 打开请求线程 | | 从其他线程显示时，打开发起审批的线程。
+tui.keymap.agents | 代理总览 | keymap | 共享代理总览中的快捷键。
+tui.keymap.agents.new_task | 新建会话 | | 在选中的检出目录中打开新会话。
+tui.keymap.agents.new_worktree | 新建 worktree 会话 | | 从项目默认分支创建 worktree 并打开新会话。
+tui.keymap.agents.resume | 恢复会话 | | 打开会话恢复选择器。
+tui.keymap.agents.fork | 分叉会话 | | 分叉选中的对话并打开新会话。
+tui.keymap.agents.rename | 重命名 | | 重命名选中的任务。
+tui.keymap.agents.search | 搜索 | | 搜索可用的代理任务。
+tui.keymap.agents.stop | 停止 | | 停止选中的运行中任务。
+tui.keymap.agents.hide | 隐藏 | | 隐藏选中任务，直到手动恢复或 TUI 重启。
+tui.keymap.agents.archive | 归档 | | 确认后归档选中任务及其子代理。
+tui.keymap.agents.delete | 删除 | | 确认后永久删除选中任务及其子代理。
+tui.keymap.agents.toggle_pin | 置顶 | | 在共享侧边栏中置顶或取消置顶选中任务。
+tui.keymap.agents.toggle_grouping | 切换分组 | | 在按状态和按项目分组之间切换。
+tui.keymap.list | 列表选择 | keymap | 弹出式可选列表中的快捷键。
+tui.keymap.list.accept | 确认 | | 确认当前选择。
+tui.keymap.list.cancel | 取消 | | 取消并关闭选择视图。
+tui.keymap.list.move_up | 上移 | | 选择上一项。
+tui.keymap.list.move_down | 下移 | | 选择下一项。
+tui.keymap.list.move_left | 左移 | | 在支持横向操作的列表中向左。
+tui.keymap.list.move_right | 右移 | | 在支持横向操作的列表中向右。
+tui.keymap.list.page_up | 上一页 | | 向上翻一页。
+tui.keymap.list.page_down | 下一页 | | 向下翻一页。
+tui.keymap.list.jump_top | 到顶部 | | 跳到第一项。
+tui.keymap.list.jump_bottom | 到底部 | | 跳到最后一项。
+tui.keymap.pager | 分页查看 | keymap | 对话记录和静态浮层中的分页快捷键。
+tui.keymap.pager.close | 关闭 | | 关闭分页浮层。
+tui.keymap.pager.close_transcript | 关闭记录 | | 用专用切换键关闭对话记录浮层。
+tui.keymap.pager.find | 查找 | | 在记录中查找文字。
+tui.keymap.pager.scroll_up | 上滚一行 | | 向上滚动一行。
+tui.keymap.pager.scroll_down | 下滚一行 | | 向下滚动一行。
+tui.keymap.pager.page_up | 上一页 | | 向上滚动一页。
+tui.keymap.pager.page_down | 下一页 | | 向下滚动一页。
+tui.keymap.pager.half_page_up | 上滚半页 | | 向上滚动半页。
+tui.keymap.pager.half_page_down | 下滚半页 | | 向下滚动半页。
+tui.keymap.pager.jump_top | 到开头 | | 跳到开头。
+tui.keymap.pager.jump_bottom | 到结尾 | | 跳到结尾。
+tui.keymap.vim_normal | Vim 普通模式 | keymap | 文本框内 Vim 普通模式的快捷键。使用大写字母的动作（如 A）应写成对应的大写键。
+tui.keymap.vim_normal.enter_insert | 插入（i） | | 在光标处进入插入模式（i）。
+tui.keymap.vim_normal.append_after_cursor | 光标后追加（a） | | 在光标后进入插入模式（a）。
+tui.keymap.vim_normal.append_line_end | 行尾追加（A） | | 在行尾进入插入模式（A）。
+tui.keymap.vim_normal.insert_line_start | 行首插入（I） | | 在行首第一个非空字符处进入插入模式（I）。
+tui.keymap.vim_normal.open_line_below | 下方新行（o） | | 在下方新开一行并进入插入模式（o）。
+tui.keymap.vim_normal.open_line_above | 上方新行（O） | | 在上方新开一行并进入插入模式（O）。
+tui.keymap.vim_normal.enter_replace_mode | 替换模式（R） | | 进入替换模式覆盖光标处字符（R）。
+tui.keymap.vim_normal.replace_char | 替换字符（r） | | 替换光标处的字符（r）。
+tui.keymap.vim_normal.substitute_char | 替换并插入（s） | | 删除光标处字符并进入插入模式（s）。
+tui.keymap.vim_normal.delete_char | 删除字符（x） | | 删除光标处的字符（x）。
+tui.keymap.vim_normal.delete_to_line_end | 删除到行尾（D） | | 删除光标到行尾（D）。
+tui.keymap.vim_normal.change_to_line_end | 修改到行尾（C） | | 修改光标到行尾并进入插入模式（C）。
+tui.keymap.vim_normal.yank_line | 复制整行（Y） | | 复制整行（Y）。
+tui.keymap.vim_normal.paste_after | 粘贴（p） | | 在光标后粘贴（p）。
+tui.keymap.vim_normal.undo | 撤销（u） | | 撤销上一次完整编辑（u）。
+tui.keymap.vim_normal.redo | 重做（Ctrl-r） | | 重做上一次撤销（ctrl-r）。
+tui.keymap.vim_normal.repeat_last_change | 重复修改（.） | | 重复上一次完整编辑（.）。
+tui.keymap.vim_normal.start_delete_operator | 删除操作符（d） | | 开始删除操作，下一个键选择移动范围（d）。
+tui.keymap.vim_normal.start_yank_operator | 复制操作符（y） | | 开始复制操作，下一个键选择移动范围（y）。
+tui.keymap.vim_normal.start_change_operator | 修改操作符（c） | | 开始修改操作，后续按键选择文本对象（c）。
+tui.keymap.vim_normal.cancel_operator | 取消操作符 | | 取消待定的操作符并回到普通模式。
+tui.keymap.vim_normal.move_left | 左移（h） | | 光标左移（h）。
+tui.keymap.vim_normal.move_right | 右移（l） | | 光标右移（l）。
+tui.keymap.vim_normal.move_up | 上移（k） | | 光标上移（k），在历史边界时调出更早的输入历史。
+tui.keymap.vim_normal.move_down | 下移（j） | | 光标下移（j），在历史边界时调出更新的输入历史。
+tui.keymap.vim_normal.move_word_forward | 下一个词首（w） | | 移到下一个单词开头（w）。
+tui.keymap.vim_normal.move_word_backward | 上一个词首（b） | | 移到上一个单词开头（b）。
+tui.keymap.vim_normal.move_word_end | 词尾（e） | | 移到当前或下一个单词末尾（e）。
+tui.keymap.vim_normal.move_line_start | 行首（0） | | 移到行首（0）。
+tui.keymap.vim_normal.move_line_end | 行尾（$） | | 移到行尾（$）。
+tui.keymap.vim_normal.jump_top | 到首行（gg） | | 开始跳到第一行（gg）。
+tui.keymap.vim_normal.jump_bottom | 到末行（G） | | 跳到最后一行（G）。
+tui.keymap.vim_normal.find_forward | 向后查找字符（f） | | 在当前行查找下一个字符（f）。
+tui.keymap.vim_normal.find_backward | 向前查找字符（F） | | 在当前行查找上一个字符（F）。
+tui.keymap.vim_normal.till_forward | 向后停到字符前（t） | | 停在当前行下一个字符之前（t）。
+tui.keymap.vim_normal.till_backward | 向前停到字符后（T） | | 停在当前行上一个字符之后（T）。
+tui.keymap.vim_operator | Vim 操作符待定 | keymap | Vim 操作符待定模式（按 d 或 y 后等待移动）的快捷键。
+tui.keymap.vim_operator.cancel | 取消 | | 取消待定操作符并回到普通模式。
+tui.keymap.vim_operator.delete_line | 删除整行（dd） | | 重复删除操作符删除整行（dd）。
+tui.keymap.vim_operator.yank_line | 复制整行（yy） | | 重复复制操作符复制整行（yy）。
+tui.keymap.vim_operator.motion_left | 移动：左（h） | | 移动范围：向左（h）。
+tui.keymap.vim_operator.motion_right | 移动：右（l） | | 移动范围：向右（l）。
+tui.keymap.vim_operator.motion_up | 移动：上（k） | | 移动范围：上一行（k）。
+tui.keymap.vim_operator.motion_down | 移动：下（j） | | 移动范围：下一行（j）。
+tui.keymap.vim_operator.motion_word_forward | 移动：下一个词（w） | | 移动范围：到下一个单词开头（w）。
+tui.keymap.vim_operator.motion_word_backward | 移动：上一个词（b） | | 移动范围：到上一个单词开头（b）。
+tui.keymap.vim_operator.motion_word_end | 移动：词尾（e） | | 移动范围：到当前或下一个单词末尾（e）。
+tui.keymap.vim_operator.motion_line_start | 移动：行首（0） | | 移动范围：到行首（0）。
+tui.keymap.vim_operator.motion_line_end | 移动：行尾（$） | | 移动范围：到行尾（$）。
+tui.keymap.vim_operator.motion_jump_top | 移动：首行（gg） | | 移动范围：开始跳到第一行（gg）。
+tui.keymap.vim_operator.motion_jump_bottom | 移动：末行（G） | | 移动范围：跳到最后一行（G）。
+tui.keymap.vim_operator.motion_find_forward | 移动：向后查找（f） | | 移动范围：当前行下一个字符（f）。
+tui.keymap.vim_operator.motion_find_backward | 移动：向前查找（F） | | 移动范围：当前行上一个字符（F）。
+tui.keymap.vim_operator.motion_till_forward | 移动：停到字符前（t） | | 移动范围：停在下一个字符之前（t）。
+tui.keymap.vim_operator.motion_till_backward | 移动：停到字符后（T） | | 移动范围：停在上一个字符之后（T）。
+tui.keymap.vim_operator.select_inner_text_object | 选择内部文本对象（i） | | 操作符后选择内部文本对象。
+tui.keymap.vim_operator.select_around_text_object | 选择外围文本对象（a） | | 操作符后选择包含边界的文本对象。
+tui.keymap.vim_search | Vim 搜索 | keymap | Vim 普通模式与操作符待定模式共用的搜索快捷键。
+tui.keymap.vim_search.forward | 向后搜索（/） | | 在当前缓冲区向后搜索（/）。
+tui.keymap.vim_search.backward | 向前搜索（?） | | 在当前缓冲区向前搜索（?）。
+tui.keymap.vim_search.next | 下一个匹配（n） | | 重复上次搜索（n）。
+tui.keymap.vim_search.previous | 上一个匹配（N） | | 反方向重复搜索（N）。
+tui.keymap.vim_text_object | Vim 文本对象 | keymap | 文本框内 Vim 文本对象的快捷键。
+tui.keymap.vim_text_object.word | 单词（w） | | 文本对象：单词。
+tui.keymap.vim_text_object.big_word | 空白分隔词（W） | | 文本对象：以空白分隔的 WORD。
+tui.keymap.vim_text_object.parentheses | 圆括号 | | 文本对象：圆括号。
+tui.keymap.vim_text_object.brackets | 方括号 | | 文本对象：方括号。
+tui.keymap.vim_text_object.braces | 花括号 | | 文本对象：花括号。
+tui.keymap.vim_text_object.double_quote | 双引号 | | 文本对象：双引号。
+tui.keymap.vim_text_object.single_quote | 单引号 | | 文本对象：单引号。
+tui.keymap.vim_text_object.backtick | 反引号 | | 文本对象：反引号。
+tui.keymap.vim_text_object.cancel | 取消 | | 取消待定的文本对象命令。

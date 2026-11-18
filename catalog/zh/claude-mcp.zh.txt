@@ -1,0 +1,19 @@
+# Claude Code MCP 服务器中文叠加层（~/.claude.json 与 .mcp.json 中的 mcpServers）
+# 字段来自 Claude Code 2.1.327 程序内置的 MCP 配置定义
+
+@category mcp | MCP 服务器 | 10 | Claude Code 能调用的 MCP 服务器。本地服务器填「启动命令」，远程服务器把连接方式改为 http / sse 并填「地址」。也可以在终端用 claude mcp add 添加。
+@prefix mcpServers => mcp
+
+mcpServers | MCP 服务器 | mcp | 给 Claude Code 添加 MCP 服务器，扩展它能用的工具。每个条目的名称就是服务器名。 | | | ex={"my-server":{"command":"npx","args":["-y","<package-name>"]}}
+mcpServers.*.type | 连接方式 | mcp | 本地命令（stdio）或远程（http / sse / ws），本地服务器可以不填 | | | enum=stdio:本地命令,http:HTTP,sse:SSE,ws:WebSocket
+mcpServers.*.command | 启动命令 | mcp | 启动本地服务器的命令，如 npx、uvx、node | | | ph=npx
+mcpServers.*.args | 命令参数 | mcp | 传给启动命令的参数，每行一个 | | | ex=["-y","<package-name>"]
+mcpServers.*.env | 环境变量 | mcp | 传给服务器进程的环境变量，常用来放 API Key | | | s
+mcpServers.*.url | 地址 | mcp | 远程服务器的地址 | | | ph=<YOUR_MCP_URL>
+mcpServers.*.headers | 请求头 | mcp | 发给远程服务器的请求头，如 Authorization | | | s
+mcpServers.*.headersHelper | 请求头生成命令 | mcp | 运行命令获取请求头（输出 JSON），适合会过期的令牌 | | |
+mcpServers.*.oauth.clientId | OAuth 客户端 ID | mcp | 服务器要求预先注册客户端时填写 | | |
+mcpServers.*.oauth.callbackPort | OAuth 回调端口 | mcp | 登录回调使用的固定端口 | | |
+mcpServers.*.oauth.scopes | OAuth 权限范围 | mcp | 登录时申请的权限范围 | | |
+mcpServers.*.timeout | 超时 | mcp | 请求超时时间，超过就放弃这次请求 | | | u=毫秒
+mcpServers.*.alwaysLoad | 总是加载工具 | mcp | 开启后工具总是直接提供给模型，不再按需加载 | | |

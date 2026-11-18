@@ -1,0 +1,81 @@
+# Claude Code settings.json 一句话说明（第 2 部分）
+hooks | 在特定事件发生时自动运行你的命令，如编辑后自动格式化
+disableAllHooks | 开启后所有 hooks 和状态栏命令都不再运行
+disableReplyCheck | 仅 Claude Tag 自托管用：关闭回合结束时的回复检查
+enableAllProjectMcpServers | 开启后项目里的 MCP 服务器自动启用，不再逐个询问
+disableClaudeAiConnectors | 开启后不连接 claude.ai 上的云端连接器
+enabledPlugins | 启用或停用哪些插件
+extraKnownMarketplaces | 给项目添加插件市场，团队成员自动获得
+additionalMarketplaces | 同 extraKnownMarketplaces，建议改用它
+pluginConfigs | 各个插件自己的配置项
+skillOverrides | 控制技能在列表中怎么显示，或对模型隐藏
+disableBundledSkills | 开启后不再提供 Claude Code 自带的技能
+skillListingMaxDescChars | 每个技能描述最多发送多少字，越大越占上下文
+skillListingBudgetFraction | 技能列表最多占上下文的比例，越大越占空间
+disableSkillShellExecution | 禁止技能和自定义命令里直接运行 Shell 命令
+theme | 界面配色，如 dark、light
+tui | 设为 fullscreen 可消除终端闪烁
+viewMode | 启动时显示多少细节，如 verbose 显示完整工具输出
+defaultView | 默认只看关键消息还是完整记录
+editorMode | 输入框使用普通按键还是 vim 按键
+vimInsertModeRemaps | vim 插入模式的快捷键映射，如 jj 当 Esc
+keybindingFlavor | 已无效果，可以删除
+statusLine.refreshInterval | 状态栏每隔几秒刷新一次
+statusLine.hideVimModeIndicator | 隐藏输入框下方的 vim 模式提示
+footerLinksRegexes | 输出匹配规则时在页脚显示链接，如工单号
+spinnerVerbs.mode | 自定义动词是追加还是替换默认动词
+spinnerTipsOverride.tipsFile | 从这个文件读取等待时显示的提示
+maxProseWidth | 回复正文最多显示多宽，宽屏阅读更舒服
+spellcheck.checker | 用哪个拼写检查程序
+spellcheck.color | 拼写错误标记成什么颜色
+terminalTitleFromRename | /rename 时是否同步修改终端标题
+emojiCompletionEnabled | 关闭后输入 :表情名: 不再弹出补全
+showClearContextOnPlanAccept | 批准计划时多一个「清空上下文」选项
+askUserQuestionTimeout | Claude 提问后无人回答多久自动继续
+dialogExpiry | 远程确认框等待多久，超时按安全方式处理
+companyAnnouncements | 启动时显示的公告，常用于团队通知
+timeFormat | 时间显示为 12 小时制还是 24 小时制
+timeZone | 界面时间使用的时区，如 Asia/Shanghai
+autoScrollEnabled | 有新内容时自动滚到底部
+wheelScrollAccelerationEnabled | 快速滚动鼠标滚轮时加速滚动
+terminalProgressBarEnabled | 长任务时在终端标签页上显示进度
+clawdFileProgressEnabled | 传输文件时显示吉祥物搬运动画
+awaySummaryEnabled | 离开 5 分钟以上回来时显示会话回顾
+voice.mode | 按住说话，还是点一下开始、再点一下结束
+voiceEnabled | 开启语音输入（旧写法，新版用 voice.enabled）
+axScreenReader | 输出适合屏幕阅读器的纯文本界面
+breakReminder.intervalMinutes | 连续使用多少分钟提醒你休息
+quietHours.enabled | 在你设定的休息时段使用时提醒一次
+quietHours.end | 休息时段几点结束
+disableDeepLinkRegistration | 设为 disable 后不注册 claude-cli:// 链接
+enableArtifact | 开启或关闭 Artifacts 功能
+disableArtifact | 已弃用，改用 enableArtifact
+autoCompactWindow | 上下文用到多少 token 时自动压缩
+precomputeCompactionEnabled | 提前在后台准备压缩，压缩时不用等待
+idleCompaction | 会话空闲时自动压缩长对话
+precomputeArmTokens | 宿主程序专用，写在设置文件中无效
+autoCompactRaisedForLoad | 桌面端专用，写在设置文件中无效
+autoCompactOfferAnswer.choice | 你对压缩建议的回答（自动写入）
+autoMemoryEnabled | 关闭后 Claude 不再自动记住项目信息
+autoMemoryDirectory | 自动记忆保存在哪个目录
+autoDreamEnabled | 在后台自动整理记忆
+claudeMdExcludes | 不加载这些 CLAUDE.md 文件
+plansDirectory | 计划文件保存在哪个目录
+totalTokensReminder | 是否提示模型还剩多少 token
+totalTokensReminderBudget | 剩余 token 提示的起始预算
+totalTokensReminderAfterUserTurn | 每次你发消息后也提示剩余 token
+attribution.commit | 提交信息里的 Claude 署名，留空则不署名
+attribution.sessionUrl | 提交和 PR 中附上会话链接
+includeCoAuthoredBy | 已弃用，改用 attribution
+attributionProject | 用量计入哪个 claude.ai Project
+includeGitInstructions | 关闭后不加入内置的提交、PR 流程说明，省上下文
+prUrlTemplate | 自建代码审查系统的 PR 链接格式
+worktree.symlinkDirectories | worktree 共用这些目录，如 node_modules，省空间
+worktree.sparsePaths | worktree 只检出这些目录，大仓库更快
+worktree.baseRef | 新 worktree 从远程默认分支还是当前代码开始
+worktree.bgIsolation | 后台任务能否直接改动你的工作区
+worktree.location | 桌面端 SSH 会话的 worktree 存放位置
+defaultShell | 输入框中 ! 命令用 bash 还是 powershell
+disableWindowsBashCommandSplit | 不拆分命令，方便安全软件检查（仅 Windows）
+bashEditDiffEnabled | 显示命令改动了哪些文件
+bashOutputMaxChars | 命令输出超过这个字数时，只给 Claude 看预览

@@ -1,0 +1,79 @@
+# Claude Code settings.json 一句话说明（第 3 部分）
+taskOutputMaxChars | 已无效果，可以删除
+respondToBashCommands | 关闭后 ! 命令只把输出交给 Claude，不触发回复
+respectGitignore | @ 选择文件时跳过 .gitignore 忽略的文件
+ultracode | 开启后会话始终用多代理工作流处理任务
+agent | 主对话直接使用某个代理的设定和工具
+disableAgentView | 关闭代理视图和后台会话功能
+disableWorkflows | 关闭多代理工作流功能
+enableWorkflows | 开启或关闭多代理工作流功能
+workflowSizeGuideline | 多代理工作流的建议规模，越大越费额度
+workflowKeywordTriggerEnabled | 提示里写 ultracode 时自动使用工作流
+skipWorkflowUsageWarning | 不再提示工作流用量警告（自动写入）
+teammateMode | 代理团队的队友在哪里运行，如 tmux 窗格
+modelProposedGoals | Claude 提议的任务目标是否要你确认
+doneMeansMerged | 开启后 Claude 会一直做到 PR 可以合并
+crossSessionInbound | 是否接收你其他会话发来的消息
+isolatePeerMachines | 向其他机器上的会话发消息前需要确认
+sshConfigs | 预先配置好的远程 SSH 连接
+sshHostCommands | 用命令生成主机地址的 SSH 连接（桌面端）
+disableRemoteControl | 关闭远程控制功能
+remoteControlAtStartup | 每次启动自动开启远程控制，可在手机上继续
+remoteControl.shareHostProfile | 远程控制时上报多少本机信息
+remoteTools.allowUnattendedServing | 关闭后云端会话不能无人确认地在本机执行命令
+daemonColdStart | 后台服务没运行时：临时启动，还是询问安装
+preferredNotifChannel | 任务完成时用哪种方式通知你
+autoUpdatesChannel | 更新到最新版还是稳定版
+minimumVersion | 自动更新时不会降到低于这个版本
+apiKeyHelper | 运行脚本获取 API Key，适合会过期的密钥
+proxyAuthHelper | 运行命令获取企业代理的认证信息
+awsCredentialExport | 运行脚本获取 AWS 凭据（Bedrock 用户）
+awsAuthRefresh | AWS 凭据过期时自动运行的登录命令
+gcpAuthRefresh | GCP 凭据过期时自动运行的登录命令
+forceLoginMethod | 只允许用某种方式登录
+forceLoginGatewayUrl | 登录时预先填好的企业网关地址
+gatewayInternalNetworks | 企业网关所在的公网网段
+forceLoginOrgUUID | 只允许指定组织的账号登录
+allowNestedModelAccessUnderForceLogin | 自托管 runner 专用：允许子进程借用模型权限
+otelHeadersHelper | 运行脚本生成监控上报时的请求头
+cleanupPeriodDays | 本机聊天记录保留多少天
+desktopSessionCleanupPeriodDays | 桌面端会话记录最多保留多少天，0 为不限
+syncClaudeAiSkills | 关闭后不再同步 claude.ai 上启用的技能
+syncClaudeAiPlugins | 关闭后不再同步 claude.ai 上启用的插件
+feedbackSurveyRate | 弹出满意度调查的概率，0 为不再弹出
+feedbackDrafts | Claude 起草反馈时如何提示你
+autoUploadSessions | 把本机会话同步到 claude.ai 上查看
+processWrapper | 用企业启动器包裹后台进程
+policyHelpers | 按系统配置策略辅助程序（内部功能）
+wslInheritsWindowsSettings | WSL 里的 Claude Code 也遵循 Windows 上的策略
+attributionProjectPolicy.default | 用量默认计入的项目
+allowManagedHooksOnly | 只运行管理员设置的 hooks
+allowedHttpHookUrls | HTTP hook 只能访问这些地址
+httpHookAllowedEnvVars | HTTP hook 能使用的环境变量
+allowManagedPermissionRulesOnly | 只认管理员设置的权限规则
+allowManagedMcpServersOnly | MCP 白名单只认管理员的设置
+allowAllClaudeAiMcps | 锁定 MCP 时仍允许 claude.ai 连接器
+allowClaudeInChromeWithManagedMcp | 锁定 MCP 时仍允许 Claude in Chrome
+strictPluginOnlyCustomization | 技能、代理、hooks、MCP 只能通过插件添加
+managedMcpServers | 组织统一提供给每个人的 MCP 服务器
+allowedMcpServers | 只能使用这些 MCP 服务器
+deniedMcpServers | 禁止使用这些 MCP 服务器
+prependPlugins | 最先执行 hooks 的托管插件
+appendPlugins | 最后执行 hooks 的托管插件
+strictKnownMarketplaces | 只能添加这些来源的插件市场
+allowedMarketplaces | 同 strictKnownMarketplaces（别名）
+blockedMarketplaces | 禁止添加这些插件市场
+disableCommandPluginSources | 是否允许安装命令生成的插件
+disableSideloadFlags | 禁止用启动参数临时加载插件和 MCP
+pluginSuggestionMarketplaces | 只推荐这些市场里的插件
+parentSettingsBehavior | SDK 传入的设置是否与管理员设置合并
+managedSourcesBehavior | 多个托管来源同时存在时如何合并
+allowedProviders | 只允许使用这些 API 服务商
+forceRemoteSettingsRefresh | 启动前必须先拉取最新的远程策略
+requiredMinimumVersion | 低于这个版本的 Claude Code 不能启动
+requiredMaximumVersion | 高于这个版本的 Claude Code 不能启动
+claudeMd | 组织统一下发的 CLAUDE.md 指令
+pluginTrustMessage | 安装插件时附加的提示文字
+channelsEnabled | 是否允许 MCP 服务器向会话推送消息
+allowedChannelPlugins | 允许推送消息的插件
+skipWebFetchPreflight | 跳过网页抓取前的安全预检

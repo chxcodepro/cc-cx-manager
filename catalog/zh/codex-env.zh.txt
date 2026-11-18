@@ -1,0 +1,34 @@
+# Codex ~/.codex/.env 中文叠加层（对应 Codex CLI 0.170.0，来源 learn.chatgpt.com/docs/config-file/environment-variables 与 codex-rs/arg0/src/lib.rs）
+# .env 的加载规则（已核对源码）：
+#   - 只读取 CODEX_HOME/.env（默认 ~/.codex/.env），项目目录里的 .env 不会被读取
+#   - 以 CODEX_ 开头的变量（不区分大小写）一律忽略，必须在系统环境变量中设置
+#   - 其他变量会写入 Codex 进程环境，并覆盖同名的系统环境变量；无法解析的行会被跳过
+
+@category refs | config.toml 引用的变量 | 5 | 根据 config.toml 中 model_providers 的 env_key / env_http_headers，以及 mcp_servers 的 bearer_token_env_var / env_vars / env_http_headers 自动列出。Codex 启动时会把 .env 载入进程环境，所以服务商 API Key 可以直接写在这里，不必设置系统环境变量。
+@category auth | 认证与身份 | 10 | 工作负载身份（Workload Identity）联合认证相关变量，用于在 CI / 云环境中免密钥登录 OpenAI。
+@category network | 网络与证书 | 20 | 代理与自定义 CA 证书。公司网络有 TLS 拦截或使用自签名证书时需要配置。
+@category debug | 日志与调试 | 30 | 排查问题时调整日志详细程度。
+@category sysenv | 仅系统环境变量（.env 中无效） | 40 | 以下变量都以 CODEX_ 开头，Codex 会忽略 .env 中的这些变量，必须在系统环境中设置。\nWindows：设置 → 系统 → 关于 → 高级系统设置 → 环境变量；或在 PowerShell 中运行 [Environment]::SetEnvironmentVariable('变量名', '值', 'User')，然后重新打开终端。\nmacOS / Linux：在 ~/.zshrc 或 ~/.bashrc 中加入 export 变量名="值"，然后重新打开终端或执行 source。
+
+# ---------------- 认证与身份 ----------------
+OPENAI_FEDERATION_RULE_ID | 联合认证规则 ID | auth | 选择为当前工作负载配置的联合认证（federation）规则。与 OPENAI_IDENTITY_TOKEN_FILE 一起使用，让 CI 或云主机用 OIDC 令牌换取访问权限，无需保存 API Key。 | | | ;; tags=enterprise ;; ph=<YOUR_FEDERATION_RULE_ID>
+OPENAI_IDENTITY_TOKEN_FILE | 身份令牌文件 | auth | 指向保存当前 OIDC 令牌或 SPIFFE JWT-SVID 的文件，必须是绝对路径。令牌由 CI 平台或云服务自动写入并轮换。 | | | ;; tags=enterprise ;; ph=/var/run/secrets/openai/token
+OPENAI_WORKLOAD_IDENTITY_CONTEXT | 工作负载审计上下文 | auth | 可选：提供有限长度的 JSON 标识，用于客户端上报的审计归属（例如流水线名称、任务 ID）。不影响认证和授权。 | | | ;; tags=enterprise ;; ex={"pipeline":"build","job_id":"123"}
+
+# ---------------- 网络与证书 ----------------
+SSL_CERT_FILE | CA 证书文件 | network | PEM 格式的 CA 证书包路径，在未设置 CODEX_CA_CERTIFICATE 时生效，用于 HTTPS、登录和 WebSocket 连接。公司网络做了 TLS 拦截（出现证书错误）时，把公司根证书导出为 PEM 后在这里指定。 | | 只有出现证书错误时才需要设置 | ph=/path/to/corporate-ca.pem ;; pn.windows=Windows 路径可写成 C:/certs/corp-ca.pem（正斜杠）以免转义问题
+HTTPS_PROXY | HTTPS 代理 | network | Codex 使用的 HTTP 客户端（reqwest）会读取此变量，把 HTTPS 请求经过代理发送。官方文档未单独列出。写在 .env 中也会传给 Codex 执行的命令（取决于 shell_environment_policy）。 | | 需要代理访问 OpenAI 时设置 | tags=undocumented ;; ph=http://127.0.0.1:7890
+HTTP_PROXY | HTTP 代理 | network | 同 HTTPS_PROXY，作用于 http:// 请求。官方文档未单独列出。 | | | ;; tags=undocumented ;; ph=http://127.0.0.1:7890
+NO_PROXY | 不走代理的地址 | network | 用逗号分隔的主机名或域名后缀，这些地址直连、不经过代理。使用本地模型服务（如 localhost）时建议加上。官方文档未单独列出。 | | | ;; tags=undocumented ;; ph=localhost,127.0.0.1,::1
+
+# ---------------- 日志与调试 ----------------
+RUST_LOG | 日志级别 | debug | 控制 Rust 日志的过滤与详细程度，可写 error、warn、info、debug、trace，也可以按模块指定，如 codex_core=debug,codex_tui=debug。codex exec 默认只输出 error。交互式 CLI 默认不写明文日志文件，需要 codex-tui.log 时请同时在 config.toml 中设置 log_dir。 | | 平时不要设置；排查问题时临时设为 debug，用完删除，避免日志过大 | ph=info ;; ex="codex_core=debug,codex_tui=debug"
+
+# ---------------- 仅系统环境变量 ----------------
+CODEX_HOME | Codex 数据目录 | sysenv | 设置 Codex 状态的根目录，包括 config.toml、登录凭据、日志、会话、技能和独立安装包元数据。指定的目录必须已经存在。注意：.env 本身就位于 CODEX_HOME 中，因此无法用 .env 修改它，只能在系统环境中设置。 | | | ;; tags=sysenv ;; dn=~/.codex ;; ph=D:/codex-home
+CODEX_SQLITE_HOME | SQLite 数据目录 | sysenv | 设置 SQLite 状态数据的存放位置。config.toml 中的 sqlite_home 优先级更高；相对路径以当前工作目录为基准。多台 Linux 主机共享网络文件系统（NFS）上的 Codex 目录时可单独指定到本地磁盘。只能在系统环境中设置。 | | 一般不需要设置；需要时优先用 config.toml 的 sqlite_home | tags=sysenv ;; dn=与 CODEX_HOME 相同
+CODEX_NON_INTERACTIVE | 安装程序非交互模式 | sysenv | 设为 1、true 或 yes 时，独立安装脚本（install.sh / install.ps1）跳过所有提问并使用默认答案。适合脚本化安装与更新，不适合首次安装。只对运行安装脚本的那个 shell 生效。 | | | ;; tags=sysenv ;; dn=false ;; ex="1" ;; pn.windows=PowerShell：$env:CODEX_NON_INTERACTIVE=1; irm https://chatgpt.com/codex/install.ps1 \| iex ;; pn.macos=curl -fsSL https://chatgpt.com/codex/install.sh \| CODEX_NON_INTERACTIVE=1 sh ;; pn.linux=curl -fsSL https://chatgpt.com/codex/install.sh \| CODEX_NON_INTERACTIVE=1 sh
+CODEX_INSTALL_DIR | 命令安装目录 | sysenv | 修改独立安装脚本放置 codex 命令的位置。安装包缓存仍然位于 CODEX_HOME/packages/standalone。只对安装脚本生效。 | | | ;; tags=sysenv ;; dn=macOS / Linux：~/.local/bin；Windows：%LOCALAPPDATA%\\Programs\\OpenAI\\Codex\\bin
+CODEX_API_KEY | API Key（非交互） | sysenv | 为非交互的 Codex 进程（codex exec、review、TypeScript SDK、远程 exec-server）提供 API Key。运行仓库中不受信任的代码时，建议只在单条命令前临时设置，而不是对整个任务全局设置。只能在系统环境或命令行中设置。 | | 交互式使用请改用 codex login 登录 | tags=sysenv,security ;; s ;; ph=<YOUR_API_KEY>
+CODEX_ACCESS_TOKEN | 访问令牌 | sysenv | 为受信任的自动化流程提供 ChatGPT 或 Codex 访问令牌。需要持久登录时，可通过管道传给 codex login --with-access-token。只能在系统环境或命令行中设置。 | | | ;; tags=sysenv,security ;; s ;; ph=<YOUR_ACCESS_TOKEN>
+CODEX_CA_CERTIFICATE | Codex 专用 CA 证书 | sysenv | 指向 PEM 格式的 CA 证书包，用于公司 TLS 拦截或私有根证书环境，优先级高于 SSL_CERT_FILE。由于以 CODEX_ 开头，写在 .env 中无效；如果只能用 .env，请改用 SSL_CERT_FILE。 | | | ;; tags=sysenv ;; ph=/path/to/corporate-ca.pem

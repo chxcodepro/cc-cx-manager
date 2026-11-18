@@ -1,0 +1,4061 @@
+{
+ "meta": {
+  "version": "0.170.0",
+  "source": "openai/codex@rust-v0.170.0 codex-rs/core/config.schema.json",
+  "generatedAt": "2026-11-18"
+ },
+ "items": [
+  {
+   "key": "agents",
+   "type": "group",
+   "en": "Agent-related settings (thread limits, etc.)."
+  },
+  {
+   "key": "agents.default_subagent_model",
+   "type": "string",
+   "en": "Default model for spawned subagents when the spawn call does not select one."
+  },
+  {
+   "key": "agents.default_subagent_reasoning_effort",
+   "type": "string",
+   "en": "Default reasoning effort for spawned subagents when the spawn call does not select one."
+  },
+  {
+   "key": "agents.enabled",
+   "type": "boolean",
+   "en": "Whether multi-agent tools are enabled. Defaults to true. An enabled `features.multi_agent_v2` setting takes precedence."
+  },
+  {
+   "key": "agents.interrupt_message",
+   "type": "boolean",
+   "en": "Whether to record a model-visible message when an agent turn is interrupted. Defaults to true."
+  },
+  {
+   "key": "agents.max_concurrent_threads_per_session",
+   "type": "integer",
+   "min": 1,
+   "en": "Maximum number of spawned agent threads that can be open concurrently per session. When unset, the selected multi-agent backend uses its default."
+  },
+  {
+   "key": "agents.max_depth",
+   "type": "integer",
+   "en": "Maximum nesting depth for V1 agent threads. Ignored by V2."
+  },
+  {
+   "key": "allow_login_shell",
+   "type": "boolean",
+   "en": "Whether the model may request a login shell for shell-based tools. Default to `true`\n\nIf `true`, the model may request a login shell (`login = true`), and omitting `login` defaults to using a login shell. If `false`, the model can never use a login shell: `login = true` requests are rejected, and omitting `login` defaults to a non-login shell."
+  },
+  {
+   "key": "allow_symlinked_codex_home",
+   "type": "boolean",
+   "en": "Allow macOS sandbox writable roots at or beneath CODEX_HOME to traverse symlinks. Read only from the host's user config at startup; defaults to false. This grants no write access by itself, but trusts symlink targets even if they change between commands or lie outside CODEX_HOME. This setting has no effect on Linux or Windows."
+  },
+  {
+   "key": "analytics",
+   "type": "group",
+   "en": "When `enabled` is `false`, disables OpenAI analytics across Codex product surfaces on this machine. Custom OTLP metrics exporters are controlled by `otel.metrics_exporter`. When unset, the default depends on the client."
+  },
+  {
+   "key": "analytics.enabled",
+   "type": "boolean",
+   "en": "When `false`, disables OpenAI analytics across Codex product surfaces in this profile. Custom OTLP metrics exporters remain enabled; set `otel.metrics_exporter = \"none\"` to disable them."
+  },
+  {
+   "key": "approval_policy",
+   "type": "json",
+   "en": "Default approval policy for executing commands."
+  },
+  {
+   "key": "approvals_reviewer",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "user"
+    },
+    {
+     "value": "auto_review"
+    },
+    {
+     "value": "guardian_subagent"
+    }
+   ],
+   "en": "Configures who approval requests are routed to for review once they have been escalated. This does not disable separate safety checks such as ARC."
+  },
+  {
+   "key": "apps",
+   "type": "group",
+   "en": "Settings for app-specific controls."
+  },
+  {
+   "key": "apps._default",
+   "type": "group",
+   "en": "Default settings for all apps."
+  },
+  {
+   "key": "apps._default.approvals_reviewer",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "user"
+    },
+    {
+     "value": "auto_review"
+    },
+    {
+     "value": "guardian_subagent"
+    }
+   ],
+   "en": "Reviewer for approval prompts unless overridden by per-app settings."
+  },
+  {
+   "key": "apps._default.default_tools_approval_mode",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "auto"
+    },
+    {
+     "value": "prompt"
+    },
+    {
+     "value": "writes"
+    },
+    {
+     "value": "approve"
+    }
+   ],
+   "en": "Approval mode for tools unless overridden by per-app or per-tool settings."
+  },
+  {
+   "key": "apps._default.destructive_enabled",
+   "type": "boolean",
+   "en": "Whether tools with `destructive_hint = true` are allowed by default."
+  },
+  {
+   "key": "apps._default.enabled",
+   "type": "boolean",
+   "default": true,
+   "en": "When `false`, apps are disabled unless overridden by per-app settings."
+  },
+  {
+   "key": "apps._default.open_world_enabled",
+   "type": "boolean",
+   "en": "Whether tools with `open_world_hint = true` are allowed by default."
+  },
+  {
+   "key": "apps_mcp_product_sku",
+   "type": "string",
+   "en": "Optional product SKU forwarded on host-owned Codex Apps MCP requests."
+  },
+  {
+   "key": "audio",
+   "type": "group",
+   "en": "Machine-local realtime audio device preferences used by realtime voice."
+  },
+  {
+   "key": "audio.microphone",
+   "type": "string"
+  },
+  {
+   "key": "audio.microphone_channel",
+   "type": "json",
+   "en": "One-based microphone channels to mix; unset mixes all input channels."
+  },
+  {
+   "key": "audio.speaker",
+   "type": "string"
+  },
+  {
+   "key": "auto_review",
+   "type": "group",
+   "en": "Optional policy instructions for the guardian auto-reviewer."
+  },
+  {
+   "key": "auto_review.circuit_break_action",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "default",
+     "en": "Emit the warning and interrupt without structured error details."
+    },
+    {
+     "value": "strict",
+     "en": "Emit the same warning and interruption, with structured error details."
+    }
+   ],
+   "en": "Controls whether circuit-breaker interruptions include a structured error. Strict mode writes structured errors that older clients may not recognize when reading shared history. Defaults to `default`."
+  },
+  {
+   "key": "auto_review.conversation_history_max_output_tokens",
+   "type": "integer",
+   "min": 1,
+   "en": "Maximum estimated tokens per Guardian history-tool response, before the standard serialization allowance. Defaults to 4,000; stricter parent tool limits still apply."
+  },
+  {
+   "key": "auto_review.experimental_conversation_history_prompt",
+   "type": "string",
+   "en": "Experimental replacement for the history-retrieval instructions when history tools and Apps are enabled. Omitted or blank values use the built-in prompt."
+  },
+  {
+   "key": "auto_review.policy",
+   "type": "string",
+   "en": "Additional policy instructions inserted into the guardian prompt."
+  },
+  {
+   "key": "auto_review.timeout_ms",
+   "type": "integer",
+   "min": 0,
+   "en": "Overall Guardian review budget in milliseconds, including setup and retries. Defaults to 90,000. Set to 0 to wait without a review deadline; cancellation and independent transport timeouts still apply."
+  },
+  {
+   "key": "background_terminal_max_timeout",
+   "type": "integer",
+   "min": 0,
+   "en": "Maximum poll window for background terminal output (`write_stdin`), in milliseconds. Default: `300000` (5 minutes)."
+  },
+  {
+   "key": "browser_use",
+   "type": "group"
+  },
+  {
+   "key": "browser_use.allow_history_access",
+   "type": "boolean"
+  },
+  {
+   "key": "browser_use.default_origin_policy",
+   "type": "group"
+  },
+  {
+   "key": "browser_use.default_origin_policy.access",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "allow"
+    },
+    {
+     "value": "deny"
+    }
+   ]
+  },
+  {
+   "key": "browser_use.default_origin_policy.downloads",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "allow"
+    },
+    {
+     "value": "deny"
+    }
+   ]
+  },
+  {
+   "key": "browser_use.default_origin_policy.full_cdp_access",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "allow"
+    },
+    {
+     "value": "deny"
+    }
+   ]
+  },
+  {
+   "key": "browser_use.default_origin_policy.uploads",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "allow"
+    },
+    {
+     "value": "deny"
+    }
+   ]
+  },
+  {
+   "key": "browser_use.origins",
+   "type": "record"
+  },
+  {
+   "key": "browser_use.origins.*.access",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "allow"
+    },
+    {
+     "value": "deny"
+    }
+   ]
+  },
+  {
+   "key": "browser_use.origins.*.downloads",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "allow"
+    },
+    {
+     "value": "deny"
+    }
+   ]
+  },
+  {
+   "key": "browser_use.origins.*.full_cdp_access",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "allow"
+    },
+    {
+     "value": "deny"
+    }
+   ]
+  },
+  {
+   "key": "browser_use.origins.*.uploads",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "allow"
+    },
+    {
+     "value": "deny"
+    }
+   ]
+  },
+  {
+   "key": "chatgpt_base_url",
+   "type": "string",
+   "en": "Base URL for requests to ChatGPT (as opposed to the OpenAI API)."
+  },
+  {
+   "key": "check_for_update_on_startup",
+   "type": "boolean",
+   "en": "When `true`, checks for Codex updates on startup and surfaces update prompts. Set to `false` only if your Codex updates are centrally managed. Defaults to `true`."
+  },
+  {
+   "key": "cli_auth_credentials_store",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "file",
+     "en": "Persist credentials in CODEX_HOME/auth.json."
+    },
+    {
+     "value": "keyring",
+     "en": "Persist credentials in the keyring. Fail if unavailable."
+    },
+    {
+     "value": "auto",
+     "en": "Use keyring when available; otherwise, fall back to a file in CODEX_HOME."
+    },
+    {
+     "value": "ephemeral",
+     "en": "Store credentials in memory only for the current process."
+    }
+   ],
+   "en": "Preferred backend for storing CLI auth credentials. file (default): Use a file in the Codex home directory. keyring: Use an OS-specific keyring service. auto: Use the keyring if available, otherwise use a file."
+  },
+  {
+   "key": "cloud",
+   "type": "group",
+   "en": "Cloud-owned feature settings."
+  },
+  {
+   "key": "cloud.skills",
+   "type": "group",
+   "en": "Cloud skills are permitted by default; the host must supply a cloud provider."
+  },
+  {
+   "key": "cloud.skills.enabled",
+   "type": "boolean"
+  },
+  {
+   "key": "compact_prompt",
+   "type": "string",
+   "en": "Compact prompt used for history compaction."
+  },
+  {
+   "key": "computer_use",
+   "type": "group"
+  },
+  {
+   "key": "computer_use.default_app_access",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "allow"
+    },
+    {
+     "value": "deny"
+    }
+   ]
+  },
+  {
+   "key": "computer_use.macos",
+   "type": "group"
+  },
+  {
+   "key": "computer_use.macos.bundle_ids",
+   "type": "map"
+  },
+  {
+   "key": "computer_use.windows",
+   "type": "group"
+  },
+  {
+   "key": "computer_use.windows.aumids",
+   "type": "map"
+  },
+  {
+   "key": "computer_use.windows.exes",
+   "type": "json"
+  },
+  {
+   "key": "daybreak",
+   "type": "boolean",
+   "en": "Default Daybreak preference for new threads and non-interactive turns."
+  },
+  {
+   "key": "default_permissions",
+   "type": "string",
+   "en": "Default permissions profile to apply. Names starting with `:` refer to built-in profiles; other names are resolved from the `[permissions]` table."
+  },
+  {
+   "key": "desktop",
+   "type": "json",
+   "en": "Opaque desktop settings stored alongside the rest of config.toml."
+  },
+  {
+   "key": "developer_instructions",
+   "type": "string",
+   "en": "Developer instructions inserted as a `developer` role message."
+  },
+  {
+   "key": "disable_paste_burst",
+   "type": "boolean",
+   "en": "Legacy fallback for `tui.disable_paste_burst`. Prefer the setting under `[tui]`."
+  },
+  {
+   "key": "experimental_compact_prompt_file",
+   "type": "string",
+   "en": "A path that is guaranteed to be absolute and normalized (though it is not guaranteed to be canonicalized or exist on the filesystem).\n\nIMPORTANT: When deserializing an `AbsolutePathBuf`, a base path must be set using [AbsolutePathBufGuard::new]. If no base path is set, the deserialization will fail unless the path being deserialized is already absolute."
+  },
+  {
+   "key": "experimental_realtime_start_instructions",
+   "type": "string",
+   "en": "Experimental / do not use. Replaces the built-in realtime start instructions inserted into developer messages when realtime becomes active."
+  },
+  {
+   "key": "experimental_realtime_webrtc_call_base_url",
+   "type": "string",
+   "en": "Experimental / do not use. Overrides only the WebRTC realtime call creation base URL. This is separate from `experimental_realtime_ws_base_url` because WebRTC call creation is HTTP, while sideband control is websocket."
+  },
+  {
+   "key": "experimental_realtime_ws_backend_prompt",
+   "type": "string",
+   "en": "Experimental / do not use. Overrides only the realtime conversation websocket transport instructions (the `Op::RealtimeConversation` `/ws` session.update instructions) without changing normal prompts."
+  },
+  {
+   "key": "experimental_realtime_ws_base_url",
+   "type": "string",
+   "en": "Experimental / do not use. Overrides only the realtime conversation websocket transport base URL (the `Op::RealtimeConversation` `/v1/realtime` connection) without changing normal provider HTTP requests."
+  },
+  {
+   "key": "experimental_realtime_ws_model",
+   "type": "string",
+   "en": "Experimental / do not use. Selects the realtime websocket model/snapshot used for the `Op::RealtimeConversation` connection."
+  },
+  {
+   "key": "experimental_realtime_ws_startup_context",
+   "type": "string",
+   "en": "Experimental / do not use. Replaces the synthesized realtime startup context appended to websocket session instructions. An empty string disables startup context injection entirely."
+  },
+  {
+   "key": "experimental_thread_store",
+   "type": "group",
+   "en": "Experimental / do not use. Selects the thread store implementation."
+  },
+  {
+   "key": "experimental_thread_store.type",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "local"
+    }
+   ]
+  },
+  {
+   "key": "experimental_use_unified_exec_tool",
+   "type": "boolean"
+  },
+  {
+   "key": "feedback",
+   "type": "group",
+   "en": "When `false`, disables feedback collection across Codex product surfaces. Defaults to `true`."
+  },
+  {
+   "key": "feedback.enabled",
+   "type": "boolean",
+   "en": "When `false`, disables feedback uploads and background Guardian review retention. Explicit local exports remain available."
+  },
+  {
+   "key": "file_opener",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "vscode"
+    },
+    {
+     "value": "vscode-insiders"
+    },
+    {
+     "value": "windsurf"
+    },
+    {
+     "value": "cursor"
+    },
+    {
+     "value": "none",
+     "en": "Option to disable the URI-based file opener."
+    }
+   ],
+   "en": "Optional URI-based file opener. If set, citations to files in the model output will be hyperlinked using the specified URI scheme."
+  },
+  {
+   "key": "forced_chatgpt_workspace_id",
+   "type": "json",
+   "en": "When set, restricts ChatGPT login to one or more workspace identifiers."
+  },
+  {
+   "key": "forced_login_method",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "chatgpt"
+    },
+    {
+     "value": "api"
+    }
+   ],
+   "en": "When set, restricts the login mechanism users may use."
+  },
+  {
+   "key": "ghost_snapshot",
+   "type": "group",
+   "en": "Compatibility-only settings retained so legacy `ghost_snapshot` config still loads."
+  },
+  {
+   "key": "ghost_snapshot.disable_warnings",
+   "type": "boolean",
+   "en": "Legacy no-op setting retained for compatibility."
+  },
+  {
+   "key": "ghost_snapshot.ignore_large_untracked_dirs",
+   "type": "integer",
+   "en": "Legacy no-op setting retained for compatibility."
+  },
+  {
+   "key": "ghost_snapshot.ignore_large_untracked_files",
+   "type": "integer",
+   "en": "Legacy no-op setting retained for compatibility."
+  },
+  {
+   "key": "goals",
+   "type": "group",
+   "en": "Goal-related settings."
+  },
+  {
+   "key": "goals.max_goal_token_budget",
+   "type": "integer",
+   "min": 1,
+   "en": "Maximum token budget allowed for a goal and default budget for new goals."
+  },
+  {
+   "key": "hide_agent_reasoning",
+   "type": "boolean",
+   "default": false,
+   "en": "When set to `true`, `AgentReasoning` events will be hidden from the UI/output. Defaults to `false`."
+  },
+  {
+   "key": "history",
+   "type": "group",
+   "default": {
+    "max_bytes": null,
+    "persistence": "save-all"
+   },
+   "en": "Settings that govern if and what will be written to `~/.codex/history.jsonl`."
+  },
+  {
+   "key": "history.max_bytes",
+   "type": "integer",
+   "min": 0,
+   "en": "If set, the maximum size of the history file in bytes. The oldest entries are dropped once the file exceeds this limit."
+  },
+  {
+   "key": "history.persistence",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "save-all",
+     "en": "Save all history entries to disk."
+    },
+    {
+     "value": "none",
+     "en": "Do not write history to disk."
+    }
+   ],
+   "default": "save-all",
+   "en": "If true, history entries will not be written to disk."
+  },
+  {
+   "key": "hooks",
+   "type": "group",
+   "en": "Lifecycle hooks configured inline in TOML plus user-level overrides."
+  },
+  {
+   "key": "hooks.Interrupt",
+   "type": "json",
+   "default": []
+  },
+  {
+   "key": "hooks.PermissionRequest",
+   "type": "json",
+   "default": []
+  },
+  {
+   "key": "hooks.PostCompact",
+   "type": "json",
+   "default": []
+  },
+  {
+   "key": "hooks.PostModelRequest",
+   "type": "json",
+   "default": []
+  },
+  {
+   "key": "hooks.PostToolUse",
+   "type": "json",
+   "default": []
+  },
+  {
+   "key": "hooks.PreCompact",
+   "type": "json",
+   "default": []
+  },
+  {
+   "key": "hooks.PreModelRequest",
+   "type": "json",
+   "default": []
+  },
+  {
+   "key": "hooks.PreToolUse",
+   "type": "json",
+   "default": []
+  },
+  {
+   "key": "hooks.SessionEnd",
+   "type": "json",
+   "default": []
+  },
+  {
+   "key": "hooks.SessionStart",
+   "type": "json",
+   "default": []
+  },
+  {
+   "key": "hooks.Stop",
+   "type": "json",
+   "default": []
+  },
+  {
+   "key": "hooks.SubagentStart",
+   "type": "json",
+   "default": []
+  },
+  {
+   "key": "hooks.SubagentStop",
+   "type": "json",
+   "default": []
+  },
+  {
+   "key": "hooks.UserPromptSubmit",
+   "type": "json",
+   "default": []
+  },
+  {
+   "key": "hooks.state",
+   "type": "record"
+  },
+  {
+   "key": "hooks.state.*.enabled",
+   "type": "boolean"
+  },
+  {
+   "key": "hooks.state.*.trusted_content_hash",
+   "type": "string",
+   "en": "Approved plugin contents; kept separate for declaration-only clients."
+  },
+  {
+   "key": "hooks.state.*.trusted_hash",
+   "type": "string"
+  },
+  {
+   "key": "include_apps_instructions",
+   "type": "boolean",
+   "en": "Whether to inject the `<apps_instructions>` developer block."
+  },
+  {
+   "key": "include_collaboration_mode_instructions",
+   "type": "boolean",
+   "en": "Whether to inject the `<collaboration_mode>` developer block."
+  },
+  {
+   "key": "include_environment_context",
+   "type": "boolean",
+   "en": "Whether to inject the `<environment_context>` user block."
+  },
+  {
+   "key": "include_environment_context_time",
+   "type": "boolean",
+   "en": "Whether environment context includes the current date and timezone."
+  },
+  {
+   "key": "include_permissions_instructions",
+   "type": "boolean",
+   "en": "Whether to inject the `<permissions instructions>` developer block."
+  },
+  {
+   "key": "instructions",
+   "type": "string",
+   "en": "System instructions."
+  },
+  {
+   "key": "log_dir",
+   "type": "string",
+   "en": "Directory for log files. Setting this value explicitly also routes the SQLite logs database here and enables the TUI text log in this directory. When unset, log files use `$CODEX_HOME/log` and SQLite logs use `sqlite_home`. Existing SQLite logs in `sqlite_home` are not migrated automatically. A managed `sqlite_home` requirement keeps SQLite logs in that required directory."
+  },
+  {
+   "key": "marketplaces",
+   "type": "record",
+   "default": {},
+   "en": "User-level marketplace entries keyed by marketplace name."
+  },
+  {
+   "key": "marketplaces.*.last_revision",
+   "type": "string",
+   "en": "Git revision Codex last successfully activated for this marketplace."
+  },
+  {
+   "key": "marketplaces.*.last_updated",
+   "type": "string",
+   "en": "Last time Codex successfully added or refreshed this marketplace."
+  },
+  {
+   "key": "marketplaces.*.ref",
+   "type": "string",
+   "en": "Git ref to check out when `source_type` is `git`."
+  },
+  {
+   "key": "marketplaces.*.source",
+   "type": "string",
+   "en": "Source location used when the marketplace was added."
+  },
+  {
+   "key": "marketplaces.*.source_type",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "git"
+    },
+    {
+     "value": "local"
+    }
+   ],
+   "en": "Source kind used to install this marketplace."
+  },
+  {
+   "key": "marketplaces.*.sparse_paths",
+   "type": "string[]",
+   "en": "Sparse checkout paths used when `source_type` is `git`."
+  },
+  {
+   "key": "mcp_enterprise_managed_auth",
+   "type": "group",
+   "en": "Trusted enterprise IdP shared by EMA-enabled MCP servers and plugins."
+  },
+  {
+   "key": "mcp_enterprise_managed_auth.idp",
+   "type": "group",
+   "en": "Shared enterprise authorization, independent of Codex account credentials."
+  },
+  {
+   "key": "mcp_enterprise_managed_auth.idp.client_id",
+   "type": "string",
+   "en": "OAuth client registered with that enterprise IdP."
+  },
+  {
+   "key": "mcp_enterprise_managed_auth.idp.client_secret",
+   "type": "string",
+   "en": "Provisioned client secret for confidential IdP login and token exchange. Omitted for a public client."
+  },
+  {
+   "key": "mcp_enterprise_managed_auth.idp.issuer",
+   "type": "string",
+   "en": "Issuer used for enterprise OAuth discovery and identity validation."
+  },
+  {
+   "key": "mcp_enterprise_managed_auth.idp.token_endpoint_auth_method",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "client_secret_basic"
+    },
+    {
+     "value": "client_secret_post"
+    }
+   ],
+   "en": "Registered EMA client authentication method. Defaults to client_secret_basic when a secret is configured; requires a client secret."
+  },
+  {
+   "key": "mcp_oauth_callback_port",
+   "type": "integer",
+   "min": 0,
+   "en": "Optional fixed port for the local HTTP callback server used during MCP OAuth login. When unset, Codex will bind to an ephemeral port chosen by the OS."
+  },
+  {
+   "key": "mcp_oauth_callback_url",
+   "type": "string",
+   "en": "Optional redirect URI to use during MCP OAuth login. When set, this URI is used in the OAuth authorization request instead of the local listener address. The local callback listener still binds to 127.0.0.1 (using `mcp_oauth_callback_port` when provided)."
+  },
+  {
+   "key": "mcp_oauth_credentials_store",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "auto",
+     "en": "Prefer `Keyring` and use `File` when keyring storage is unavailable. Once an MCP client loads credentials from one store, that client keeps the resolved store for its lifetime so refreshes cannot switch to a possibly stale credential source. Credentials stored in the keyring will only be readable by Codex unless the user explicitly grants access via OS-level keyring access."
+    },
+    {
+     "value": "file",
+     "en": "CODEX_HOME/.credentials.json This file will be readable to Codex and other applications running as the same user."
+    },
+    {
+     "value": "keyring",
+     "en": "Keyring when available, otherwise fail."
+    }
+   ],
+   "en": "Preferred backend for storing MCP OAuth credentials. keyring: Use an OS-specific keyring service. https://github.com/openai/codex/blob/main/codex-rs/rmcp-client/src/oauth.rs#L2 file: Use a file in the Codex home directory. auto (default): Use the OS-specific keyring service if available, otherwise use a file."
+  },
+  {
+   "key": "mcp_optional_startup_grace_ms",
+   "type": "integer",
+   "min": 0,
+   "en": "Milliseconds to wait for optional MCP servers while building the initial tool catalog.\n\nDefaults to 1000. Set to 0 to disable the shared grace and wait for each server's configured `startup_timeout_sec` instead."
+  },
+  {
+   "key": "mcp_servers",
+   "type": "record",
+   "default": {},
+   "en": "Definition for MCP servers that Codex can reach out to for tool calls."
+  },
+  {
+   "key": "mcp_servers.*.args",
+   "type": "string[]"
+  },
+  {
+   "key": "mcp_servers.*.auth",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "oauth",
+     "en": "Use stored MCP OAuth credentials when available. Starting an OAuth login is a separate operation."
+    },
+    {
+     "value": "chatgpt",
+     "en": "Use the current ChatGPT session for servers on the trusted first-party ChatGPT origin. If no ChatGPT session provider is available, startup can still fall back to stored OAuth credentials."
+    },
+    {
+     "value": "ema_auth",
+     "en": "Exchange an enterprise IdP refresh token for resource-specific authorization. Alternate credentials and ordinary OAuth fallback are not permitted."
+    }
+   ],
+   "en": "Authentication flow for an HTTP MCP server. Explicit credentials take precedence for OAuth and ChatGPT; EMA rejects alternate credentials and fallback."
+  },
+  {
+   "key": "mcp_servers.*.bearer_token_env_var",
+   "type": "string"
+  },
+  {
+   "key": "mcp_servers.*.command",
+   "type": "string"
+  },
+  {
+   "key": "mcp_servers.*.cwd",
+   "type": "string"
+  },
+  {
+   "key": "mcp_servers.*.default_tools_approval_mode",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "auto"
+    },
+    {
+     "value": "prompt"
+    },
+    {
+     "value": "writes"
+    },
+    {
+     "value": "approve"
+    }
+   ]
+  },
+  {
+   "key": "mcp_servers.*.disabled_tools",
+   "type": "string[]"
+  },
+  {
+   "key": "mcp_servers.*.enabled",
+   "type": "boolean"
+  },
+  {
+   "key": "mcp_servers.*.enabled_tools",
+   "type": "string[]"
+  },
+  {
+   "key": "mcp_servers.*.env",
+   "type": "map"
+  },
+  {
+   "key": "mcp_servers.*.env_http_headers",
+   "type": "map"
+  },
+  {
+   "key": "mcp_servers.*.env_vars",
+   "type": "json"
+  },
+  {
+   "key": "mcp_servers.*.environment_id",
+   "type": "string"
+  },
+  {
+   "key": "mcp_servers.*.http_headers",
+   "type": "map"
+  },
+  {
+   "key": "mcp_servers.*.http_headers_helper",
+   "type": "string"
+  },
+  {
+   "key": "mcp_servers.*.name",
+   "type": "string",
+   "en": "Legacy display-name field accepted for backward compatibility."
+  },
+  {
+   "key": "mcp_servers.*.oauth",
+   "type": "group",
+   "en": "Client settings for MCP OAuth login or enterprise token exchange."
+  },
+  {
+   "key": "mcp_servers.*.oauth.authorization_server_issuer",
+   "type": "string",
+   "en": "Expected resource authorization server issuer for EMA token exchange."
+  },
+  {
+   "key": "mcp_servers.*.oauth.callback_port",
+   "type": "integer",
+   "min": 0,
+   "en": "Fixed callback port that takes precedence over Codex's global OAuth callback port."
+  },
+  {
+   "key": "mcp_servers.*.oauth.callback_url",
+   "type": "string",
+   "en": "Registered callback URL associated with this OAuth client."
+  },
+  {
+   "key": "mcp_servers.*.oauth.client_id",
+   "type": "string",
+   "en": "Explicit OAuth client identifier to present during authorization and token exchange."
+  },
+  {
+   "key": "mcp_servers.*.oauth.client_secret",
+   "type": "string",
+   "en": "OAuth client secret used for token exchange with a pre-registered client."
+  },
+  {
+   "key": "mcp_servers.*.oauth.token_endpoint_auth_method",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "client_secret_basic"
+    },
+    {
+     "value": "client_secret_post"
+    }
+   ],
+   "en": "Registered EMA client authentication method. Defaults to client_secret_basic when a secret is configured; requires a client secret."
+  },
+  {
+   "key": "mcp_servers.*.oauth_resource",
+   "type": "string"
+  },
+  {
+   "key": "mcp_servers.*.omit_tools_from",
+   "type": "enum[]",
+   "enum": [
+    {
+     "value": "code_mode",
+     "en": "Nested tools available to Code Mode scripts."
+    },
+    {
+     "value": "deferred",
+     "en": "Tools discovered later through tool search."
+    },
+    {
+     "value": "direct",
+     "en": "Tools present in the model's initial tool list."
+    }
+   ]
+  },
+  {
+   "key": "mcp_servers.*.required",
+   "type": "boolean"
+  },
+  {
+   "key": "mcp_servers.*.scopes",
+   "type": "string[]"
+  },
+  {
+   "key": "mcp_servers.*.startup_readiness",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "connection",
+     "en": "Use the live connection to determine startup readiness."
+    },
+    {
+     "value": "catalog",
+     "en": "Allow a valid cached tool catalog while the live connection starts. Tool execution still requires the current connection."
+    }
+   ],
+   "en": "Whether startup requires a live connection or can use a valid cached tool catalog."
+  },
+  {
+   "key": "mcp_servers.*.startup_timeout_ms",
+   "type": "integer",
+   "min": 0
+  },
+  {
+   "key": "mcp_servers.*.startup_timeout_sec",
+   "type": "number"
+  },
+  {
+   "key": "mcp_servers.*.supports_parallel_tool_calls",
+   "type": "boolean"
+  },
+  {
+   "key": "mcp_servers.*.tool_input_schema_max_bytes",
+   "type": "integer",
+   "min": 1,
+   "en": "UTF-8 byte threshold for compacting each ordinary MCP tool input schema. Defaults to 5,000 bytes. Code Mode also uses an explicitly configured limit when rendering each tool's input type. Larger limits preserve more parameter descriptions."
+  },
+  {
+   "key": "mcp_servers.*.tool_timeout_sec",
+   "type": "number"
+  },
+  {
+   "key": "mcp_servers.*.tools",
+   "type": "record"
+  },
+  {
+   "key": "mcp_servers.*.tools.*.approval_mode",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "auto"
+    },
+    {
+     "value": "prompt"
+    },
+    {
+     "value": "writes"
+    },
+    {
+     "value": "approve"
+    }
+   ],
+   "en": "Approval mode for this tool."
+  },
+  {
+   "key": "mcp_servers.*.tools.*.output_token_limit",
+   "type": "integer",
+   "min": 1,
+   "en": "Token budget for this tool's output, before the standard 20% serialization allowance."
+  },
+  {
+   "key": "mcp_servers.*.url",
+   "type": "string"
+  },
+  {
+   "key": "memories",
+   "type": "group",
+   "en": "Memories subsystem settings."
+  },
+  {
+   "key": "memories.consolidation_model",
+   "type": "string",
+   "en": "Model used for memory consolidation."
+  },
+  {
+   "key": "memories.consolidation_service_tier",
+   "type": "string",
+   "en": "Service tier for memory consolidation. Defaults to Standard (`\"default\"`)."
+  },
+  {
+   "key": "memories.dedicated_tools",
+   "type": "boolean",
+   "en": "When `true`, expose dedicated memory tools through the extension tool surface."
+  },
+  {
+   "key": "memories.disable_on_external_context",
+   "type": "boolean",
+   "en": "When `true`, external context sources mark the thread `memory_mode` as `\"polluted\"`."
+  },
+  {
+   "key": "memories.dual_write",
+   "type": "boolean",
+   "en": "Generate both versions while v1 is selected; v2 runs alone after cutover."
+  },
+  {
+   "key": "memories.extract_model",
+   "type": "string",
+   "en": "Model used for thread summarisation."
+  },
+  {
+   "key": "memories.generate_memories",
+   "type": "boolean",
+   "en": "When `false`, newly created threads are stored with `memory_mode = \"disabled\"` in the state DB."
+  },
+  {
+   "key": "memories.max_raw_memories_for_consolidation",
+   "type": "integer",
+   "min": 1,
+   "max": 4096,
+   "en": "Maximum number of recent raw memories retained for global consolidation."
+  },
+  {
+   "key": "memories.max_rollout_age_days",
+   "type": "integer",
+   "en": "Maximum age of the threads used for memories."
+  },
+  {
+   "key": "memories.max_rollouts_per_startup",
+   "type": "integer",
+   "min": 1,
+   "max": 128,
+   "en": "Maximum number of rollout candidates processed per pass."
+  },
+  {
+   "key": "memories.max_unused_days",
+   "type": "integer",
+   "en": "Maximum number of days since a memory was last used before it becomes ineligible for phase 2 selection."
+  },
+  {
+   "key": "memories.min_rate_limit_remaining_percent",
+   "type": "integer",
+   "min": 0,
+   "max": 100,
+   "en": "Minimum remaining percentage required in Codex rate-limit windows before memory startup runs."
+  },
+  {
+   "key": "memories.min_rollout_idle_hours",
+   "type": "integer",
+   "en": "Minimum idle time between last thread activity and memory creation (hours). > 12h recommended."
+  },
+  {
+   "key": "memories.use_memories",
+   "type": "boolean",
+   "en": "When `false`, skip injecting memory usage instructions into developer prompts."
+  },
+  {
+   "key": "memories.version",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "v1"
+    },
+    {
+     "value": "v2"
+    }
+   ],
+   "en": "Selects the memory pipeline. Fresh profiles default to v2 when memories are enabled, unless dual-write is explicitly disabled; existing v1 profiles default to v1."
+  },
+  {
+   "key": "model",
+   "type": "string",
+   "en": "Optional override of model selection."
+  },
+  {
+   "key": "model_auto_compact_token_limit",
+   "type": "integer",
+   "en": "Token usage threshold triggering auto-compaction of conversation history."
+  },
+  {
+   "key": "model_auto_compact_token_limit_scope",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "total",
+     "en": "Count the full active context against the limit."
+    },
+    {
+     "value": "body_after_prefix",
+     "en": "Count sampled output and later growth after the carried window prefix."
+    }
+   ],
+   "en": "Controls whether the auto-compaction limit applies to the full context or only to tokens after the carried prefix in the current compaction window."
+  },
+  {
+   "key": "model_catalog_json",
+   "type": "string",
+   "en": "Optional path to a JSON model catalog (applied on startup only). Per-thread `config` overrides are accepted but do not reapply this (no-ops)."
+  },
+  {
+   "key": "model_context_window",
+   "type": "integer",
+   "en": "Size of the context window for the model, in tokens."
+  },
+  {
+   "key": "model_instructions_file",
+   "type": "string",
+   "en": "Optional path to a file containing model instructions that will override the built-in instructions for the selected model. Users are STRONGLY DISCOURAGED from using this field, as deviating from the instructions sanctioned by Codex will likely degrade model performance."
+  },
+  {
+   "key": "model_post_turn_compact_threshold_percent",
+   "type": "integer",
+   "min": 0,
+   "max": 100,
+   "en": "Percentage of the usable context window that triggers compaction after a final response. Existing auto-compaction limits still apply. Omitted or zero disables turn-end compaction; valid values are 0–100."
+  },
+  {
+   "key": "model_provider",
+   "type": "string",
+   "en": "Provider to use from the model_providers map."
+  },
+  {
+   "key": "model_providers",
+   "type": "record",
+   "default": {},
+   "en": "User-defined provider entries that extend the built-in list. Built-in IDs cannot be overridden."
+  },
+  {
+   "key": "model_providers.*.auth",
+   "type": "group",
+   "en": "Command-backed bearer-token configuration for this provider."
+  },
+  {
+   "key": "model_providers.*.auth.args",
+   "type": "string[]",
+   "default": [],
+   "en": "Command arguments."
+  },
+  {
+   "key": "model_providers.*.auth.command",
+   "type": "string",
+   "en": "Command to execute. Bare names are resolved via `PATH`; paths are resolved against `cwd`."
+  },
+  {
+   "key": "model_providers.*.auth.cwd",
+   "type": "string",
+   "en": "Working directory used when running the token command."
+  },
+  {
+   "key": "model_providers.*.auth.refresh_interval_ms",
+   "type": "integer",
+   "min": 0,
+   "default": 300000,
+   "en": "Maximum age for the cached token before rerunning the command. Set to `0` to disable proactive refresh and only rerun after a 401 retry path."
+  },
+  {
+   "key": "model_providers.*.auth.timeout_ms",
+   "type": "integer",
+   "min": 1,
+   "default": 5000,
+   "en": "Maximum time to wait for the token command to exit successfully."
+  },
+  {
+   "key": "model_providers.*.aws",
+   "type": "group",
+   "en": "AWS SigV4 auth configuration for this provider."
+  },
+  {
+   "key": "model_providers.*.aws.auth_refresh",
+   "type": "group",
+   "en": "Optional command used to reauthenticate after a refreshable AWS auth failure."
+  },
+  {
+   "key": "model_providers.*.aws.auth_refresh.args",
+   "type": "string[]",
+   "default": [],
+   "en": "Arguments passed to the refresh command."
+  },
+  {
+   "key": "model_providers.*.aws.auth_refresh.command",
+   "type": "string",
+   "en": "Executable to invoke directly, without a shell."
+  },
+  {
+   "key": "model_providers.*.aws.auth_refresh.timeout_ms",
+   "type": "integer",
+   "min": 1,
+   "default": 300000,
+   "en": "Maximum time to wait for the refresh command to complete."
+  },
+  {
+   "key": "model_providers.*.aws.credential_export",
+   "type": "group",
+   "en": "Optional command whose exported credentials replace the AWS SDK credential chain."
+  },
+  {
+   "key": "model_providers.*.aws.credential_export.args",
+   "type": "string[]",
+   "default": [],
+   "en": "Arguments passed to the credential export command."
+  },
+  {
+   "key": "model_providers.*.aws.credential_export.command",
+   "type": "string",
+   "en": "Executable to invoke directly, without a shell."
+  },
+  {
+   "key": "model_providers.*.aws.credential_export.timeout_ms",
+   "type": "integer",
+   "min": 1,
+   "default": 30000,
+   "en": "Maximum time to wait for the credential export command to complete."
+  },
+  {
+   "key": "model_providers.*.aws.profile",
+   "type": "string",
+   "en": "AWS profile name to use. When unset, the AWS SDK default chain decides."
+  },
+  {
+   "key": "model_providers.*.aws.region",
+   "type": "string",
+   "en": "AWS region to use for provider-specific endpoints."
+  },
+  {
+   "key": "model_providers.*.base_url",
+   "type": "string",
+   "en": "Base URL for the provider's OpenAI-compatible API."
+  },
+  {
+   "key": "model_providers.*.capabilities",
+   "type": "group",
+   "en": "Optional API capability overrides for a custom Responses-compatible provider. Unspecified capabilities retain their existing provider defaults."
+  },
+  {
+   "key": "model_providers.*.capabilities.cyber_access_programs",
+   "type": "boolean",
+   "en": "Whether the provider accepts explicit `access_programs.cyber` selections. Defaults to enabled for the built-in OpenAI provider and disabled otherwise. This does not grant program access or change authentication."
+  },
+  {
+   "key": "model_providers.*.capabilities.external_web_access",
+   "type": "boolean",
+   "en": "Whether hosted web search may access the live web."
+  },
+  {
+   "key": "model_providers.*.capabilities.remote_compaction",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "unsupported",
+     "en": "Use local compaction instead of a provider compaction protocol."
+    },
+    {
+     "value": "v2",
+     "en": "Send `compaction_trigger` items over the Responses endpoint."
+    }
+   ],
+   "en": "Remote context-compaction protocol; omission preserves provider defaults."
+  },
+  {
+   "key": "model_providers.*.credential_file",
+   "type": "string",
+   "en": "Absolute path to a Google ADC credential file. For GCP, overrides GOOGLE_APPLICATION_CREDENTIALS in the auth command's environment only."
+  },
+  {
+   "key": "model_providers.*.env_http_headers",
+   "type": "map",
+   "en": "Optional HTTP headers to include in requests to this provider where the (key, value) pairs are the header name and _environment variable_ whose value should be used. If the environment variable is not set, or the value is empty, the header will not be included in the request."
+  },
+  {
+   "key": "model_providers.*.env_key",
+   "type": "string",
+   "en": "Environment variable that stores the user's API key for this provider."
+  },
+  {
+   "key": "model_providers.*.env_key_instructions",
+   "type": "string",
+   "en": "Optional instructions to help the user get a valid value for the variable and set it."
+  },
+  {
+   "key": "model_providers.*.experimental_bearer_token",
+   "type": "string",
+   "en": "Value to use with `Authorization: Bearer <token>` header. Use of this config is discouraged in favor of `env_key` for security reasons, but this may be necessary when using this programmatically."
+  },
+  {
+   "key": "model_providers.*.gateway_oauth",
+   "type": "json",
+   "en": "Gateway access token from OAuth or a credential export command."
+  },
+  {
+   "key": "model_providers.*.http_headers",
+   "type": "map",
+   "en": "Additional HTTP headers to include in requests to this provider where the (key, value) pairs are the header name and value."
+  },
+  {
+   "key": "model_providers.*.location",
+   "type": "string",
+   "en": "Google Cloud location for the built-in GCP provider. Takes precedence over `GOOGLE_CLOUD_LOCATION`; defaults to `global` when neither is set."
+  },
+  {
+   "key": "model_providers.*.model_catalog_url",
+   "type": "string",
+   "en": "Optional full URL for a Codex-native model catalog. When unset, OpenAI discovery uses the Codex backend unless `base_url` overrides the inference endpoint. The endpoint must serve the Codex catalog format, not the public `/v1/models` API.\n\nFor built-in OpenAI, set this under `[model_providers.openai]`; other non-default provider overrides are rejected. The URL must use HTTPS and an allowed ChatGPT host. Other hosts require a custom provider. Inference still uses `openai_base_url`.\n\nCatalog requests use the provider's credentials, including an API key or ChatGPT access token. Only configure an endpoint you trust with those credentials. Setting this URL does not grant catalog access or guarantee that the endpoint accepts a regional API key. Existing discovery gates and entitlement checks apply."
+  },
+  {
+   "key": "model_providers.*.name",
+   "type": "string",
+   "default": "",
+   "en": "Friendly display name."
+  },
+  {
+   "key": "model_providers.*.project_id",
+   "type": "string",
+   "en": "Google Cloud project ID for the built-in GCP provider. Takes precedence over `GOOGLE_CLOUD_PROJECT` when deriving the Vertex AI endpoint."
+  },
+  {
+   "key": "model_providers.*.query_params",
+   "type": "map",
+   "en": "Optional query parameters to append to the base URL."
+  },
+  {
+   "key": "model_providers.*.request_max_retries",
+   "type": "integer",
+   "min": 0,
+   "en": "Maximum number of times to retry a failed HTTP request to this provider."
+  },
+  {
+   "key": "model_providers.*.requires_openai_auth",
+   "type": "boolean",
+   "default": false,
+   "en": "Does this provider require an OpenAI API key or ChatGPT login token? If true, the user is presented with a login screen on first run, and credentials are stored using the backend selected by `cli_auth_credentials_store`. If false (the default), the login screen is skipped, and the API key (if needed) comes from the environment variable specified by `env_key`."
+  },
+  {
+   "key": "model_providers.*.stream_idle_timeout_ms",
+   "type": "integer",
+   "min": 0,
+   "en": "Idle timeout (in milliseconds) to wait for activity on a streaming response before treating the connection as lost."
+  },
+  {
+   "key": "model_providers.*.stream_max_retries",
+   "type": "integer",
+   "min": 0,
+   "en": "Number of times to retry reconnecting a dropped streaming response before failing."
+  },
+  {
+   "key": "model_providers.*.supports_standalone_web_search",
+   "type": "boolean",
+   "default": false,
+   "en": "Whether this provider supports the standalone web-search endpoint."
+  },
+  {
+   "key": "model_providers.*.supports_websockets",
+   "type": "boolean",
+   "default": false,
+   "en": "Whether this provider supports the Responses API WebSocket transport."
+  },
+  {
+   "key": "model_providers.*.websocket_connect_timeout_ms",
+   "type": "integer",
+   "min": 0,
+   "en": "Maximum time (in milliseconds) to wait for a websocket connection attempt before treating it as failed."
+  },
+  {
+   "key": "model_providers.*.wire_api",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "responses",
+     "en": "The Responses API exposed by OpenAI at `/v1/responses`."
+    }
+   ],
+   "default": "responses",
+   "en": "Which wire protocol this provider expects."
+  },
+  {
+   "key": "model_reasoning_effort",
+   "type": "string",
+   "en": "A non-empty reasoning effort value advertised by the model."
+  },
+  {
+   "key": "model_reasoning_summary",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "auto"
+    },
+    {
+     "value": "concise"
+    },
+    {
+     "value": "detailed"
+    },
+    {
+     "value": "none",
+     "en": "Option to disable reasoning summaries."
+    }
+   ],
+   "en": "A summary of the reasoning performed by the model. This can be useful for debugging and understanding the model's reasoning process. See https://platform.openai.com/docs/guides/reasoning?api-mode=responses#reasoning-summaries"
+  },
+  {
+   "key": "model_verbosity",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "low"
+    },
+    {
+     "value": "medium"
+    },
+    {
+     "value": "high"
+    }
+   ],
+   "en": "Optional verbosity control for GPT-5 models (Responses API `text.verbosity`)."
+  },
+  {
+   "key": "notice",
+   "type": "group",
+   "en": "Collection of in-product notices (different from notifications) See [`crate::types::Notice`] for more details"
+  },
+  {
+   "key": "notice.external_config_migration_prompts",
+   "type": "group",
+   "default": {
+    "home": null,
+    "home_last_prompted_at": null,
+    "project_last_prompted_at": {},
+    "projects": {}
+   },
+   "en": "Tracks scopes where external config migration prompts should be suppressed."
+  },
+  {
+   "key": "notice.external_config_migration_prompts.home",
+   "type": "boolean",
+   "en": "Tracks whether home-level external config migration prompts are hidden."
+  },
+  {
+   "key": "notice.external_config_migration_prompts.home_last_prompted_at",
+   "type": "integer",
+   "en": "Tracks the last time the home-level external config migration prompt was shown."
+  },
+  {
+   "key": "notice.external_config_migration_prompts.project_last_prompted_at",
+   "type": "json",
+   "default": {},
+   "en": "Tracks the last time a project-level external config migration prompt was shown."
+  },
+  {
+   "key": "notice.external_config_migration_prompts.projects",
+   "type": "json",
+   "default": {},
+   "en": "Tracks which project paths have opted out of external config migration prompts."
+  },
+  {
+   "key": "notice.fast_default_opt_out",
+   "type": "boolean",
+   "en": "Tracks whether the user opted out of Codex-managed fast defaults."
+  },
+  {
+   "key": "notice.hide_full_access_warning",
+   "type": "boolean",
+   "en": "Tracks whether the user has acknowledged the full access warning prompt."
+  },
+  {
+   "key": "notice.hide_gov_cloud_guidance",
+   "type": "boolean",
+   "en": "Tracks whether the user has acknowledged the AWS GovCloud guidance."
+  },
+  {
+   "key": "notice.hide_gpt-5.1-codex-max_migration_prompt",
+   "type": "boolean",
+   "en": "Tracks whether the user has seen the gpt-5.1-codex-max migration prompt"
+  },
+  {
+   "key": "notice.hide_gpt5_1_migration_prompt",
+   "type": "boolean",
+   "en": "Tracks whether the user has seen the model migration prompt"
+  },
+  {
+   "key": "notice.hide_rate_limit_model_nudge",
+   "type": "boolean",
+   "en": "Tracks whether the user opted out of the rate limit model switch reminder."
+  },
+  {
+   "key": "notice.hide_world_writable_warning",
+   "type": "boolean",
+   "en": "Tracks whether the user has acknowledged the Windows world-writable directories warning."
+  },
+  {
+   "key": "notice.model_migrations",
+   "type": "map",
+   "default": {},
+   "en": "Tracks acknowledged model migrations as old->new model slug mappings."
+  },
+  {
+   "key": "notify",
+   "type": "string[]",
+   "en": "Optional external command to spawn for end-user notifications."
+  },
+  {
+   "key": "openai_base_url",
+   "type": "string",
+   "en": "Base URL override for the built-in `openai` model provider."
+  },
+  {
+   "key": "orchestrator",
+   "type": "group",
+   "en": "Orchestrator-owned feature settings."
+  },
+  {
+   "key": "orchestrator.mcp",
+   "type": "group",
+   "en": "Optional enablement of a configured feature."
+  },
+  {
+   "key": "orchestrator.mcp.enabled",
+   "type": "boolean"
+  },
+  {
+   "key": "orchestrator.skills",
+   "type": "group",
+   "en": "Legacy no-op setting retained for compatibility. Use `cloud.skills` to configure cloud skills."
+  },
+  {
+   "key": "orchestrator.skills.enabled",
+   "type": "boolean"
+  },
+  {
+   "key": "oss_provider",
+   "type": "string",
+   "en": "Preferred OSS provider for local models, e.g. \"lmstudio\" or \"ollama\"."
+  },
+  {
+   "key": "otel",
+   "type": "group",
+   "en": "OTEL configuration."
+  },
+  {
+   "key": "otel.environment",
+   "type": "string",
+   "en": "Mark traces with environment (dev, staging, prod, test). Defaults to dev."
+  },
+  {
+   "key": "otel.exporter",
+   "type": "json",
+   "en": "Optional log exporter"
+  },
+  {
+   "key": "otel.headers_helper",
+   "type": "string",
+   "en": "Command that prints a JSON object of HTTP headers for explicit OTLP HTTP exporters. Runs from CODEX_HOME. Repository-local configuration cannot set OTel options."
+  },
+  {
+   "key": "otel.headers_helper_refresh_interval_ms",
+   "type": "integer",
+   "min": 1,
+   "en": "Interval between helper executions in milliseconds. Defaults to 29 minutes."
+  },
+  {
+   "key": "otel.log_agent_responses",
+   "type": "boolean",
+   "en": "Opt in to logging final main-agent and spawned-subagent responses to an OTLP log exporter. Defaults to false. Response text can be sensitive and is capped at 64 KiB."
+  },
+  {
+   "key": "otel.log_guardian_assessments",
+   "type": "boolean",
+   "en": "Opt in to logging completed Guardian assessments to an OTLP log exporter. Defaults to false. Rationales can be sensitive and are capped at 64 KiB."
+  },
+  {
+   "key": "otel.log_sse_deltas",
+   "type": "boolean",
+   "en": "Log successful SSE events whose kind ends in `.delta`. Defaults to true. Disabling this preserves errors, completion events, and metrics."
+  },
+  {
+   "key": "otel.log_user_prompt",
+   "type": "boolean",
+   "en": "Log user prompt in traces"
+  },
+  {
+   "key": "otel.metrics_exporter",
+   "type": "json",
+   "en": "Metrics exporter. Defaults to `statsig`, which follows `analytics.enabled`. Custom OTLP exporters are independent of `analytics.enabled`; `none` disables metrics export."
+  },
+  {
+   "key": "otel.span_attributes",
+   "type": "map",
+   "en": "Attributes to add to every exported trace span."
+  },
+  {
+   "key": "otel.tool_result",
+   "type": "group",
+   "en": "Byte limit for tool-result log output; independent of model-visible output."
+  },
+  {
+   "key": "otel.tool_result.max_bytes",
+   "type": "integer",
+   "min": 0,
+   "default": 2048,
+   "en": "Maximum UTF-8 bytes before the truncation notice. Defaults to 2048."
+  },
+  {
+   "key": "otel.trace_exporter",
+   "type": "json",
+   "en": "Optional trace exporter"
+  },
+  {
+   "key": "otel.tracestate",
+   "type": "json",
+   "en": "Semicolon-separated `key:value` fields to upsert into W3C tracestate members."
+  },
+  {
+   "key": "permissions",
+   "type": "json",
+   "en": "Named permissions profiles."
+  },
+  {
+   "key": "personality",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "none"
+    },
+    {
+     "value": "friendly"
+    },
+    {
+     "value": "pragmatic"
+    }
+   ],
+   "en": "Deprecated: `friendly` and `pragmatic` no longer select a style."
+  },
+  {
+   "key": "plan_mode_reasoning_effort",
+   "type": "string",
+   "en": "A non-empty reasoning effort value advertised by the model."
+  },
+  {
+   "key": "plugins",
+   "type": "group",
+   "default": {},
+   "en": "Default and per-plugin settings keyed by exact `<plugin>@<marketplace>` IDs."
+  },
+  {
+   "key": "plugins._default",
+   "type": "group",
+   "en": "Defaults for installed plugin activation. Omission preserves source enablement. Explicit plugin enablement settings override this default, but cannot enable an installation disabled by its source."
+  },
+  {
+   "key": "plugins._default.enabled",
+   "type": "boolean",
+   "default": true
+  },
+  {
+   "key": "profile",
+   "type": "string",
+   "en": "Profile to use from the `profiles` map."
+  },
+  {
+   "key": "profiles",
+   "type": "record",
+   "en": "Named profiles to facilitate switching between different configurations.",
+   "fieldKeys": [
+    "analytics",
+    "approval_policy",
+    "approvals_reviewer",
+    "chatgpt_base_url",
+    "experimental_compact_prompt_file",
+    "experimental_use_unified_exec_tool",
+    "features",
+    "include_apps_instructions",
+    "include_collaboration_mode_instructions",
+    "include_environment_context",
+    "include_environment_context_time",
+    "include_permissions_instructions",
+    "model",
+    "model_catalog_json",
+    "model_instructions_file",
+    "model_provider",
+    "model_reasoning_effort",
+    "model_reasoning_summary",
+    "model_verbosity",
+    "oss_provider",
+    "personality",
+    "plan_mode_reasoning_effort",
+    "sandbox_mode",
+    "service_tier",
+    "tools",
+    "tui",
+    "web_search",
+    "windows"
+   ]
+  },
+  {
+   "key": "project_doc_fallback_filenames",
+   "type": "string[]",
+   "default": [],
+   "en": "Ordered list of fallback filenames to look for when AGENTS.md is missing."
+  },
+  {
+   "key": "project_doc_max_bytes",
+   "type": "integer",
+   "min": 0,
+   "default": 32768,
+   "en": "Maximum total bytes of project instruction content across all selected environments."
+  },
+  {
+   "key": "project_root_markers",
+   "type": "string[]",
+   "en": "Markers used to detect the project root when searching parent directories for `.codex` folders. Defaults to [\".git\"] when unset."
+  },
+  {
+   "key": "projects",
+   "type": "record"
+  },
+  {
+   "key": "projects.*.trust_level",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "trusted"
+    },
+    {
+     "value": "untrusted"
+    }
+   ],
+   "en": "Represents the trust level for a project directory. This determines the approval policy and sandbox mode applied."
+  },
+  {
+   "key": "realtime",
+   "type": "group",
+   "en": "Experimental / do not use. Realtime websocket session selection. `version` controls v1/v2 and `type` controls conversational/transcription."
+  },
+  {
+   "key": "realtime.transport",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "webrtc"
+    },
+    {
+     "value": "websocket"
+    }
+   ]
+  },
+  {
+   "key": "realtime.type",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "conversational"
+    },
+    {
+     "value": "transcription"
+    }
+   ]
+  },
+  {
+   "key": "realtime.version",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "v1"
+    },
+    {
+     "value": "v2"
+    },
+    {
+     "value": "v3"
+    }
+   ]
+  },
+  {
+   "key": "realtime.voice",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "alloy"
+    },
+    {
+     "value": "arbor"
+    },
+    {
+     "value": "ash"
+    },
+    {
+     "value": "aube"
+    },
+    {
+     "value": "ballad"
+    },
+    {
+     "value": "breeze"
+    },
+    {
+     "value": "bubbie"
+    },
+    {
+     "value": "cedar"
+    },
+    {
+     "value": "coral"
+    },
+    {
+     "value": "cove"
+    },
+    {
+     "value": "echo"
+    },
+    {
+     "value": "ember"
+    },
+    {
+     "value": "haetsal"
+    },
+    {
+     "value": "hanul"
+    },
+    {
+     "value": "himari"
+    },
+    {
+     "value": "juniper"
+    },
+    {
+     "value": "leher"
+    },
+    {
+     "value": "maple"
+    },
+    {
+     "value": "marin"
+    },
+    {
+     "value": "miko"
+    },
+    {
+     "value": "neer"
+    },
+    {
+     "value": "porto"
+    },
+    {
+     "value": "rindo"
+    },
+    {
+     "value": "rio"
+    },
+    {
+     "value": "rivage"
+    },
+    {
+     "value": "sage"
+    },
+    {
+     "value": "selva"
+    },
+    {
+     "value": "shimmer"
+    },
+    {
+     "value": "sol"
+    },
+    {
+     "value": "sonna"
+    },
+    {
+     "value": "spruce"
+    },
+    {
+     "value": "tinta"
+    },
+    {
+     "value": "vale"
+    },
+    {
+     "value": "verse"
+    },
+    {
+     "value": "viola"
+    }
+   ]
+  },
+  {
+   "key": "responses_api_metadata",
+   "type": "map",
+   "en": "Bounded, product-owned metadata attached to every Responses API request."
+  },
+  {
+   "key": "review_model",
+   "type": "string",
+   "en": "Review model override used by the `/review` feature."
+  },
+  {
+   "key": "sandbox_mode",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "read-only"
+    },
+    {
+     "value": "workspace-write"
+    },
+    {
+     "value": "danger-full-access"
+    }
+   ],
+   "en": "Sandbox mode to use."
+  },
+  {
+   "key": "sandbox_workspace_write",
+   "type": "group",
+   "en": "Sandbox configuration to apply if `sandbox` is `WorkspaceWrite`."
+  },
+  {
+   "key": "sandbox_workspace_write.exclude_slash_tmp",
+   "type": "boolean",
+   "default": false
+  },
+  {
+   "key": "sandbox_workspace_write.exclude_tmpdir_env_var",
+   "type": "boolean",
+   "default": false
+  },
+  {
+   "key": "sandbox_workspace_write.network_access",
+   "type": "boolean",
+   "default": false
+  },
+  {
+   "key": "sandbox_workspace_write.writable_roots",
+   "type": "string[]",
+   "default": []
+  },
+  {
+   "key": "service_tier",
+   "type": "string",
+   "en": "Optional explicit service tier request id for new turns (for example `default`, `priority`, or `flex`; legacy `fast` also works)."
+  },
+  {
+   "key": "shell_environment_policy",
+   "type": "group",
+   "default": {
+    "exclude": null,
+    "experimental_use_profile": null,
+    "filters": null,
+    "ignore_default_excludes": null,
+    "include_only": null,
+    "inherit": null,
+    "set": null
+   },
+   "en": "Policy for building the `env` when spawning a process via shell-like tools."
+  },
+  {
+   "key": "shell_environment_policy.exclude",
+   "type": "string[]",
+   "en": "Legacy list of regular expressions to exclude."
+  },
+  {
+   "key": "shell_environment_policy.experimental_use_profile",
+   "type": "boolean"
+  },
+  {
+   "key": "shell_environment_policy.filters",
+   "type": "map",
+   "en": "Pattern actions used by the canonical table representation.\n\nOrdinary config keeps accepting the legacy arrays above during the migration. Requirements will accept only this keyed form, keeping array compatibility isolated so the legacy fields can be deprecated later. Pattern keys merge case-insensitively across config layers, matching how the resulting patterns match environment variable names."
+  },
+  {
+   "key": "shell_environment_policy.ignore_default_excludes",
+   "type": "boolean"
+  },
+  {
+   "key": "shell_environment_policy.include_only",
+   "type": "string[]",
+   "en": "Legacy list of regular expressions to include."
+  },
+  {
+   "key": "shell_environment_policy.inherit",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "core",
+     "en": "\"Core\" environment variables for the platform. On UNIX, this would include HOME, LOGNAME, PATH, SHELL, and USER, among others."
+    },
+    {
+     "value": "all",
+     "en": "Inherits the full environment from the parent process."
+    },
+    {
+     "value": "none",
+     "en": "Do not inherit any environment variables from the parent process."
+    }
+   ]
+  },
+  {
+   "key": "shell_environment_policy.set",
+   "type": "map"
+  },
+  {
+   "key": "show_raw_agent_reasoning",
+   "type": "boolean",
+   "en": "When set to `true`, `AgentReasoningRawContentEvent` events will be shown in the UI/output. Defaults to `false`."
+  },
+  {
+   "key": "skills",
+   "type": "group",
+   "en": "User-level skill config entries keyed by SKILL.md path."
+  },
+  {
+   "key": "skills.bundled",
+   "type": "group"
+  },
+  {
+   "key": "skills.bundled.enabled",
+   "type": "boolean",
+   "default": true
+  },
+  {
+   "key": "skills.config",
+   "type": "json"
+  },
+  {
+   "key": "skills.include_instructions",
+   "type": "boolean",
+   "en": "Whether turns receive the automatic skills instructions block."
+  },
+  {
+   "key": "skills.max_context_tokens",
+   "type": "integer",
+   "min": 1,
+   "en": "Maximum tokens used by the available-skills catalog. Defaults to 2% of the model context window and is capped at 10,000 tokens when set."
+  },
+  {
+   "key": "sqlite_home",
+   "type": "string",
+   "en": "Directory where Codex stores the SQLite state DB. Defaults to `$CODEX_SQLITE_HOME` when set. Otherwise uses `$CODEX_HOME`."
+  },
+  {
+   "key": "suppress_unstable_features_warning",
+   "type": "boolean",
+   "en": "Suppress warnings about unstable (under development) features."
+  },
+  {
+   "key": "thread_unload_delay_secs",
+   "type": "integer",
+   "min": 0,
+   "en": "Seconds a thread must have no subscribers and no activity before app-server unloads it. Defaults to 60 (1 minute); zero unloads immediately. Resolved when each thread is loaded; request config overrides apply per thread."
+  },
+  {
+   "key": "tool_output_token_limit",
+   "type": "integer",
+   "min": 0,
+   "en": "Token budget applied when storing tool/function outputs in the context manager."
+  },
+  {
+   "key": "tool_suggest",
+   "type": "group",
+   "en": "Additional discoverable tools that can be suggested for installation."
+  },
+  {
+   "key": "tool_suggest.disabled_tools",
+   "type": "json",
+   "default": []
+  },
+  {
+   "key": "tool_suggest.discoverables",
+   "type": "json",
+   "default": []
+  },
+  {
+   "key": "tools",
+   "type": "group",
+   "en": "Nested tools section for feature toggles"
+  },
+  {
+   "key": "tools.client_search_provider",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "standalone"
+    },
+    {
+     "value": "search_mcp"
+    }
+   ],
+   "en": "Client provider preference when the model does not select a provider."
+  },
+  {
+   "key": "tools.experimental_request_user_input",
+   "type": "group"
+  },
+  {
+   "key": "tools.experimental_request_user_input.enabled",
+   "type": "boolean",
+   "default": true
+  },
+  {
+   "key": "tools.update_plan",
+   "type": "group"
+  },
+  {
+   "key": "tools.update_plan.enabled",
+   "type": "boolean",
+   "default": false
+  },
+  {
+   "key": "tools.web_search",
+   "type": "group"
+  },
+  {
+   "key": "tools.web_search.allowed_domains",
+   "type": "string[]"
+  },
+  {
+   "key": "tools.web_search.context_size",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "low"
+    },
+    {
+     "value": "medium"
+    },
+    {
+     "value": "high"
+    }
+   ]
+  },
+  {
+   "key": "tools.web_search.location",
+   "type": "group"
+  },
+  {
+   "key": "tools.web_search.location.city",
+   "type": "string"
+  },
+  {
+   "key": "tools.web_search.location.country",
+   "type": "string"
+  },
+  {
+   "key": "tools.web_search.location.region",
+   "type": "string"
+  },
+  {
+   "key": "tools.web_search.location.timezone",
+   "type": "string"
+  },
+  {
+   "key": "tui",
+   "type": "group",
+   "en": "Collection of settings that are specific to the TUI."
+  },
+  {
+   "key": "tui.agents_overview_grouping",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "project"
+    },
+    {
+     "value": "status"
+    },
+    {
+     "value": "model"
+    }
+   ],
+   "default": "project",
+   "en": "Last selected grouping in Agent Command Center."
+  },
+  {
+   "key": "tui.alternate_screen",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "auto",
+     "en": "Use alternate screen mode."
+    },
+    {
+     "value": "always",
+     "en": "Always use alternate screen mode."
+    },
+    {
+     "value": "never",
+     "en": "Never use alternate screen (inline mode only)."
+    }
+   ],
+   "default": "auto",
+   "en": "Controls whether the TUI uses the terminal's alternate screen buffer.\n\n- `auto` (default): Use alternate screen. - `always`: Always use alternate screen. - `never`: Never use alternate screen (inline mode only, preserves scrollback)."
+  },
+  {
+   "key": "tui.animations",
+   "type": "boolean",
+   "default": true,
+   "en": "Enable animations (welcome screen, shimmer effects, spinners). Defaults to `true`."
+  },
+  {
+   "key": "tui.auto_recap",
+   "type": "boolean",
+   "default": true,
+   "en": "Generate automatic conversation recaps when the terminal is unfocused. Defaults to `true`. Disabling this leaves `/recap` available on demand."
+  },
+  {
+   "key": "tui.collapse_turn_details",
+   "type": "boolean",
+   "default": false,
+   "en": "Summarize tool calls and collapse completed turns in the full-screen transcript. Defaults to `false`."
+  },
+  {
+   "key": "tui.copy_on_select",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "auto",
+     "en": "Use the terminal-specific default."
+    },
+    {
+     "value": "always",
+     "en": "Copy every nonempty transcript, footer, or composer mouse selection on release."
+    },
+    {
+     "value": "never",
+     "en": "Require an explicit copy action."
+    }
+   ],
+   "default": "auto",
+   "en": "Copy selected transcript, footer, or composer text when the mouse button is released. Defaults to `auto`: enabled except in direct terminals known to forward their native copy shortcut (Ghostty 1.2+, Kitty on macOS, Windows Terminal, and VS Code on Windows). Unknown terminals, Ghostty without a recognized version, and tmux/Zellij default to copying."
+  },
+  {
+   "key": "tui.copy_on_select_clear_selection",
+   "type": "boolean",
+   "default": false,
+   "en": "Deselect read-only transcript or footer text after Copy on select confirms delivery. Editable composer selections remain visible. Defaults to `false` and has no effect when Copy on select is off."
+  },
+  {
+   "key": "tui.default_hosts",
+   "type": "json",
+   "default": {},
+   "en": "Preferred hosts for new conversations, indexed by project and local user identity. Read from the user configuration only; values are never endpoints or credentials."
+  },
+  {
+   "key": "tui.disable_paste_burst",
+   "type": "boolean",
+   "en": "When true, disables burst-paste detection for typed input entirely. All characters are inserted as they are received, and no buffering or placeholder replacement will occur for fast keypress bursts. Overrides the legacy top-level `disable_paste_burst` setting. Defaults to `false`."
+  },
+  {
+   "key": "tui.effects",
+   "type": "group",
+   "default": {
+    "effort": true,
+    "progress": true,
+    "shimmer": true,
+    "starfield": true,
+    "title": true,
+    "welcome": true
+   },
+   "en": "Individual visual effects. Each also requires animations to be enabled."
+  },
+  {
+   "key": "tui.effects.effort",
+   "type": "boolean",
+   "default": true,
+   "en": "Animate reasoning-effort changes in the composer and footer."
+  },
+  {
+   "key": "tui.effects.progress",
+   "type": "boolean",
+   "default": true,
+   "en": "Animate activity bullets and loading spinners."
+  },
+  {
+   "key": "tui.effects.shimmer",
+   "type": "boolean",
+   "default": true,
+   "en": "Shimmer status and loading text."
+  },
+  {
+   "key": "tui.effects.starfield",
+   "type": "boolean",
+   "default": true,
+   "en": "Animate the composer starfield."
+  },
+  {
+   "key": "tui.effects.title",
+   "type": "boolean",
+   "default": true,
+   "en": "Blink the terminal-title indicator when user action is required."
+  },
+  {
+   "key": "tui.effects.welcome",
+   "type": "boolean",
+   "default": true,
+   "en": "Animate the welcome artwork."
+  },
+  {
+   "key": "tui.fullscreen_transcript",
+   "type": "boolean",
+   "default": true,
+   "en": "Own the fullscreen transcript, including scrolling, selection, and search. Defaults to `true`; alternate-screen restrictions take precedence."
+  },
+  {
+   "key": "tui.keymap",
+   "type": "group",
+   "default": {
+    "agents": {
+     "archive": null,
+     "delete": null,
+     "fork": null,
+     "hide": null,
+     "new_task": null,
+     "new_worktree": null,
+     "rename": null,
+     "resume": null,
+     "search": null,
+     "stop": null,
+     "toggle_grouping": null,
+     "toggle_pin": null
+    },
+    "approval": {
+     "approve": null,
+     "approve_for_prefix": null,
+     "approve_for_session": null,
+     "cancel": null,
+     "decline": null,
+     "deny": null,
+     "open_fullscreen": null,
+     "open_thread": null
+    },
+    "chat": {
+     "decrease_reasoning_effort": null,
+     "edit_queued_message": null,
+     "increase_reasoning_effort": null,
+     "interrupt_turn": null,
+     "next_permission_mode": null,
+     "open_presets": null,
+     "previous_permission_mode": null,
+     "prompt_stack_back": null,
+     "skip_question": null,
+     "toggle_voice": null,
+     "toggle_voice_mute": null
+    },
+    "composer": {
+     "history_search_next": null,
+     "history_search_previous": null,
+     "queue": null,
+     "submit": null,
+     "toggle_shortcuts": null
+    },
+    "editor": {
+     "delete_backward": null,
+     "delete_backward_word": null,
+     "delete_forward": null,
+     "delete_forward_word": null,
+     "insert_newline": null,
+     "kill_line_end": null,
+     "kill_line_start": null,
+     "kill_whole_line": null,
+     "move_down": null,
+     "move_left": null,
+     "move_line_end": null,
+     "move_line_start": null,
+     "move_right": null,
+     "move_up": null,
+     "move_word_left": null,
+     "move_word_right": null,
+     "yank": null
+    },
+    "global": {
+     "change_host": null,
+     "clear_terminal": null,
+     "close_sidebar_tab": null,
+     "copy": null,
+     "equalize_pane_widths": null,
+     "find_transcript": null,
+     "focus_activity": null,
+     "focus_main_composer": null,
+     "focus_pane_left": null,
+     "focus_pane_right": null,
+     "focus_sidebar_content": null,
+     "focus_sidebar_tabs": null,
+     "hide_pane": null,
+     "leader": null,
+     "maximize_pane_width": null,
+     "minimize_pane_width": null,
+     "move_divider_left": null,
+     "move_divider_right": null,
+     "open_agents": null,
+     "open_external_editor": null,
+     "open_transcript": null,
+     "queue": null,
+     "resize_panes": null,
+     "select_transcript": null,
+     "sidebar_down": null,
+     "sidebar_up": null,
+     "submit": null,
+     "toggle_fast_mode": null,
+     "toggle_pane_zoom": null,
+     "toggle_raw_output": null,
+     "toggle_shortcuts": null,
+     "toggle_side_conversation": null,
+     "toggle_vim_mode": null
+    },
+    "list": {
+     "accept": null,
+     "cancel": null,
+     "jump_bottom": null,
+     "jump_top": null,
+     "move_down": null,
+     "move_left": null,
+     "move_right": null,
+     "move_up": null,
+     "page_down": null,
+     "page_up": null
+    },
+    "pager": {
+     "close": null,
+     "close_transcript": null,
+     "find": null,
+     "half_page_down": null,
+     "half_page_up": null,
+     "jump_bottom": null,
+     "jump_top": null,
+     "page_down": null,
+     "page_up": null,
+     "scroll_down": null,
+     "scroll_up": null
+    },
+    "vim_normal": {
+     "append_after_cursor": null,
+     "append_line_end": null,
+     "cancel_operator": null,
+     "change_to_line_end": null,
+     "delete_char": null,
+     "delete_to_line_end": null,
+     "enter_insert": null,
+     "enter_replace_mode": null,
+     "find_backward": null,
+     "find_forward": null,
+     "insert_line_start": null,
+     "jump_bottom": null,
+     "jump_top": null,
+     "move_down": null,
+     "move_left": null,
+     "move_line_end": null,
+     "move_line_start": null,
+     "move_right": null,
+     "move_up": null,
+     "move_word_backward": null,
+     "move_word_end": null,
+     "move_word_forward": null,
+     "open_line_above": null,
+     "open_line_below": null,
+     "paste_after": null,
+     "redo": null,
+     "repeat_last_change": null,
+     "replace_char": null,
+     "start_change_operator": null,
+     "start_delete_operator": null,
+     "start_yank_operator": null,
+     "substitute_char": null,
+     "till_backward": null,
+     "till_forward": null,
+     "undo": null,
+     "yank_line": null
+    },
+    "vim_operator": {
+     "cancel": null,
+     "delete_line": null,
+     "motion_down": null,
+     "motion_find_backward": null,
+     "motion_find_forward": null,
+     "motion_jump_bottom": null,
+     "motion_jump_top": null,
+     "motion_left": null,
+     "motion_line_end": null,
+     "motion_line_start": null,
+     "motion_right": null,
+     "motion_till_backward": null,
+     "motion_till_forward": null,
+     "motion_up": null,
+     "motion_word_backward": null,
+     "motion_word_end": null,
+     "motion_word_forward": null,
+     "select_around_text_object": null,
+     "select_inner_text_object": null,
+     "yank_line": null
+    },
+    "vim_search": {
+     "backward": null,
+     "forward": null,
+     "next": null,
+     "previous": null
+    },
+    "vim_text_object": {
+     "backtick": null,
+     "big_word": null,
+     "braces": null,
+     "brackets": null,
+     "cancel": null,
+     "double_quote": null,
+     "parentheses": null,
+     "single_quote": null,
+     "word": null
+    }
+   },
+   "en": "Keybinding overrides for the TUI.\n\nThis supports rebinding selected actions globally and by context. Context bindings take precedence over `global` bindings."
+  },
+  {
+   "key": "tui.keymap.agents",
+   "type": "group",
+   "default": {
+    "archive": null,
+    "delete": null,
+    "fork": null,
+    "hide": null,
+    "new_task": null,
+    "new_worktree": null,
+    "rename": null,
+    "resume": null,
+    "search": null,
+    "stop": null,
+    "toggle_grouping": null,
+    "toggle_pin": null
+   },
+   "en": "Shortcuts specific to the shared agents overview."
+  },
+  {
+   "key": "tui.keymap.agents.archive",
+   "type": "json",
+   "en": "Archive the selected task and its child agents after confirmation."
+  },
+  {
+   "key": "tui.keymap.agents.delete",
+   "type": "json",
+   "en": "Permanently delete the selected task and its child agents after confirmation."
+  },
+  {
+   "key": "tui.keymap.agents.fork",
+   "type": "json",
+   "en": "Fork the selected conversation and open the new session."
+  },
+  {
+   "key": "tui.keymap.agents.hide",
+   "type": "json",
+   "en": "Hide the selected task until explicitly resumed or the TUI restarts."
+  },
+  {
+   "key": "tui.keymap.agents.new_task",
+   "type": "json",
+   "en": "Open a new session in the selected checkout."
+  },
+  {
+   "key": "tui.keymap.agents.new_worktree",
+   "type": "json",
+   "en": "Open a new session in a worktree from the project default branch."
+  },
+  {
+   "key": "tui.keymap.agents.rename",
+   "type": "json",
+   "en": "Rename the selected task."
+  },
+  {
+   "key": "tui.keymap.agents.resume",
+   "type": "json",
+   "en": "Open the session resume picker."
+  },
+  {
+   "key": "tui.keymap.agents.search",
+   "type": "json",
+   "en": "Search the available agent tasks."
+  },
+  {
+   "key": "tui.keymap.agents.stop",
+   "type": "json",
+   "en": "Stop the selected running task."
+  },
+  {
+   "key": "tui.keymap.agents.toggle_grouping",
+   "type": "json",
+   "en": "Toggle grouping tasks by status or project."
+  },
+  {
+   "key": "tui.keymap.agents.toggle_pin",
+   "type": "json",
+   "en": "Pin or unpin the selected task in the shared sidebar section."
+  },
+  {
+   "key": "tui.keymap.approval",
+   "type": "group",
+   "default": {
+    "approve": null,
+    "approve_for_prefix": null,
+    "approve_for_session": null,
+    "cancel": null,
+    "decline": null,
+    "deny": null,
+    "open_fullscreen": null,
+    "open_thread": null
+   },
+   "en": "Approval overlay keybindings."
+  },
+  {
+   "key": "tui.keymap.approval.approve",
+   "type": "json",
+   "en": "Approve the primary option."
+  },
+  {
+   "key": "tui.keymap.approval.approve_for_prefix",
+   "type": "json",
+   "en": "Approve with exec-policy prefix when that option exists."
+  },
+  {
+   "key": "tui.keymap.approval.approve_for_session",
+   "type": "json",
+   "en": "Approve for session when that option exists."
+  },
+  {
+   "key": "tui.keymap.approval.cancel",
+   "type": "json",
+   "en": "Cancel an elicitation request."
+  },
+  {
+   "key": "tui.keymap.approval.decline",
+   "type": "json",
+   "en": "Decline and provide corrective guidance."
+  },
+  {
+   "key": "tui.keymap.approval.deny",
+   "type": "json",
+   "en": "Deny without providing follow-up guidance."
+  },
+  {
+   "key": "tui.keymap.approval.open_fullscreen",
+   "type": "json",
+   "en": "Open the full-screen approval details view."
+  },
+  {
+   "key": "tui.keymap.approval.open_thread",
+   "type": "json",
+   "en": "Open the thread that requested approval when shown from another thread."
+  },
+  {
+   "key": "tui.keymap.chat",
+   "type": "group",
+   "default": {
+    "decrease_reasoning_effort": null,
+    "edit_queued_message": null,
+    "increase_reasoning_effort": null,
+    "interrupt_turn": null,
+    "next_permission_mode": null,
+    "open_presets": null,
+    "previous_permission_mode": null,
+    "prompt_stack_back": null,
+    "skip_question": null,
+    "toggle_voice": null,
+    "toggle_voice_mute": null
+   },
+   "en": "Chat context keybindings."
+  },
+  {
+   "key": "tui.keymap.chat.decrease_reasoning_effort",
+   "type": "json",
+   "en": "Decrease the active reasoning effort."
+  },
+  {
+   "key": "tui.keymap.chat.edit_queued_message",
+   "type": "json",
+   "en": "Move up through pending async questions, then edit the most recently queued message."
+  },
+  {
+   "key": "tui.keymap.chat.increase_reasoning_effort",
+   "type": "json",
+   "en": "Increase the active reasoning effort."
+  },
+  {
+   "key": "tui.keymap.chat.interrupt_turn",
+   "type": "json",
+   "en": "Interrupt the active turn."
+  },
+  {
+   "key": "tui.keymap.chat.next_permission_mode",
+   "type": "json",
+   "en": "Switch to the next available permission mode."
+  },
+  {
+   "key": "tui.keymap.chat.open_presets",
+   "type": "json",
+   "en": "Open saved prompts and slash commands."
+  },
+  {
+   "key": "tui.keymap.chat.previous_permission_mode",
+   "type": "json",
+   "en": "Switch to the previous available permission mode."
+  },
+  {
+   "key": "tui.keymap.chat.prompt_stack_back",
+   "type": "json",
+   "en": "Move back through pending async questions toward the composer."
+  },
+  {
+   "key": "tui.keymap.chat.skip_question",
+   "type": "json",
+   "en": "Skip the focused question."
+  },
+  {
+   "key": "tui.keymap.chat.toggle_voice",
+   "type": "json",
+   "en": "Start or stop a voice conversation."
+  },
+  {
+   "key": "tui.keymap.chat.toggle_voice_mute",
+   "type": "json",
+   "en": "Toggle the microphone in an active voice conversation."
+  },
+  {
+   "key": "tui.keymap.composer",
+   "type": "group",
+   "default": {
+    "history_search_next": null,
+    "history_search_previous": null,
+    "queue": null,
+    "submit": null,
+    "toggle_shortcuts": null
+   },
+   "en": "Composer context keybindings. These override corresponding `global` actions."
+  },
+  {
+   "key": "tui.keymap.composer.history_search_next",
+   "type": "json",
+   "en": "Move to the next match in reverse history search."
+  },
+  {
+   "key": "tui.keymap.composer.history_search_previous",
+   "type": "json",
+   "en": "Open reverse history search or move to the previous match."
+  },
+  {
+   "key": "tui.keymap.composer.queue",
+   "type": "json",
+   "en": "Queue the current composer draft while a task is running."
+  },
+  {
+   "key": "tui.keymap.composer.submit",
+   "type": "json",
+   "en": "Submit the current composer draft."
+  },
+  {
+   "key": "tui.keymap.composer.toggle_shortcuts",
+   "type": "json",
+   "en": "Toggle the composer shortcut overlay."
+  },
+  {
+   "key": "tui.keymap.editor",
+   "type": "group",
+   "default": {
+    "delete_backward": null,
+    "delete_backward_word": null,
+    "delete_forward": null,
+    "delete_forward_word": null,
+    "insert_newline": null,
+    "kill_line_end": null,
+    "kill_line_start": null,
+    "kill_whole_line": null,
+    "move_down": null,
+    "move_left": null,
+    "move_line_end": null,
+    "move_line_start": null,
+    "move_right": null,
+    "move_up": null,
+    "move_word_left": null,
+    "move_word_right": null,
+    "yank": null
+   },
+   "en": "Editor context keybindings for text editing inside text areas."
+  },
+  {
+   "key": "tui.keymap.editor.delete_backward",
+   "type": "json",
+   "en": "Delete one grapheme to the left."
+  },
+  {
+   "key": "tui.keymap.editor.delete_backward_word",
+   "type": "json",
+   "en": "Delete the previous word."
+  },
+  {
+   "key": "tui.keymap.editor.delete_forward",
+   "type": "json",
+   "en": "Delete one grapheme to the right."
+  },
+  {
+   "key": "tui.keymap.editor.delete_forward_word",
+   "type": "json",
+   "en": "Delete the next word."
+  },
+  {
+   "key": "tui.keymap.editor.insert_newline",
+   "type": "json",
+   "en": "Insert a newline in the editor."
+  },
+  {
+   "key": "tui.keymap.editor.kill_line_end",
+   "type": "json",
+   "en": "Kill text from cursor to line end."
+  },
+  {
+   "key": "tui.keymap.editor.kill_line_start",
+   "type": "json",
+   "en": "Kill text from cursor to line start."
+  },
+  {
+   "key": "tui.keymap.editor.kill_whole_line",
+   "type": "json",
+   "en": "Kill the current line."
+  },
+  {
+   "key": "tui.keymap.editor.move_down",
+   "type": "json",
+   "en": "Move cursor down one visual line."
+  },
+  {
+   "key": "tui.keymap.editor.move_left",
+   "type": "json",
+   "en": "Move cursor left by one grapheme."
+  },
+  {
+   "key": "tui.keymap.editor.move_line_end",
+   "type": "json",
+   "en": "Move cursor to end of line."
+  },
+  {
+   "key": "tui.keymap.editor.move_line_start",
+   "type": "json",
+   "en": "Move cursor to beginning of line."
+  },
+  {
+   "key": "tui.keymap.editor.move_right",
+   "type": "json",
+   "en": "Move cursor right by one grapheme."
+  },
+  {
+   "key": "tui.keymap.editor.move_up",
+   "type": "json",
+   "en": "Move cursor up one visual line."
+  },
+  {
+   "key": "tui.keymap.editor.move_word_left",
+   "type": "json",
+   "en": "Move cursor to beginning of previous word."
+  },
+  {
+   "key": "tui.keymap.editor.move_word_right",
+   "type": "json",
+   "en": "Move cursor to end of next word."
+  },
+  {
+   "key": "tui.keymap.editor.yank",
+   "type": "json",
+   "en": "Yank the kill buffer."
+  },
+  {
+   "key": "tui.keymap.global",
+   "type": "group",
+   "default": {
+    "change_host": null,
+    "clear_terminal": null,
+    "close_sidebar_tab": null,
+    "copy": null,
+    "equalize_pane_widths": null,
+    "find_transcript": null,
+    "focus_activity": null,
+    "focus_main_composer": null,
+    "focus_pane_left": null,
+    "focus_pane_right": null,
+    "focus_sidebar_content": null,
+    "focus_sidebar_tabs": null,
+    "hide_pane": null,
+    "leader": null,
+    "maximize_pane_width": null,
+    "minimize_pane_width": null,
+    "move_divider_left": null,
+    "move_divider_right": null,
+    "open_agents": null,
+    "open_external_editor": null,
+    "open_transcript": null,
+    "queue": null,
+    "resize_panes": null,
+    "select_transcript": null,
+    "sidebar_down": null,
+    "sidebar_up": null,
+    "submit": null,
+    "toggle_fast_mode": null,
+    "toggle_pane_zoom": null,
+    "toggle_raw_output": null,
+    "toggle_shortcuts": null,
+    "toggle_side_conversation": null,
+    "toggle_vim_mode": null
+   },
+   "en": "Global keybindings. These are used when a context does not define an override."
+  },
+  {
+   "key": "tui.keymap.global.change_host",
+   "type": "json",
+   "en": "Change where a new conversation runs."
+  },
+  {
+   "key": "tui.keymap.global.clear_terminal",
+   "type": "json",
+   "en": "Clear the terminal UI."
+  },
+  {
+   "key": "tui.keymap.global.close_sidebar_tab",
+   "type": "json",
+   "en": "Close the active sidebar tab."
+  },
+  {
+   "key": "tui.keymap.global.copy",
+   "type": "json",
+   "en": "Copy the last agent response to the clipboard."
+  },
+  {
+   "key": "tui.keymap.global.equalize_pane_widths",
+   "type": "json",
+   "en": "Equalize visible pane widths."
+  },
+  {
+   "key": "tui.keymap.global.find_transcript",
+   "type": "json",
+   "en": "Find text in the full transcript."
+  },
+  {
+   "key": "tui.keymap.global.focus_activity",
+   "type": "json",
+   "en": "Focus activity groups in the owned transcript to inspect their details."
+  },
+  {
+   "key": "tui.keymap.global.focus_main_composer",
+   "type": "json",
+   "en": "Focus the main conversation composer."
+  },
+  {
+   "key": "tui.keymap.global.focus_pane_left",
+   "type": "json",
+   "en": "Focus the parent conversation."
+  },
+  {
+   "key": "tui.keymap.global.focus_pane_right",
+   "type": "json",
+   "en": "Focus the open side conversation."
+  },
+  {
+   "key": "tui.keymap.global.focus_sidebar_content",
+   "type": "json",
+   "en": "Focus the side conversation, or hide it when already focused."
+  },
+  {
+   "key": "tui.keymap.global.focus_sidebar_tabs",
+   "type": "json",
+   "en": "Open the sidebar tab chooser."
+  },
+  {
+   "key": "tui.keymap.global.hide_pane",
+   "type": "json",
+   "en": "Hide the focused sidebar pane."
+  },
+  {
+   "key": "tui.keymap.global.leader",
+   "type": "json",
+   "en": "Prefix for persistent, context-aware shortcut menus."
+  },
+  {
+   "key": "tui.keymap.global.maximize_pane_width",
+   "type": "json",
+   "en": "Maximize the focused pane width."
+  },
+  {
+   "key": "tui.keymap.global.minimize_pane_width",
+   "type": "json",
+   "en": "Minimize the focused pane width."
+  },
+  {
+   "key": "tui.keymap.global.move_divider_left",
+   "type": "json",
+   "en": "Move the divider left when the side pane has focus."
+  },
+  {
+   "key": "tui.keymap.global.move_divider_right",
+   "type": "json",
+   "en": "Move the divider right when the side pane has focus."
+  },
+  {
+   "key": "tui.keymap.global.open_agents",
+   "type": "json",
+   "en": "Open the shared agent-session overview."
+  },
+  {
+   "key": "tui.keymap.global.open_external_editor",
+   "type": "json",
+   "en": "Open the external editor for the current draft."
+  },
+  {
+   "key": "tui.keymap.global.open_transcript",
+   "type": "json",
+   "en": "Open the transcript overlay."
+  },
+  {
+   "key": "tui.keymap.global.queue",
+   "type": "json",
+   "en": "Queue the current composer draft while a task is running."
+  },
+  {
+   "key": "tui.keymap.global.resize_panes",
+   "type": "json",
+   "en": "Enter keyboard resize mode for visible dividers."
+  },
+  {
+   "key": "tui.keymap.global.select_transcript",
+   "type": "json",
+   "en": "Enter keyboard selection mode for the transcript."
+  },
+  {
+   "key": "tui.keymap.global.sidebar_down",
+   "type": "json",
+   "en": "Switch to the next sidebar tab."
+  },
+  {
+   "key": "tui.keymap.global.sidebar_up",
+   "type": "json",
+   "en": "Switch to the previous sidebar tab."
+  },
+  {
+   "key": "tui.keymap.global.submit",
+   "type": "json",
+   "en": "Submit the current composer draft."
+  },
+  {
+   "key": "tui.keymap.global.toggle_fast_mode",
+   "type": "json",
+   "en": "Toggle Fast mode."
+  },
+  {
+   "key": "tui.keymap.global.toggle_pane_zoom",
+   "type": "json",
+   "en": "Zoom or restore the focused pane."
+  },
+  {
+   "key": "tui.keymap.global.toggle_raw_output",
+   "type": "json",
+   "en": "Toggle raw scrollback mode for copy-friendly transcript selection."
+  },
+  {
+   "key": "tui.keymap.global.toggle_shortcuts",
+   "type": "json",
+   "en": "Toggle the composer shortcut overlay."
+  },
+  {
+   "key": "tui.keymap.global.toggle_side_conversation",
+   "type": "json",
+   "en": "Switch between a side conversation and its parent without closing either."
+  },
+  {
+   "key": "tui.keymap.global.toggle_vim_mode",
+   "type": "json",
+   "en": "Toggle Vim mode for the composer input."
+  },
+  {
+   "key": "tui.keymap.list",
+   "type": "group",
+   "default": {
+    "accept": null,
+    "cancel": null,
+    "jump_bottom": null,
+    "jump_top": null,
+    "move_down": null,
+    "move_left": null,
+    "move_right": null,
+    "move_up": null,
+    "page_down": null,
+    "page_up": null
+   },
+   "en": "List selection context keybindings for popup-style selectable lists."
+  },
+  {
+   "key": "tui.keymap.list.accept",
+   "type": "json",
+   "en": "Accept current selection."
+  },
+  {
+   "key": "tui.keymap.list.cancel",
+   "type": "json",
+   "en": "Cancel and close selection view."
+  },
+  {
+   "key": "tui.keymap.list.jump_bottom",
+   "type": "json",
+   "en": "Jump to the last list item."
+  },
+  {
+   "key": "tui.keymap.list.jump_top",
+   "type": "json",
+   "en": "Jump to the first list item."
+  },
+  {
+   "key": "tui.keymap.list.move_down",
+   "type": "json",
+   "en": "Move list selection down."
+  },
+  {
+   "key": "tui.keymap.list.move_left",
+   "type": "json",
+   "en": "Move horizontally left in list pickers that support horizontal actions."
+  },
+  {
+   "key": "tui.keymap.list.move_right",
+   "type": "json",
+   "en": "Move horizontally right in list pickers that support horizontal actions."
+  },
+  {
+   "key": "tui.keymap.list.move_up",
+   "type": "json",
+   "en": "Move list selection up."
+  },
+  {
+   "key": "tui.keymap.list.page_down",
+   "type": "json",
+   "en": "Move list selection down by one page."
+  },
+  {
+   "key": "tui.keymap.list.page_up",
+   "type": "json",
+   "en": "Move list selection up by one page."
+  },
+  {
+   "key": "tui.keymap.pager",
+   "type": "group",
+   "default": {
+    "close": null,
+    "close_transcript": null,
+    "find": null,
+    "half_page_down": null,
+    "half_page_up": null,
+    "jump_bottom": null,
+    "jump_top": null,
+    "page_down": null,
+    "page_up": null,
+    "scroll_down": null,
+    "scroll_up": null
+   },
+   "en": "Pager context keybindings for transcript and static overlays."
+  },
+  {
+   "key": "tui.keymap.pager.close",
+   "type": "json",
+   "en": "Close the pager overlay."
+  },
+  {
+   "key": "tui.keymap.pager.close_transcript",
+   "type": "json",
+   "en": "Close the transcript overlay via its dedicated toggle key."
+  },
+  {
+   "key": "tui.keymap.pager.find",
+   "type": "json",
+   "en": "Find text in a transcript pager."
+  },
+  {
+   "key": "tui.keymap.pager.half_page_down",
+   "type": "json",
+   "en": "Scroll down by half a page."
+  },
+  {
+   "key": "tui.keymap.pager.half_page_up",
+   "type": "json",
+   "en": "Scroll up by half a page."
+  },
+  {
+   "key": "tui.keymap.pager.jump_bottom",
+   "type": "json",
+   "en": "Jump to the end."
+  },
+  {
+   "key": "tui.keymap.pager.jump_top",
+   "type": "json",
+   "en": "Jump to the beginning."
+  },
+  {
+   "key": "tui.keymap.pager.page_down",
+   "type": "json",
+   "en": "Scroll down by one page."
+  },
+  {
+   "key": "tui.keymap.pager.page_up",
+   "type": "json",
+   "en": "Scroll up by one page."
+  },
+  {
+   "key": "tui.keymap.pager.scroll_down",
+   "type": "json",
+   "en": "Scroll down by one row."
+  },
+  {
+   "key": "tui.keymap.pager.scroll_up",
+   "type": "json",
+   "en": "Scroll up by one row."
+  },
+  {
+   "key": "tui.keymap.vim_normal",
+   "type": "group",
+   "default": {
+    "append_after_cursor": null,
+    "append_line_end": null,
+    "cancel_operator": null,
+    "change_to_line_end": null,
+    "delete_char": null,
+    "delete_to_line_end": null,
+    "enter_insert": null,
+    "enter_replace_mode": null,
+    "find_backward": null,
+    "find_forward": null,
+    "insert_line_start": null,
+    "jump_bottom": null,
+    "jump_top": null,
+    "move_down": null,
+    "move_left": null,
+    "move_line_end": null,
+    "move_line_start": null,
+    "move_right": null,
+    "move_up": null,
+    "move_word_backward": null,
+    "move_word_end": null,
+    "move_word_forward": null,
+    "open_line_above": null,
+    "open_line_below": null,
+    "paste_after": null,
+    "redo": null,
+    "repeat_last_change": null,
+    "replace_char": null,
+    "start_change_operator": null,
+    "start_delete_operator": null,
+    "start_yank_operator": null,
+    "substitute_char": null,
+    "till_backward": null,
+    "till_forward": null,
+    "undo": null,
+    "yank_line": null
+   },
+   "en": "Vim normal-mode keybindings for modal editing inside text areas.\n\nActions that use uppercase letters (like `A` for append-line-end) should be specified as `shift-a` in config; the runtime matcher handles cross-terminal shift-reporting differences automatically."
+  },
+  {
+   "key": "tui.keymap.vim_normal.append_after_cursor",
+   "type": "json",
+   "en": "Enter insert mode after cursor (`a`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.append_line_end",
+   "type": "json",
+   "en": "Enter insert mode at end of line (`A`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.cancel_operator",
+   "type": "json",
+   "en": "Cancel a pending operator and return to normal mode."
+  },
+  {
+   "key": "tui.keymap.vim_normal.change_to_line_end",
+   "type": "json",
+   "en": "Change from cursor to end of line and enter insert mode (`C`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.delete_char",
+   "type": "json",
+   "en": "Delete character under cursor (`x`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.delete_to_line_end",
+   "type": "json",
+   "en": "Delete from cursor to end of line (`D`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.enter_insert",
+   "type": "json",
+   "en": "Enter insert mode at cursor (`i`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.enter_replace_mode",
+   "type": "json",
+   "en": "Enter replace mode and overwrite characters under the cursor (`R`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.find_backward",
+   "type": "json",
+   "en": "Find the previous character on the current line (`F`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.find_forward",
+   "type": "json",
+   "en": "Find the next character on the current line (`f`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.insert_line_start",
+   "type": "json",
+   "en": "Enter insert mode at first non-blank of line (`I`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.jump_bottom",
+   "type": "json",
+   "en": "Jump to the last buffer line (`G`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.jump_top",
+   "type": "json",
+   "en": "Begin a jump to the first buffer line (`gg`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.move_down",
+   "type": "json",
+   "en": "Move cursor down (`j`), or recall newer composer history at history boundaries."
+  },
+  {
+   "key": "tui.keymap.vim_normal.move_left",
+   "type": "json",
+   "en": "Move cursor left (`h`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.move_line_end",
+   "type": "json",
+   "en": "Move cursor to end of line (`$`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.move_line_start",
+   "type": "json",
+   "en": "Move cursor to start of line (`0`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.move_right",
+   "type": "json",
+   "en": "Move cursor right (`l`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.move_up",
+   "type": "json",
+   "en": "Move cursor up (`k`), or recall older composer history at history boundaries."
+  },
+  {
+   "key": "tui.keymap.vim_normal.move_word_backward",
+   "type": "json",
+   "en": "Move cursor to start of previous word (`b`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.move_word_end",
+   "type": "json",
+   "en": "Move cursor to end of current/next word (`e`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.move_word_forward",
+   "type": "json",
+   "en": "Move cursor to start of next word (`w`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.open_line_above",
+   "type": "json",
+   "en": "Open a new line above and enter insert mode (`O`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.open_line_below",
+   "type": "json",
+   "en": "Open a new line below and enter insert mode (`o`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.paste_after",
+   "type": "json",
+   "en": "Paste after cursor (`p`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.redo",
+   "type": "json",
+   "en": "Redo the last undone edit (`ctrl-r`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.repeat_last_change",
+   "type": "json",
+   "en": "Repeat the last complete edit (`.`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.replace_char",
+   "type": "json",
+   "en": "Replace the character under the cursor (`r`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.start_change_operator",
+   "type": "json",
+   "en": "Begin change operator; next keys select a text object."
+  },
+  {
+   "key": "tui.keymap.vim_normal.start_delete_operator",
+   "type": "json",
+   "en": "Begin delete operator; next key selects motion (`d`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.start_yank_operator",
+   "type": "json",
+   "en": "Begin yank operator; next key selects motion (`y`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.substitute_char",
+   "type": "json",
+   "en": "Delete character under cursor and enter insert mode (`s`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.till_backward",
+   "type": "json",
+   "en": "Stop after the previous character on the current line (`T`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.till_forward",
+   "type": "json",
+   "en": "Stop before the next character on the current line (`t`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.undo",
+   "type": "json",
+   "en": "Undo the last complete edit (`u`)."
+  },
+  {
+   "key": "tui.keymap.vim_normal.yank_line",
+   "type": "json",
+   "en": "Yank the entire line (`Y`)."
+  },
+  {
+   "key": "tui.keymap.vim_operator",
+   "type": "group",
+   "default": {
+    "cancel": null,
+    "delete_line": null,
+    "motion_down": null,
+    "motion_find_backward": null,
+    "motion_find_forward": null,
+    "motion_jump_bottom": null,
+    "motion_jump_top": null,
+    "motion_left": null,
+    "motion_line_end": null,
+    "motion_line_start": null,
+    "motion_right": null,
+    "motion_till_backward": null,
+    "motion_till_forward": null,
+    "motion_up": null,
+    "motion_word_backward": null,
+    "motion_word_end": null,
+    "motion_word_forward": null,
+    "select_around_text_object": null,
+    "select_inner_text_object": null,
+    "yank_line": null
+   },
+   "en": "Vim operator-pending keybindings for modal editing inside text areas.\n\nThis context is active only while waiting for a motion after `d` or `y`. Repeating the operator key (`dd`, `yy`) targets the entire line. Pressing `Esc` cancels the pending operator and returns to normal mode without modifying text."
+  },
+  {
+   "key": "tui.keymap.vim_operator.cancel",
+   "type": "json",
+   "en": "Cancel the pending operator and return to normal mode."
+  },
+  {
+   "key": "tui.keymap.vim_operator.delete_line",
+   "type": "json",
+   "en": "Repeat delete operator to delete the whole line (`dd`)."
+  },
+  {
+   "key": "tui.keymap.vim_operator.motion_down",
+   "type": "json",
+   "en": "Motion: down one line (`j`)."
+  },
+  {
+   "key": "tui.keymap.vim_operator.motion_find_backward",
+   "type": "json",
+   "en": "Motion: find the previous character on the current line (`F`)."
+  },
+  {
+   "key": "tui.keymap.vim_operator.motion_find_forward",
+   "type": "json",
+   "en": "Motion: find the next character on the current line (`f`)."
+  },
+  {
+   "key": "tui.keymap.vim_operator.motion_jump_bottom",
+   "type": "json",
+   "en": "Motion: jump to the last buffer line (`G`)."
+  },
+  {
+   "key": "tui.keymap.vim_operator.motion_jump_top",
+   "type": "json",
+   "en": "Motion: begin a jump to the first buffer line (`gg`)."
+  },
+  {
+   "key": "tui.keymap.vim_operator.motion_left",
+   "type": "json",
+   "en": "Motion: left (`h`)."
+  },
+  {
+   "key": "tui.keymap.vim_operator.motion_line_end",
+   "type": "json",
+   "en": "Motion: to end of line (`$`)."
+  },
+  {
+   "key": "tui.keymap.vim_operator.motion_line_start",
+   "type": "json",
+   "en": "Motion: to start of line (`0`)."
+  },
+  {
+   "key": "tui.keymap.vim_operator.motion_right",
+   "type": "json",
+   "en": "Motion: right (`l`)."
+  },
+  {
+   "key": "tui.keymap.vim_operator.motion_till_backward",
+   "type": "json",
+   "en": "Motion: stop after the previous character on the current line (`T`)."
+  },
+  {
+   "key": "tui.keymap.vim_operator.motion_till_forward",
+   "type": "json",
+   "en": "Motion: stop before the next character on the current line (`t`)."
+  },
+  {
+   "key": "tui.keymap.vim_operator.motion_up",
+   "type": "json",
+   "en": "Motion: up one line (`k`)."
+  },
+  {
+   "key": "tui.keymap.vim_operator.motion_word_backward",
+   "type": "json",
+   "en": "Motion: to start of previous word (`b`)."
+  },
+  {
+   "key": "tui.keymap.vim_operator.motion_word_end",
+   "type": "json",
+   "en": "Motion: to end of current/next word (`e`)."
+  },
+  {
+   "key": "tui.keymap.vim_operator.motion_word_forward",
+   "type": "json",
+   "en": "Motion: to start of next word (`w`)."
+  },
+  {
+   "key": "tui.keymap.vim_operator.select_around_text_object",
+   "type": "json",
+   "en": "Select an around text object after an operator."
+  },
+  {
+   "key": "tui.keymap.vim_operator.select_inner_text_object",
+   "type": "json",
+   "en": "Select an inner text object after an operator."
+  },
+  {
+   "key": "tui.keymap.vim_operator.yank_line",
+   "type": "json",
+   "en": "Repeat yank operator to yank the whole line (`yy`)."
+  },
+  {
+   "key": "tui.keymap.vim_search",
+   "type": "group",
+   "default": {
+    "backward": null,
+    "forward": null,
+    "next": null,
+    "previous": null
+   },
+   "en": "Search motions shared by Vim normal and operator-pending input."
+  },
+  {
+   "key": "tui.keymap.vim_search.backward",
+   "type": "json",
+   "en": "Search backward in the active buffer (`?`)."
+  },
+  {
+   "key": "tui.keymap.vim_search.forward",
+   "type": "json",
+   "en": "Search forward in the active buffer (`/`)."
+  },
+  {
+   "key": "tui.keymap.vim_search.next",
+   "type": "json",
+   "en": "Repeat the accepted search (`n`)."
+  },
+  {
+   "key": "tui.keymap.vim_search.previous",
+   "type": "json",
+   "en": "Repeat in the opposite direction (`N`)."
+  },
+  {
+   "key": "tui.keymap.vim_text_object",
+   "type": "group",
+   "default": {
+    "backtick": null,
+    "big_word": null,
+    "braces": null,
+    "brackets": null,
+    "cancel": null,
+    "double_quote": null,
+    "parentheses": null,
+    "single_quote": null,
+    "word": null
+   },
+   "en": "Vim text-object keybindings for modal editing inside text areas."
+  },
+  {
+   "key": "tui.keymap.vim_text_object.backtick",
+   "type": "json",
+   "en": "Text object: backticks."
+  },
+  {
+   "key": "tui.keymap.vim_text_object.big_word",
+   "type": "json",
+   "en": "Text object: whitespace-delimited WORD."
+  },
+  {
+   "key": "tui.keymap.vim_text_object.braces",
+   "type": "json",
+   "en": "Text object: braces."
+  },
+  {
+   "key": "tui.keymap.vim_text_object.brackets",
+   "type": "json",
+   "en": "Text object: brackets."
+  },
+  {
+   "key": "tui.keymap.vim_text_object.cancel",
+   "type": "json",
+   "en": "Cancel the pending text-object command."
+  },
+  {
+   "key": "tui.keymap.vim_text_object.double_quote",
+   "type": "json",
+   "en": "Text object: double quotes."
+  },
+  {
+   "key": "tui.keymap.vim_text_object.parentheses",
+   "type": "json",
+   "en": "Text object: parentheses."
+  },
+  {
+   "key": "tui.keymap.vim_text_object.single_quote",
+   "type": "json",
+   "en": "Text object: single quotes."
+  },
+  {
+   "key": "tui.keymap.vim_text_object.word",
+   "type": "json",
+   "en": "Text object: word."
+  },
+  {
+   "key": "tui.model_availability_nux",
+   "type": "json",
+   "default": {},
+   "en": "Startup tooltip availability NUX state persisted by the TUI."
+  },
+  {
+   "key": "tui.mouse_scroll_speed",
+   "type": "number",
+   "en": "Mouse wheel speed multiplier for transcript scrolling, based on one row per event. Defaults to `1.0`. Positive fractional values slow scrolling; values above `1.0` speed it up."
+  },
+  {
+   "key": "tui.notification_condition",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "unfocused",
+     "en": "Emit TUI notifications only while the terminal is unfocused."
+    },
+    {
+     "value": "always",
+     "en": "Emit TUI notifications regardless of terminal focus."
+    }
+   ],
+   "default": "unfocused",
+   "en": "Controls whether TUI notifications are delivered only when the terminal is unfocused or regardless of focus. Defaults to `unfocused`."
+  },
+  {
+   "key": "tui.notification_method",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "auto"
+    },
+    {
+     "value": "osc9"
+    },
+    {
+     "value": "osc777"
+    },
+    {
+     "value": "bel"
+    }
+   ],
+   "default": "auto",
+   "en": "Notification method to use for terminal notifications. Defaults to `auto`."
+  },
+  {
+   "key": "tui.notifications",
+   "type": "json",
+   "default": true,
+   "en": "Enable desktop notifications from the TUI. Defaults to `true`."
+  },
+  {
+   "key": "tui.pet",
+   "type": "string",
+   "en": "Pet id to preselect in the terminal pet picker.\n\nCustom pet ids resolve against CODEX_HOME/pets/<pet-id>/pet.json."
+  },
+  {
+   "key": "tui.pet_anchor",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "composer",
+     "en": "Anchor the pet to the bottom of the current TUI composer viewport."
+    },
+    {
+     "value": "screen-bottom",
+     "en": "Anchor the pet to the physical bottom of the terminal screen."
+    }
+   ],
+   "default": "composer",
+   "en": "Where the terminal pet should anchor vertically.\n\nDefaults to `composer`, which follows the current TUI composer viewport."
+  },
+  {
+   "key": "tui.presets",
+   "type": "record",
+   "default": {},
+   "en": "Saved inputs keyed by a single digit (`0` through `9`)."
+  },
+  {
+   "key": "tui.presets.*.input",
+   "type": "string",
+   "en": "Plain-text input, limited to 8,000 UTF-8 bytes."
+  },
+  {
+   "key": "tui.presets.*.label",
+   "type": "string",
+   "en": "Optional short name for the picker and shortcut hints."
+  },
+  {
+   "key": "tui.question_esc_back",
+   "type": "boolean",
+   "default": true,
+   "en": "Escape returns from async questions to the composer, preserving the answer draft."
+  },
+  {
+   "key": "tui.raw_output_mode",
+   "type": "boolean",
+   "default": false,
+   "en": "Start the TUI in raw scrollback mode for copy-friendly transcript output. Defaults to `false`."
+  },
+  {
+   "key": "tui.rendering",
+   "type": "group",
+   "default": {
+    "lists": true,
+    "math": true,
+    "mermaid": true,
+    "tables": true
+   },
+   "en": "Rich content rendering. Independent of animations and visual effects."
+  },
+  {
+   "key": "tui.rendering.lists",
+   "type": "boolean",
+   "default": true,
+   "en": "Render Markdown bullets and task-list markers as Unicode symbols."
+  },
+  {
+   "key": "tui.rendering.math",
+   "type": "boolean",
+   "default": true,
+   "en": "Render math expressions using Unicode notation."
+  },
+  {
+   "key": "tui.rendering.mermaid",
+   "type": "boolean",
+   "default": true,
+   "en": "Render Mermaid code blocks as diagrams."
+  },
+  {
+   "key": "tui.rendering.tables",
+   "type": "boolean",
+   "default": true,
+   "en": "Render pipe tables, including tables inside Markdown fences."
+  },
+  {
+   "key": "tui.resume_cwd",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "current",
+     "en": "Use the directory where Codex was launched."
+    },
+    {
+     "value": "session",
+     "en": "Use the latest working directory recorded in the selected session."
+    }
+   ],
+   "en": "Working directory to use when resuming or forking a session. When unset, prompt if the current and session directories differ."
+  },
+  {
+   "key": "tui.right_click_paste",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "auto",
+     "en": "Enable on Windows/WSL/Linux, except recognized terminal-owned paste paths."
+    },
+    {
+     "value": "on",
+     "en": "Enable on supported local platforms; selection and terminal-owned paste still win."
+    },
+    {
+     "value": "off",
+     "en": "Leave right-click paste to the terminal."
+    }
+   ],
+   "default": "auto",
+   "en": "Right-click text paste fallback. Defaults to `auto` (Windows/WSL/Linux). `on` also enables macOS; neither mode reads over SSH or in recognized VS Code terminals. This controls the fullscreen fallback, not the terminal's own paste binding."
+  },
+  {
+   "key": "tui.screen_reader_detection_done",
+   "type": "boolean",
+   "en": "Records the one-time screen-reader detection attempt. Either value skips detection."
+  },
+  {
+   "key": "tui.session_picker_view",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "comfortable"
+    },
+    {
+     "value": "dense"
+    }
+   ],
+   "en": "Preferred layout for resume/fork session picker results."
+  },
+  {
+   "key": "tui.show_server_version_notice",
+   "type": "boolean",
+   "default": true,
+   "en": "Show informational notices about connected app server version differences. Defaults to `true`; this does not control compatibility errors or version status."
+  },
+  {
+   "key": "tui.show_tooltips",
+   "type": "boolean",
+   "default": true,
+   "en": "Show startup tooltips in the TUI welcome screen. Defaults to `true`."
+  },
+  {
+   "key": "tui.sidebar_width_percent",
+   "type": "integer",
+   "min": 1,
+   "max": 99,
+   "en": "Preferred docked sidebar width as a percentage of the terminal. Defaults to one third."
+  },
+  {
+   "key": "tui.status_line",
+   "type": "string[]",
+   "en": "Ordered list of status line item identifiers.\n\nWhen set, the TUI renders the selected items as the status line. When unset, the TUI defaults to: `model-with-reasoning`, `current-dir`, and `thread-name`."
+  },
+  {
+   "key": "tui.status_line_use_colors",
+   "type": "boolean",
+   "default": true,
+   "en": "Color status line items with colors derived from the active syntax theme. Defaults to `true`."
+  },
+  {
+   "key": "tui.terminal_resize_reflow_max_rows",
+   "type": "integer",
+   "min": 0,
+   "en": "Trim terminal resize-reflow replay to the most recent rendered terminal rows when the transcript exceeds this cap. Omit to use Codex's terminal-specific default. Set to `0` to keep all rendered rows."
+  },
+  {
+   "key": "tui.terminal_title",
+   "type": "string[]",
+   "en": "Ordered list of terminal title item identifiers.\n\nWhen set, the TUI renders the selected items into the terminal window/tab title. When unset, the TUI defaults to: `activity`, `thread-name`, and `project-name`. The `activity` item spins while working and shows an action-required message when blocked on the user."
+  },
+  {
+   "key": "tui.theme",
+   "type": "string",
+   "en": "Syntax highlighting theme name (kebab-case).\n\nWhen set, overrides automatic light/dark theme detection. Use `/theme` in the TUI or see `$CODEX_HOME/themes` for custom themes."
+  },
+  {
+   "key": "tui.vim_mode_default",
+   "type": "boolean",
+   "default": false,
+   "en": "Start the composer in Vim mode (`Normal`) by default. Defaults to `false`."
+  },
+  {
+   "key": "web_search",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "disabled"
+    },
+    {
+     "value": "cached"
+    },
+    {
+     "value": "indexed"
+    },
+    {
+     "value": "live"
+    }
+   ],
+   "en": "Controls the web search tool mode: disabled, cached, indexed, or live."
+  },
+  {
+   "key": "windows",
+   "type": "group",
+   "en": "Windows-specific configuration."
+  },
+  {
+   "key": "windows.allow_mxc",
+   "type": "boolean",
+   "en": "False blocks both explicit MXC configuration and automatic selection."
+  },
+  {
+   "key": "windows.sandbox",
+   "type": "enum",
+   "enum": [
+    {
+     "value": "elevated"
+    },
+    {
+     "value": "unelevated"
+    },
+    {
+     "value": "mxc"
+    }
+   ]
+  }
+ ]
+}

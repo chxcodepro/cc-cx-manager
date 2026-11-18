@@ -1,0 +1,180 @@
+# Claude Code settings.json 中文叠加层（第 2 部分）
+
+# ---------------- Hooks ----------------
+hooks | Hooks 钩子 | hooks | 在特定事件发生时自动运行的命令或 HTTP 请求。结构为「事件名 → 匹配器列表 → hooks 列表」。2.1.327 支持的事件：PreToolUse、PostToolUse、PostToolUseFailure、PostToolBatch、Notification、UserPromptSubmit、UserPromptExpansion、SessionStart、SessionEnd、Stop、StopFailure、SubagentStart、SubagentStop、PreCompact、PostCompact、PreModelSwitch、PostModelSwitch、PermissionRequest、PermissionDenied、Setup、TeammateIdle、TaskCreated、TaskCompleted、Elicitation、ElicitationResult、ConfigChange、WorktreeCreate、WorktreeRemove、InstructionsLoaded、CwdChanged、FileChanged、DirectoryAdded、MessageDisplay。可以用 /hooks 查看当前生效的 hooks。 | | hooks 会以你的身份执行任意命令，只添加你信任的脚本 | tags=security ;; ex={"PostToolUse":[{"matcher":"Edit\|Write","hooks":[{"type":"command","command":"npx prettier --write \"$CLAUDE_PROJECT_DIR\""}]}],"Notification":[{"hooks":[{"type":"command","command":"echo done"}]}]} ;; doc=https://code.claude.com/docs/en/hooks
+disableAllHooks | 禁用所有 Hooks | hooks | 禁用 settings 文件和已安装插件中定义的全部 hooks 以及状态栏命令。Claude Code 的内置功能不受影响。 | | 排查问题时临时开启很有用 |
+disableReplyCheck | 禁用回复检查 | hooks | 仅用于自托管 runner 上的 Claude Tag 会话：关闭「回合结束时未调用回复工具就重新提示」的检查（每回合最多四次）。它不是 hook，disableAllHooks 不会影响它。 | | | ;; tags=advanced
+
+# ---------------- MCP ----------------
+enableAllProjectMcpServers | 自动批准项目 MCP | mcp | 为 true 时自动批准项目 .mcp.json 中定义的所有 MCP 服务器，不再逐个询问。 | | 建议保持关闭：项目里的 MCP 服务器会在本机运行命令，应逐个审核后再批准 | tags=security
+enabledMcpjsonServers | 已批准的项目 MCP | mcp | 已批准启用的 .mcp.json 服务器名称列表。 | | | ;; ex=["github","memory"]
+disabledMcpjsonServers | 已拒绝的项目 MCP | mcp | 已拒绝的 .mcp.json 服务器名称列表。 | | | ;; ex=["filesystem"]
+disableClaudeAiConnectors | 禁用 claude.ai 连接器 | mcp | 任何设置来源中为 true 时，不自动获取和连接 claude.ai 的 MCP 云端连接器，显式传入的 claudeai-proxy 服务器也不会连接。 | | 不使用 claude.ai 连接器、想加快启动时可开启 |
+
+# ---------------- 插件与技能 ----------------
+enabledPlugins | 已启用插件 | plugins | 启用的插件，格式为「插件名@市场名」到 true / false 的映射，例如 { "formatter@anthropic-tools": true }。只有 true 会启用插件。优先级：用户 < 项目 < 本地 < 命令行 < 策略，要禁用项目启用的插件可在本地设置中写 false。 | | 通常用 /plugin 命令管理即可 | ex={"formatter@anthropic-tools":true}
+extraKnownMarketplaces | 额外插件市场 | plugins | 为本仓库额外提供的插件市场，常写在项目 .claude/settings.json 中，让团队成员自动获得所需的插件来源。每个市场以名称为键，source 支持 github、git、url、本地目录等。 | | | ;; ex={"team-tools":{"source":{"source":"github","repo":"my-org/claude-plugins"}}}
+additionalMarketplaces | 额外插件市场（别名） | plugins | extraKnownMarketplaces 的别名，读取方式完全相同。同一文件中不要两者都写；Claude Code 更新文件时可能把它改写为 extraKnownMarketplaces。 | | 请使用 extraKnownMarketplaces | by=extraKnownMarketplaces ;; ex={"team-tools":{"source":{"source":"github","repo":"my-org/claude-plugins"}}}
+pluginConfigs | 插件配置 | plugins | 按插件 ID（plugin@marketplace）分别设置的配置，包括插件内 MCP 服务器的用户配置项。 | | | ;; ex={"my-plugin@my-market":{"mcpServers":{"server":{"apiUrl":"<YOUR_BASE_URL>"}}}}
+skillOverrides | 技能显示覆盖 | plugins | 按技能名覆盖其在技能列表中的呈现：name-only 只列名称不带描述；user-invocable-only 对模型隐藏、但保留 /名称 调用；off 两者都隐藏。不设置即为正常显示。 | | 技能很多导致上下文占用大时，可把不常用的设为 name-only | ex={"pdf":"name-only","old-skill":"off"}
+disableBundledSkills | 禁用内置技能 | plugins | 移除 Claude Code 自带的技能与工作流；内置斜杠命令仍可输入，但对模型隐藏。插件和 .claude/skills、.claude/commands 不受影响。等同于 CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=1。 | | |
+skillListingMaxDescChars | 技能描述长度上限 | plugins | 发送给 Claude 的技能列表中，每个技能描述的最大字符数（默认 1536），超出会被截断。调大会增加每轮的上下文消耗。 | | | ;; u=字符 ;; def=1536
+skillListingBudgetFraction | 技能列表预算占比 | plugins | 技能列表在上下文窗口中可占的比例（默认 0.01 即 1%），超出时会缩短描述。调大会增加每轮上下文消耗。 | | | ;; def=0.01 ;; min=0 ;; max=1
+disableSkillShellExecution | 禁止技能内联命令 | plugins | 禁止用户、项目或插件来源的技能与自定义斜杠命令中内联执行 Shell 命令，命令会被替换为占位文本。 | | 使用来路不明的技能时可开启 | tags=security
+
+# ---------------- 子代理与工作流 ----------------
+agent | 主线程代理 | agents | 主线程使用的代理名称（内置或自定义代理），会应用该代理的系统提示、工具限制和模型。 | | | ;; ex="code-reviewer"
+disableAgentView | 禁用代理视图 | agents | 禁用代理视图（claude agents、--bg、/background 及按需守护进程）。等同于 CLAUDE_CODE_DISABLE_AGENT_VIEW=1，通常在托管设置中使用。 | | |
+disableWorkflows | 禁用工作流 | agents | 禁用 Workflows 功能。在 Anthropic 云端运行的 PR 代码审查和 /ultrareview 不受此设置影响。 | | |
+enableWorkflows | 启用工作流 | agents | 为当前用户开启或关闭 Workflows（多代理编排）功能。不设置时按订阅计划的默认值。 | | |
+workflowSizeGuideline | 工作流规模建议 | agents | Claude 编写动态工作流时的规模建议：small 少于 5 个代理，medium 少于 10 个，large 少于 50 个，unrestricted 不给建议。不设置时默认 medium（Pro 计划为 small）。 | | 想控制 token 消耗时设为 small | enum=small:小（<5 个代理）,medium:中（<10 个）,large:大（<50 个）,unrestricted:不限制
+workflowKeywordTriggerEnabled | ultracode 关键词触发 | agents | 是否启用 ultracode 关键词：在提示里写这个词会让该回合使用 Workflow 工具。默认 true。 | | | ;; def=true
+skipWorkflowUsageWarning | 已确认工作流用量警告 | agents | 记录你已接受多代理工作流的用量警告。未设置时，自动权限模式下运行工作流前会先询问。通常由 Claude Code 自动写入。 | | | ;; tags=internal
+teammateMode | 队友运行方式 | agents | 代理团队中生成的队友如何运行：auto 自动选择、tmux 在 tmux 窗格中、iterm2 在 iTerm2 窗格中（仅 macOS）、in-process 在当前进程内。 | | | ;; enum=auto:自动,tmux:tmux 窗格,iterm2:iTerm2 窗格,in-process:进程内 ;; pn.windows=Windows 上通常使用 auto 或 in-process
+modelProposedGoals | 模型提议目标 | agents | 会话目标工具的行为：auto（默认）由模型决定是否请求确认；alwaysAsk 每个模型提议的目标都走确认对话框；disabled 关闭。 | | | ;; enum=auto:自动,alwaysAsk:总是询问,disabled:关闭 ;; tags=internal
+doneMeansMerged | 做到可合并为止 | agents | 为 true 时，Claude 会一直工作到 PR 可以合并、或已安排定时任务稍后继续、或交给你一个可独立执行的下一步。 | | | ;; tags=internal
+crossSessionInbound | 跨会话消息 | agents | 来自你其他会话的 SendMessage 消息：accept 直接投递，hold 暂存待你审核（Claude 不会据此行动），refuse 拒收。显式值优先。 | | | ;; enum=accept:直接投递,hold:暂存审核,refuse:拒收
+isolatePeerMachines | 跨机器消息需确认 | agents | 通过 Remote Control 向另一台机器上的会话发送 SendMessage 前需要明确批准。 | | 多台机器共用账号时建议开启 | tags=security
+
+# ---------------- Git 与署名 ----------------
+attribution | 提交 / PR 署名 | git | 自定义 Claude 在 git 提交和 PR 描述中添加的署名。各字段不设置时使用标准署名；整个设为 false 等同于 commit 和 pr 为空字符串、sessionUrl 为 false（旧版本不接受布尔值）。
+attribution.commit | 提交署名 | git | git 提交中的署名文本（含 trailer，如 Co-Authored-By）。空字符串表示不加署名。 | | 不想在提交里出现 Claude 署名时设为空字符串 | ex="Co-Authored-By: Claude <noreply@anthropic.com>"
+attribution.pr | PR 署名 | git | PR 描述中的署名文本，空字符串表示不加署名。 | | | ;; ex="🤖 Generated with Claude Code"
+attribution.sessionUrl | 附加会话链接 | git | 从网页或 Remote Control 会话创建的提交和 PR 是否附加 claude.ai 会话链接（默认 true）。 | | | ;; def=true
+includeCoAuthoredBy | 提交署名（旧） | git | 已弃用：是否在提交和 PR 中包含 Claude 的 co-authored-by 署名（默认 true）。请改用 attribution。 | | | ;; dep=已被 attribution 取代：不要署名可设 attribution.commit 和 attribution.pr 为空字符串 ;; by=attribution
+attributionProject | 用量归属项目 | git | 本会话在组织用量报告中归属的 claude.ai Project：Project ID（claude_proj_ 或 chan_ 开头）或其 UUID。空字符串表示不指定。 | | | ;; tags=enterprise
+includeGitInstructions | 内置 Git 工作流指令 | git | 是否在系统提示中包含内置的提交与 PR 工作流指令（默认 true）。 | | 有自己的提交规范（写在 CLAUDE.md）时可关闭以节省上下文 | def=true
+prUrlTemplate | PR 链接模板 | git | 页脚链接徽章与消息中 PR 链接的 URL 模板，可用占位符 {host} {owner} {repo} {number} {url}，适用于自建代码审查系统。 | | | ;; ex="https://reviews.example.com/{owner}/{repo}/pull/{number}"
+worktree | Git worktree | git | git worktree 相关配置：作用于 --worktree 参数、EnterWorktree 与代理隔离，以及 Claude Desktop 在本机为 SSH 会话创建 worktree 的位置。
+worktree.symlinkDirectories | 软链接目录 | git | 从主仓库软链接到 worktree 的目录，避免重复占用磁盘，默认不链接任何目录。 | | 前端项目链接 node_modules，免得每个 worktree 重装依赖 | ex=["node_modules",".cache"]
+worktree.sparsePaths | 稀疏检出路径 | git | 创建 worktree 时通过 git sparse-checkout（cone 模式）只检出这些目录，大型 monorepo 中能显著加快速度。 | | | ;; ex=["packages/app","packages/shared"]
+worktree.baseRef | 新 worktree 基准 | git | 新 worktree 从哪里分出：fresh（默认）从 origin/默认分支 开始，得到干净的代码；head 从你当前本地 HEAD 开始，包含未推送的提交。 | | | ;; enum=fresh:从远程默认分支,head:从本地 HEAD ;; def="fresh"
+worktree.bgIsolation | 后台会话隔离 | git | 本仓库后台会话的隔离方式：worktree（默认）在调用 EnterWorktree 之前禁止编辑主工作区；none 允许后台任务直接修改工作区。 | | | ;; enum=worktree:隔离到 worktree,none:直接修改工作区 ;; def="worktree"
+worktree.location | SSH worktree 位置 | git | Claude Desktop 为在本机运行的 SSH 会话创建 worktree 的目录（绝对路径或 ~/ 开头），代替默认的 <项目>/.claude/worktrees。 | | | ;; tags=desktop ;; ex="~/worktrees"
+
+# ---------------- Shell 与工具 ----------------
+defaultShell | 默认 Shell | shell | 输入框中 ! 命令使用的 Shell：bash 或 powershell。所有平台默认 bash（Windows 不会自动切换）。 | | | ;; enum=bash:Bash,powershell:PowerShell ;; def="bash" ;; pn.windows=Windows 上 bash 指 Git Bash；习惯 PowerShell 可改为 powershell
+disableWindowsBashCommandSplit | 不拆分 Windows 命令 | shell | 仅 Windows：为 true 时每条 Bash 命令都作为单个参数传给 bash，便于终端安全软件按命令行全文匹配；超长命令（约 7000 字符以上）可能因此失败。 | | 只有公司安全软件需要完整命令行时才开启 | p=windows
+bashEditDiffEnabled | 显示命令改动的文件差异 | shell | Bash 工具是否显示命令修改过的文件差异（PostToolUse 的 Bash hook 也会收到改动文件列表）。默认关闭，auto 与 bypassPermissions 模式下视情况开启。只在用户、命令行或策略设置中生效。 | | | ;; scopes=user,managed
+bashOutputMaxChars | 命令输出内联上限 | shell | 成功的 Bash / PowerShell 命令输出中，直接交给 Claude 的最大字符数（默认 30000，会被限制在 4000~128000）。超出部分保存到文件，Claude 只收到预览和文件路径。设置后也会取代 BASH_MAX_OUTPUT_LENGTH。 | | 输出经常被截断导致 Claude 看不全时可适当调大 | u=字符 ;; def=30000 ;; min=4000 ;; max=128000
+taskOutputMaxChars | 后台任务输出上限（旧） | shell | 已弃用：不再有任何效果（TaskOutput 工具已移除），请用 Read 工具读取后台任务的输出文件。 | | | ;; dep=已无效果，可删除
+respondToBashCommands | ! 命令后回复 | shell | 输入框 ! 命令运行后 Claude 是否回复。设为 false 则只把命令输出加入上下文，不触发回复。默认 true。 | | | ;; def=true
+respectGitignore | 遵循 .gitignore | shell | @ 文件选择器是否遵循 .gitignore（默认 true）。.ignore 文件始终生效。 | | | ;; def=true
+fileSuggestion | 自定义 @ 文件建议 | shell | 用自定义命令为 @ 提及提供文件建议列表（例如在超大仓库里用自己的索引工具）。
+fileSuggestion.type | 类型 | shell | 目前只支持 command。 | | | ;; enum=command:命令
+fileSuggestion.command | 命令 | shell | 输出文件路径列表的命令。 | | | ;; ex="~/.claude/file-suggest.sh"
+
+# ---------------- 界面与显示 ----------------
+theme | 主题 | ui | 界面配色主题，例如 dark、light、dark-daltonized、light-daltonized、dark-ansi、light-ansi，也可以是自定义主题名。可用 /theme 选择。 | | | ;; ex="dark"
+tui | 终端渲染器 | ui | fullscreen 使用无闪烁的备用屏幕渲染器（滚动内容虚拟化，等同于 CLAUDE_CODE_NO_FLICKER=1）；default 使用传统渲染器。 | | 终端经常闪烁或滚动卡顿时可试试 fullscreen | enum=default:传统,fullscreen:全屏无闪烁
+viewMode | 默认记录视图 | ui | 启动时的对话记录视图：default、verbose（显示完整工具输出）或 focus（专注模式）。 | | | ;; enum=default:默认,verbose:详细,focus:专注
+defaultView | 默认对话视图 | ui | 默认的对话视图：chat 只显示 SendUserMessage 检查点；transcript 显示完整记录。 | | | ;; enum=chat:精简对话,transcript:完整记录
+verbose | 详细输出 | ui | 显示完整的工具输出，而不是截断后的摘要。 | | |
+editorMode | 输入框按键模式 | ui | 提示输入框的按键绑定模式：normal 或 vim。可用 /vim 切换。 | | | ;; enum=normal:普通,vim:Vim
+vimInsertModeRemaps | Vim 插入模式映射 | ui | editorMode 为 vim 时，插入模式下的两键序列映射，例如 {"jj": "<Esc>"}。每个键必须是恰好两个可打印字符，目标只支持 "<Esc>"。 | | | ;; ex={"jj":"<Esc>"}
+keybindingFlavor | 按键风格（旧） | ui | 已弃用：不再有任何效果，输入框的单词编辑键始终遵循 Bash（readline）习惯。 | | | ;; dep=已无效果，可删除 ;; enum=classic:经典,readline:readline
+statusLine | 状态栏 | ui | 自定义底部状态栏：运行一个命令，把其输出显示为状态栏。命令通过标准输入收到包含模型、目录、费用等信息的 JSON。 | | | ;; doc=https://code.claude.com/docs/en/statusline
+statusLine.type | 类型 | ui | 目前只支持 command。 | | | ;; enum=command:命令
+statusLine.command | 状态栏命令 | ui | 生成状态栏内容的命令或脚本路径。 | | | ;; ex="~/.claude/statusline.sh" ;; pn.windows=Windows 可写 powershell -NoProfile -File C:/Users/me/.claude/statusline.ps1
+statusLine.padding | 内边距 | ui | 状态栏左右的空白字符数，0 表示贴边。 | | | ;; ex=0
+statusLine.refreshInterval | 定时刷新间隔 | ui | 除事件触发外，每隔 N 秒重新运行一次状态栏命令（适合显示时间、额度等变化的信息）。 | | | ;; u=秒 ;; min=1
+statusLine.hideVimModeIndicator | 隐藏 Vim 模式提示 | ui | 隐藏输入框下方内置的 -- INSERT -- / -- VISUAL -- 提示，适合状态栏脚本自己显示 vim.mode 的情况。 | | |
+subagentStatusLine | 子代理状态栏（旧） | ui | 已弃用（仍可用，未来会移除）：代理面板中每个子代理行的自定义状态栏，命令通过标准输入收到行信息 JSON。 | | | ;; dep=未来版本将移除
+subagentStatusLine.type | 类型 | ui | 目前只支持 command。 | | | ;; enum=command:命令
+subagentStatusLine.command | 命令 | ui | 生成子代理状态行的命令。 | | |
+footerLinksRegexes | 页脚链接规则 | ui | 当回合输出（工具结果和回复）匹配正则时，在页脚显示可点击的徽章链接，例如把工单号变成链接。最多显示 5 个。只在用户、命令行和托管设置中生效。 | | | ;; scopes=user,managed ;; ex=[{"type":"regex","pattern":"JIRA-(?<id>\\d+)","url":"https://jira.example.com/browse/JIRA-{id}","label":"JIRA-{id}"}]
+spinnerTipsEnabled | 加载提示语 | ui | 是否在加载动画旁显示使用技巧。 | | |
+spinnerVerbs | 加载动词 | ui | 自定义加载动画中显示的动词（如「思考中」）。mode 为 append 时追加到默认列表，replace 时只用你的。
+spinnerVerbs.mode | 模式 | ui | append 追加到默认动词；replace 只使用自定义动词。 | | | ;; enum=append:追加,replace:替换
+spinnerVerbs.verbs | 动词列表 | ui | 自定义的动词列表。 | | | ;; ex=["思考中","编码中","调试中"]
+spinnerTipsOverride | 自定义提示语 | ui | 把你自己（或团队）的提示加入加载提示轮播：tips 为字符串或 {id, text, cooldownSessions?, priority?} 对象；tipsFile 为同格式的 JSON 文件；label 为提示前缀；excludeDefault 为 true 时只显示你的提示。
+spinnerTipsOverride.excludeDefault | 只显示自定义提示 | ui | 为 true 时不显示内置提示（默认 false）。 | | | ;; def=false
+spinnerTipsOverride.tips | 提示列表 | ui | 提示字符串或对象数组。 | | | ;; ex=["提交前先跑 npm test","用 /compact 释放上下文"]
+spinnerTipsOverride.tipsFile | 提示文件 | ui | 存放提示数组的 JSON 文件路径（绝对路径或 ~/ 开头）。只在用户、--settings 与本机托管设置中生效，每个进程只读一次。 | | | ;; scopes=user,managed ;; ex="~/.claude/tips.json"
+spinnerTipsOverride.label | 提示前缀 | ui | 显示在你的提示前面的标签（默认 "Tip"）。 | | | ;; ex="团队提示"
+syntaxHighlightingDisabled | 关闭语法高亮 | ui | 关闭差异视图中的语法高亮。 | | 终端配色显示异常时可开启 |
+maxProseWidth | 正文最大宽度 | ui | Claude 回复中正文（段落、标题、列表、引用）的最大显示宽度（终端列数，最少 40）。在宽终端中正文在此宽度换行，表格和代码块仍使用全宽；只影响显示。 | | 超宽屏阅读吃力时可设为 100~120 | u=列 ;; min=40
+spellcheck | 拼写检查 | ui | 输入时用已安装的 aspell / hunspell / ispell 给拼写错误加下划线（enabled 为 true 才开启；没安装检查器则无效果）。只在用户、命令行和托管设置中生效。 | | | ;; scopes=user,managed
+spellcheck.enabled | 启用 | ui | 开启输入框拼写检查（默认 false）。 | | | ;; scopes=user,managed ;; def=false
+spellcheck.checker | 检查器 | ui | 使用的拼写检查器：aspell、hunspell、ispell，或 auto（默认，使用 PATH 中找到的第一个）。 | | | ;; scopes=user,managed ;; enum=auto:自动,aspell:aspell,hunspell:hunspell,ispell:ispell
+spellcheck.language | 词典 | ui | 原样传给检查器的词典名，例如 en_US、en_GB。 | | | ;; scopes=user,managed ;; ex="en_US"
+spellcheck.color | 标记颜色 | ui | 拼写错误的颜色：终端颜色名（如 red）、#rrggbb、rgb(r,g,b)、ansi256(n) 或 ansi:<名称>。默认使用主题的错误色。 | | | ;; scopes=user,managed ;; ex="magenta"
+terminalTitleFromRename | /rename 更新终端标题 | ui | /rename 是否同时更新终端标签页标题（默认 true）。设为 false 保留自动生成的主题标题。 | | | ;; def=true
+promptSuggestionEnabled | 提示建议 | ui | 为 false 时关闭输入框的提示建议；默认开启。 | | |
+emojiCompletionEnabled | :emoji: 补全 | ui | 为 false 时关闭 :表情名: 输入补全（弹出建议与内联替换）；默认开启。 | | |
+showClearContextOnPlanAccept | 批准计划时可清空上下文 | ui | 为 true 时，计划批准对话框提供「清空上下文」选项。默认 false。 | | 计划很长时开启，执行阶段能拥有更干净的上下文 | def=false
+askUserQuestionTimeout | 提问自动继续时间 | ui | Claude 在终端里提问后，空闲多久自动按已选答案继续。不设置则不自动继续。桌面端与网页端有自己的处理方式。 | | 无人值守长任务可设 10m | enum=60s:60 秒,5m:5 分钟,10m:10 分钟,never:从不
+dialogExpiry | 远程对话框超时 | ui | 转发给远程客户端的权限 / 提问对话框最长等待时间，以及跨会话消息等待审批的时间，超时后按安全的默认结果处理（取消 / 丢弃）。默认 5m。 | | | ;; enum=60s:60 秒,5m:5 分钟,10m:10 分钟,never:从不 ;; def="5m"
+companyAnnouncements | 启动公告 | ui | 启动时显示的公告，多条时随机显示一条。常用于团队或企业发布通知。 | | | ;; ex=["欢迎使用！请阅读团队规范：https://wiki.example.com/claude"]
+prefersReducedMotion | 减少动画 | ui | 减少或关闭动画效果（加载闪光、闪烁等），便于无障碍使用。 | | |
+timeFormat | 时间格式 | ui | 界面中时间的显示格式：auto（默认，跟随系统区域）、12-hour、24-hour、24-hour-utc，或包含 % 的 strftime 格式（如 "%H:%M"）。 | | | ;; ex="24-hour"
+timeZone | 时区 | ui | 界面中时间使用的 IANA 时区，如 Asia/Shanghai、UTC。默认使用系统时区，无效名称会回退到系统时区。 | | | ;; ex="Asia/Shanghai"
+autoScrollEnabled | 自动滚动到底部 | ui | 对话视图自动滚动到最新内容（仅 fullscreen 渲染器）。 | | |
+wheelScrollAccelerationEnabled | 滚轮加速 | ui | 快速滚动鼠标滚轮时提高滚动速度（仅 fullscreen 渲染器）。 | | |
+showTurnDuration | 显示回合耗时 | ui | 每个回合结束后显示「Cooked for Nm Ns」耗时。 | | |
+showMessageTimestamps | 显示消息时间 | ui | 为每条消息标注到达时间。 | | |
+terminalProgressBarEnabled | 终端进度条 | ui | 长时间操作时输出 OSC 9;4 进度序列（Windows Terminal、iTerm2、Ghostty 等会在标签页上显示进度）。 | | |
+todoFeatureEnabled | 待办面板 | ui | 启用待办 / 任务跟踪面板。 | | |
+clawdFileProgressEnabled | 吉祥物搬运动画 | ui | 文件与连接器之间传输时，在进度行显示吉祥物 Clawd 搬运文件的动画。 | | | ;; tags=internal
+awaySummaryEnabled | 离开回来摘要 | ui | 离开 5 分钟以上回来时显示会话回顾。设为 false 关闭。 | | | ;; tags=internal
+responseComparisonEnabled | 回答对比评选 | ui | 设为 false 后不再偶尔给出两个回答让你选择哪个更好。 | | | ;; tags=internal
+voice | 语音模式 | ui | 语音听写设置（按住说话 / 点按切换）。
+voice.enabled | 启用语音 | ui | 开启语音听写。 | | |
+voice.mode | 触发方式 | ui | hold（默认）按住说话；tap 点按开始、再点按停止并提交。 | | | ;; enum=hold:按住说话,tap:点按切换 ;; def="hold"
+voice.autoSubmit | 松开即提交 | ui | 按住说话模式下，松开按键时自动提交提示。 | | |
+voiceEnabled | 启用语音（旧位置） | ui | 开启语音模式（按住说话的听写）。新版本使用 voice.enabled。 | | | ;; by=voice.enabled
+axScreenReader | 屏幕阅读器模式 | ui | 输出适合屏幕阅读器的内容（纯文本，无装饰边框和动画）。环境变量 CLAUDE_AX_SCREEN_READER 和 --ax-screen-reader 参数优先。项目和本地设置中无效。 | | | ;; scopes=user,managed
+breakReminder | 休息提醒 | ui | 可选的休息提醒：连续使用一段时间后给出一次友好提示，不会阻断操作。
+breakReminder.enabled | 启用 | ui | 连续使用一段时间后提醒休息（默认 false）。 | | | ;; def=false
+breakReminder.intervalMinutes | 提醒间隔 | ui | 连续使用多少分钟后提醒（默认 30），直到你休息前会按此间隔重复提醒。 | | | ;; u=分钟 ;; def=30
+breakReminder.breakThresholdMinutes | 休息判定时长 | ui | 无操作多少分钟算作休息并重置计时（默认 10）。 | | | ;; u=分钟 ;; def=10
+breakReminder.message | 提醒文字 | ui | 自定义提醒文字，不设置则轮换内置的友好提示。 | | | ;; ex="站起来活动一下吧"
+quietHours | 安静时段 | ui | 可选的安静时段：在设定的本地时间段内使用时，每个会话给出一次温和提示，不会阻断。
+quietHours.enabled | 启用 | ui | 在安静时段内启动或继续使用 CLI 时提示一次（默认 false）。 | | | ;; def=false
+quietHours.start | 开始时间 | ui | 安静时段开始时间，24 小时制 "HH:MM"。 | | | ;; ex="23:00"
+quietHours.end | 结束时间 | ui | 安静时段结束时间，24 小时制 "HH:MM"，可以早于开始时间表示跨夜。 | | | ;; ex="07:00"
+disableDeepLinkRegistration | 禁止注册 claude-cli:// 链接 | ui | 设为 "disable" 阻止向操作系统注册 claude-cli:// 协议处理程序。 | | | ;; enum=disable:禁止
+enableArtifact | Artifacts | ui | 开启或关闭 Artifacts。在托管、--settings 或用户设置中关闭即生效；项目和本地设置只能关闭。不设置时功能可用后默认开启。 | | |
+disableArtifact | 关闭 Artifacts（旧） | ui | 已弃用：请改用 enableArtifact: false。仍然生效：true 关闭 Artifacts，false 被忽略。 | | | ;; dep=请改用 enableArtifact: false ;; by=enableArtifact
+
+# ---------------- 上下文与记忆 ----------------
+autoCompactEnabled | 自动压缩 | context | 上下文快满时自动压缩对话（总结历史以释放空间）。 | | 保持开启；关闭后上下文满了会直接报错 |
+autoCompactWindow | 自动压缩窗口 | context | 自动压缩使用的上下文窗口大小（token，至少 100000）。上下文用量达到该窗口的阈值时触发压缩。 | | 使用 1M 上下文模型又想控制单次请求开销时，可设为 200000~400000 | u=tokens ;; min=100000
+precomputeCompactionEnabled | 后台预生成压缩摘要 | context | 在需要压缩前就在后台预先计算压缩摘要，压缩时几乎无需等待。仅在开启自动压缩时生效。 | | 会产生少量额外请求，换来压缩时不卡顿 |
+idleCompaction | 空闲时压缩 | context | 会话空闲时是否压缩较长的对话。默认 true，设为 false 关闭。 | | | ;; def=true
+precomputeArmTokens | 预压缩触发点 | context | 仅从命令行 flag 设置读取：宿主在自动阈值之前发送 /compact 时，主对话在达到此 token 数时开始后台生成压缩摘要。 | | | ;; u=tokens ;; tags=internal
+autoCompactRaisedForLoad | 提高压缩阈值 | context | 仅从 flag 设置读取（Claude Desktop 的 Code 标签页）：允许对话在摘要后固定内容的两倍处才压缩。 | | | ;; tags=internal,desktop
+autoCompactOfferAnswer | 压缩窗口建议回答 | context | 仅从 flag 设置读取（Claude Desktop）：记录你对「降低自动压缩窗口」建议的回答。由程序自动写入。 | | | ;; tags=internal,desktop
+autoCompactOfferAnswer.model | 模型 | context | 建议针对的模型。 | | | ;; tags=internal
+autoCompactOfferAnswer.choice | 选择 | context | 你的回答：accept 接受、keep 保持、undo 撤销。 | | | ;; tags=internal ;; enum=accept:接受,keep:保持,undo:撤销
+autoCompactOfferAnswer.tokens | 窗口大小 | context | 选择或保留的窗口（token）。 | | | ;; tags=internal ;; u=tokens
+autoCompactOfferAnswer.at | 回答时间 | context | 回答时间（毫秒时间戳）。 | | | ;; tags=internal
+autoMemoryEnabled | 自动记忆 | context | 为本项目启用自动记忆。为 false 时 Claude 不会读写自动记忆目录。 | | |
+autoMemoryDirectory | 自动记忆目录 | context | 自定义自动记忆的存储目录，支持 ~/ 开头。出于安全考虑，写在项目 .claude/settings.json 中会被忽略。默认为 ~/.claude/projects/<项目路径>/memory/。 | | | ;; scopes=user,local,managed ;; ex="~/claude-memory"
+autoDreamEnabled | 后台整理记忆 | context | 启用后台记忆整理（auto-dream）。设置后覆盖服务端默认值。 | | |
+claudeMdExcludes | 排除的 CLAUDE.md | context | 不加载的 CLAUDE.md 文件（glob 模式或绝对路径，按绝对路径用 picomatch 匹配）。只作用于用户、项目和本地记忆，托管记忆不能排除。monorepo 中屏蔽其他团队的 CLAUDE.md 很有用。 | | | ;; ex=["**/legacy/**/CLAUDE.md"]
+plansDirectory | 计划文件目录 | context | 计划文件的存放目录（相对项目根目录）。不设置则为 ~/.claude/plans/。 | | 想把计划提交到仓库时可设为 docs/plans | ex="docs/plans"
+fileCheckpointingEnabled | 文件检查点 | context | 编辑前为文件做快照，以便用 /rewind 恢复。 | true | 误改代码时可以一键回滚，几乎没有代价
+totalTokensReminder | 剩余 token 提示 | context | 在系统提示和工具结果后插入「剩余 N tokens」提示块的方式。 | | | ;; tags=internal ;; enum=off:关闭,infinite:无限,fixed:固定,countdown:倒计时,padded-countdown:带余量倒计时
+totalTokensReminderBudget | 提示预算 | context | padded-countdown 模式的起始预算（默认 15000000）。 | | | ;; tags=internal ;; u=tokens
+totalTokensReminderAfterUserTurn | 用户回合后提示 | context | 为 true 时在每个用户提示后也插入剩余 token 提示。 | | | ;; tags=internal
+
+# ---------------- 远程与多端 ----------------
+remote | 云端会话 | remote | 云端（claude.ai/code）会话配置。
+remote.defaultEnvironmentId | 默认云环境 | remote | 云端会话默认使用的环境 ID。 | | | ;; ph=env_xxx
+disableRemoteControl | 禁用 Remote Control | remote | 禁用 Remote Control（claude.ai/code 远程控制、claude remote-control、--remote-control / --rc、自动启动及会话内开关）。通常用于托管设置。 | | |
+remoteControlAtStartup | 启动时开启远程控制 | remote | 每个会话启动时自动开启 Remote Control，可在手机或网页上继续操作。 | | 会让会话可被远程操作，确认账号安全后再开启 | tags=security
+remoteControl | Remote Control 选项 | remote | Remote Control（claude remote-control）的高级选项。 | | | ;; tags=internal
+remoteControl.shareHostProfile | 上报主机信息 | remote | Remote Control 环境注册时上报的本机信息：off 不上报；basic 上报系统、架构和检测到的开发工具；full 还包括本机配置的 MCP 服务器名称。 | | | ;; tags=internal ;; enum=off:不上报,basic:基础,full:完整
+remoteTools | 为云端会话执行工具 | remote | 本机如何为云端会话执行工具调用。 | | | ;; tags=internal
+remoteTools.allowUnattendedServing | 允许无人值守执行 | remote | 在托管或用户设置中为 false 时，自动模式下的云端会话不能在无人逐条批准的情况下在本机运行命令。默认 true。 | | | ;; scopes=user,managed ;; tags=security
+daemonColdStart | 后台服务启动方式 | remote | 没有后台服务运行时：transient 为本次登录启动一个临时服务；ask 询问是否安装为常驻服务。 | | | ;; enum=transient:临时启动,ask:询问是否常驻
+
+# ---------------- 通知 ----------------
+preferredNotifChannel | 通知方式 | notifications | 任务完成或需要输入时的系统通知渠道：auto 自动、iterm2（iTerm2 通知）、terminal_bell（终端响铃）、iterm2_with_bell、kitty、ghostty、notifications_disabled（关闭）。 | | | ;; enum=auto:自动,iterm2:iTerm2,terminal_bell:终端响铃,iterm2_with_bell:iTerm2+响铃,kitty:Kitty,ghostty:Ghostty,notifications_disabled:关闭通知 ;; pn.macos=iTerm2 用户可选 iterm2 ;; pn.windows=Windows Terminal 可用 terminal_bell
+inputNeededNotifEnabled | 需要输入时推送手机 | notifications | 有权限确认或问题等待回答时推送到手机。 | | |
+agentPushNotifEnabled | 允许主动推送手机 | notifications | 允许 Claude 主动向手机推送通知。 | | |
+
+# ---------------- 更新与版本 ----------------
+autoUpdatesChannel | 更新通道 | updates | 自动更新的发布通道：latest 最新版（新功能最快）、stable 稳定版（通常滞后约一周，跳过有严重回归的版本）、rc 预发布版。 | "stable" | 稳定性优先，减少遇到新版本回归问题的概率；想第一时间用新功能可选 latest | enum=latest:最新,stable:稳定,rc:预发布
+minimumVersion | 最低保持版本 | updates | 自动更新时不会降级到低于此版本（例如从 latest 切换到 stable 时防止回退）。 | | | ;; ex="2.1.300"

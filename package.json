@@ -1,0 +1,142 @@
+{
+  "name": "cc-cx-manager",
+  "productName": "CC-CX Manager",
+  "version": "1.0.0",
+  "description": "Claude Code 与 Codex 配置管理器：可视化编辑 settings.json / env / config.toml / .env，附全部参数中文说明与推荐值（Windows / macOS / Linux）",
+  "author": {
+    "name": "chxcode",
+    "email": "chxhaixing@gmail.com"
+  },
+  "homepage": "https://github.com/chxcodepro/cc-cx-manager",
+  "type": "module",
+  "main": "electron/main.mjs",
+  "scripts": {
+    "desktop": "npm run build && electron .",
+    "build": "vite build --config web/vite.config.ts",
+    "dist": "npm run build && electron-builder --publish never",
+    "dist:win": "npm run build && electron-builder --win --publish never",
+    "dist:mac": "npm run build && electron-builder --mac --publish never",
+    "dist:linux": "npm run build && electron-builder --linux --publish never",
+    "gen-base": "node scripts/gen-base.mjs",
+    "icon": "node scripts/make-icon.mjs",
+    "test": "node --test \"test/*.test.mjs\""
+  },
+  "dependencies": {
+    "@decimalturn/toml-patch": "^3.3.3"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "electron": "^45.3.4",
+    "electron-builder": "^26.18.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "typescript": "^5.9.0",
+    "vite": "^7.1.0"
+  },
+  "build": {
+    "appId": "com.chxcode.cc-cx-manager",
+    "productName": "CC-CX Manager",
+    "copyright": "MIT License",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "electron/**",
+      "server/**",
+      "catalog/base/**",
+      "catalog/zh/**",
+      "dist/**",
+      "package.json",
+      "!**/*.map"
+    ],
+    "asar": true,
+    "artifactName": "CC-CX-Manager-${version}-${os}-${arch}.${ext}",
+    "win": {
+      "icon": "build/icon.png",
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "portable": {
+      "artifactName": "CC-CX-Manager-${version}-windows-x64-portable.exe"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "CC-CX 配置管理器",
+      "artifactName": "CC-CX-Manager-${version}-windows-x64-setup.exe"
+    },
+    "mac": {
+      "icon": "build/icon.png",
+      "category": "public.app-category.developer-tools",
+      "identity": "-",
+      "hardenedRuntime": false,
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "universal"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
+      "artifactName": "CC-CX-Manager-${version}-macos-${arch}.${ext}"
+    },
+    "dmg": {
+      "artifactName": "CC-CX-Manager-${version}-macos-universal.dmg"
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "category": "Development",
+      "executableName": "cc-cx-manager",
+      "synopsis": "Claude Code / Codex 配置管理器",
+      "maintainer": "chxcode <chxhaixing@gmail.com>",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "tar.gz",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "CC-CX-Manager-${version}-linux-${arch}.${ext}"
+    }
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.18"
+  }
+}

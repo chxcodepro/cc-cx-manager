@@ -1,0 +1,1603 @@
+{
+ "meta": {
+  "version": "0.170.0",
+  "source": "openai/codex@rust-v0.170.0 features/src/lib.rs + codex features list",
+  "generatedAt": "2026-11-18"
+ },
+ "items": [
+  {
+   "key": "features.analytics_plan_history",
+   "type": "boolean",
+   "stage": "experimental",
+   "default": false,
+   "en": "Preview five-hour and weekly allowance history for consumer accounts in /analytics. (Preview consumer five-hour and weekly allowance history.)",
+   "featureName": "Analytics plan history"
+  },
+  {
+   "key": "features.cli_resume_account_check",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Restrict CLI resume of attributed local threads to their creator."
+  },
+  {
+   "key": "features.daemon_auto_start",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Automatically start the shared local daemon for eligible interactive launches."
+  },
+  {
+   "key": "features.tui_workspace",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Enable workspace behavior for side conversations in the owned TUI."
+  },
+  {
+   "key": "features.tui_multi_backend",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Allow the TUI to discover and select among multiple conversation backends."
+  },
+  {
+   "key": "features.tui_extensions_statusline",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Enable experimental MCP status line providers."
+  },
+  {
+   "key": "features.app_server_websocket_compression",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Enable negotiated zstd compression for app-server WebSocket and UDS connections."
+  },
+  {
+   "key": "features.transcript_v2",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed no-op; use `tui.fullscreen_transcript` instead."
+  },
+  {
+   "key": "features.undo",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag retained as a no-op so old configs can still parse `undo`."
+  },
+  {
+   "key": "features.shell_tool",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Enable the default shell tool."
+  },
+  {
+   "key": "features.view_image",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Enable the built-in local image viewer."
+  },
+  {
+   "key": "features.multi_env_copy_file",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Copy files between explicitly selected execution environments."
+  },
+  {
+   "key": "features.sleep_tool",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Allow registration of the built-in sleep tool."
+  },
+  {
+   "key": "features.unified_exec",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Use the single unified PTY-backed exec tool."
+  },
+  {
+   "key": "features.unified_exec_tty",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Allow unified exec commands to allocate an interactive terminal."
+  },
+  {
+   "key": "features.shell_zsh_fork",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag for the retired patched zsh backend."
+  },
+  {
+   "key": "features.unified_exec_zsh_fork",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag for the retired patched zsh backend."
+  },
+  {
+   "key": "features.shell_snapshot",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Experimental shell snapshotting."
+  },
+  {
+   "key": "features.login_shell_package_path",
+   "type": "boolean",
+   "stage": "experimental",
+   "default": false,
+   "en": "Keep bundled tools such as ripgrep available when login shell startup resets PATH. (Restore bundled tools to PATH after Codex's login shell starts.)",
+   "featureName": "Bundled tools in login shells"
+  },
+  {
+   "key": "features.powershell_shell_version",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Expose the selected PowerShell execution host's bounded major/minor version."
+  },
+  {
+   "key": "features.shell_snapshot_v2",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Keep policy-filtered shell snapshots entirely in executor memory."
+  },
+  {
+   "key": "features.deferred_executor",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Allow turns to start while selected executors are still starting."
+  },
+  {
+   "key": "features.cwd_relative_turn_diffs",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Use the current working directory for turn diff display paths."
+  },
+  {
+   "key": "features.js_repl",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag for the deleted JavaScript REPL feature."
+  },
+  {
+   "key": "features.content_item_kinds",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Send per-content-entry classifications in internal Responses metadata."
+  },
+  {
+   "key": "features.untrusted_as_tool_output",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Render client-supplied untrusted context as standalone named tool outputs."
+  },
+  {
+   "key": "features.executed_tool_call_metadata",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Record model-attempted tool calls in internal Responses metadata."
+  },
+  {
+   "key": "features.stable_environment_tools",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Advertise enabled environment-backed tools and their shell parameters before the executor is ready. Actual execution still requires a usable environment and its policy."
+  },
+  {
+   "key": "features.code_mode",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Enable JavaScript code mode backed by the standalone host process."
+  },
+  {
+   "key": "features.code_mode_tool_search",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Expose ranked tool discovery inside JavaScript code mode."
+  },
+  {
+   "key": "features.code_mode_buffered_exec",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag for the configurable code-mode exec yield timeout."
+  },
+  {
+   "key": "features.code_mode_host",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Run JavaScript code mode in the standalone host process."
+  },
+  {
+   "key": "features.code_mode_host_grpc",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Use gRPC over stdio for the process-owned code-mode host."
+  },
+  {
+   "key": "features.code_mode_host_output_truncation",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Truncate output in the process-owned code-mode host before sending it to Core."
+  },
+  {
+   "key": "features.code_mode_prewarm",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Establish the code-mode host connection during session startup."
+  },
+  {
+   "key": "features.code_mode_interrupt",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Terminate active code mode cells when their turn is interrupted."
+  },
+  {
+   "key": "features.code_mode_tool_description_first",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag for Code Mode tool description ordering."
+  },
+  {
+   "key": "features.instant_interrupt",
+   "type": "boolean",
+   "stage": "under development",
+   "default": true,
+   "en": "Preempt responses and yield foreground code-mode observations on new user input."
+  },
+  {
+   "key": "features.interrupt_on_cancel",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Interrupt upstream inference when a turn is cancelled."
+  },
+  {
+   "key": "features.code_mode_only",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Restrict model-visible tools to code mode entrypoints (`exec`, `wait`)."
+  },
+  {
+   "key": "features.code_mode_only_strict_3p_tools",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Keep eligible MCP/app and dynamic tools deferred in exec, only in Code Mode Only. Ignores deferLoading, omit_tools_from, and namespace skip settings."
+  },
+  {
+   "key": "features.js_repl_tools_only",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag for the deleted JavaScript REPL tool-only mode."
+  },
+  {
+   "key": "features.terminal_resize_reflow",
+   "type": "boolean",
+   "stage": "removed",
+   "default": true,
+   "en": "Removed compatibility flag. Transcript scrollback reflow on terminal resize is always on."
+  },
+  {
+   "key": "features.web_search_request",
+   "type": "boolean",
+   "stage": "deprecated",
+   "default": false,
+   "en": "Allow the model to request web searches that fetch live content."
+  },
+  {
+   "key": "features.web_search_cached",
+   "type": "boolean",
+   "stage": "deprecated",
+   "default": false,
+   "en": "Allow the model to request web searches that fetch cached content. Takes precedence over `WebSearchRequest`."
+  },
+  {
+   "key": "features.standalone_web_search",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Expose the extension-backed standalone web search tool."
+  },
+  {
+   "key": "features.hosted_search_policy",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Let the host authorize MCP search independently of native search through per-turn policy."
+  },
+  {
+   "key": "features.search_tool",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Legacy search-tool feature flag kept for backward compatibility."
+  },
+  {
+   "key": "features.codex_git_commit",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed legacy git commit attribution guidance flag."
+  },
+  {
+   "key": "features.runtime_metrics",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Enable runtime metrics snapshots via a manual reader."
+  },
+  {
+   "key": "features.critical_path_timing",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Capture internal direct-tool dependency paths for turn attribution."
+  },
+  {
+   "key": "features.sqlite",
+   "type": "boolean",
+   "stage": "removed",
+   "default": true,
+   "en": "Persist rollout metadata to a local SQLite database."
+  },
+  {
+   "key": "features.memories",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Enable startup memory extraction and file-backed memory consolidation."
+  },
+  {
+   "key": "features.external_agent_memory_import",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Enable importing project-scoped memory from external agents."
+  },
+  {
+   "key": "features.local_thread_store_compression",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Compress cold local thread-store rollout files, including shared histories. Requires every reader of the Codex home to support compressed shared histories."
+  },
+  {
+   "key": "features.local_thread_store_shared_compression",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag; local_thread_store_compression controls all rollout files."
+  },
+  {
+   "key": "features.background_paginated_rollout_migration",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Migrate legacy local rollout files to paginated history in the background."
+  },
+  {
+   "key": "features.chronicle",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Enable the Chronicle sidecar for passive screen-context memories."
+  },
+  {
+   "key": "features.apply_patch_freeform",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag for the deleted apply_patch fallback feature."
+  },
+  {
+   "key": "features.apply_patch_streaming_events",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Stream structured progress while apply_patch input is being generated."
+  },
+  {
+   "key": "features.apply_patch_preserve_line_endings",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag. Patches always preserve existing line endings."
+  },
+  {
+   "key": "features.exec_permission_approvals",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Allow exec tools to request additional permissions while staying sandboxed."
+  },
+  {
+   "key": "features.write_stdin_approval",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Require approval before writing input to escalated unified-exec terminals."
+  },
+  {
+   "key": "features.hooks",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Enable Claude-style lifecycle hooks loaded from hooks.json files."
+  },
+  {
+   "key": "features.request_permissions_tool",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Expose the built-in request_permissions tool."
+  },
+  {
+   "key": "features.use_linux_sandbox_bwrap",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed legacy Linux bubblewrap opt-in flag retained as a no-op so old wrappers and config can still parse it."
+  },
+  {
+   "key": "features.use_legacy_landlock",
+   "type": "boolean",
+   "stage": "deprecated",
+   "default": false,
+   "en": "Use the legacy Landlock Linux sandbox fallback instead of the default bubblewrap pipeline."
+  },
+  {
+   "key": "features.request_rule",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Allow the model to request approval and propose exec rules."
+  },
+  {
+   "key": "features.experimental_windows_sandbox",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Enable Windows sandbox (restricted token) on Windows."
+  },
+  {
+   "key": "features.elevated_windows_sandbox",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Use the elevated Windows sandbox pipeline (setup + runner)."
+  },
+  {
+   "key": "features.windows_sandbox_service",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Attempt elevated Windows sandbox provisioning through the installed service."
+  },
+  {
+   "key": "features.prefer_mxc",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Prefer the local native Windows sandbox when available, retaining legacy fallback."
+  },
+  {
+   "key": "features.remote_models",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Legacy remote models flag kept for backward compatibility."
+  },
+  {
+   "key": "features.api_key_model_discovery",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Discover model catalogs for OpenAI API-key authentication."
+  },
+  {
+   "key": "features.cli_daybreak",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Enable Daybreak controls and automatic access-program selection in CLI clients."
+  },
+  {
+   "key": "features.api_key_cyber_access_programs",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Forward explicit programs with builtin OpenAI API keys."
+  },
+  {
+   "key": "features.daybreak_program_propagation",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Capture the saved Daybreak choice for a native helper and its turns."
+  },
+  {
+   "key": "features.enable_request_compression",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Compress request bodies (zstd) when sending streaming requests to codex-backend."
+  },
+  {
+   "key": "features.unbounded_connection_retries",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Keep active sampling turns alive until a failed network connection recovers."
+  },
+  {
+   "key": "features.network_proxy",
+   "type": "boolean",
+   "stage": "experimental",
+   "default": false,
+   "en": "Apply network proxy restrictions to sandboxed sessions that already have network access. (Start the managed network proxy for sandboxed sessions.)",
+   "featureName": "Network proxy"
+  },
+  {
+   "key": "features.credential_masking",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Mask credentials and inject them through an already enabled network proxy."
+  },
+  {
+   "key": "features.worktrees",
+   "type": "boolean",
+   "stage": "removed",
+   "default": true,
+   "en": "Removed compatibility flag. Managed worktrees and repository-aware sessions are always available."
+  },
+  {
+   "key": "features.respect_system_proxy",
+   "type": "boolean",
+   "stage": "experimental",
+   "default": false,
+   "en": "Use macOS or Windows system proxy settings for Codex requests. (Respect host system proxy settings for Codex-owned network clients.)",
+   "featureName": "System proxy"
+  },
+  {
+   "key": "features.system_proxy_fallback",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Retry eligible bootstrap requests through the system proxy after normal routing fails."
+  },
+  {
+   "key": "features.multi_agent",
+   "type": "boolean",
+   "stage": "deprecated",
+   "default": true,
+   "en": "Enable collab tools."
+  },
+  {
+   "key": "features.multi_agent_v2",
+   "type": "boolean",
+   "stage": "stable",
+   "default": false,
+   "en": "Enable task-path-based multi-agent routing."
+  },
+  {
+   "key": "features.model_catalog_in_context",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Keep spawn model choices in append-only context instead of tool descriptions."
+  },
+  {
+   "key": "features.multi_agent_v2_dynamic_tools",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Inherit client-defined dynamic tools in fresh V2 subagents."
+  },
+  {
+   "key": "features.subagent_thread_environments",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Inherit configured thread environments instead of temporary turn selections."
+  },
+  {
+   "key": "features.subagent_default_context_limits",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Use each subagent model's default context window and auto-compaction threshold."
+  },
+  {
+   "key": "features.defer_mailbox_preemption",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Keep sampling through reasoning and commentary boundaries when agent mail arrives. Pending mail is delivered at the next normal input boundary instead."
+  },
+  {
+   "key": "features.wake_on_agent_messages",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Allow agent messages to wake idle root sessions after a completed turn."
+  },
+  {
+   "key": "features.agent_message_board",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Enable shared discussion tools for an agent tree."
+  },
+  {
+   "key": "features.agent_message_board_mcp",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Expose a tree-scoped in-memory message board through HTTP MCP."
+  },
+  {
+   "key": "features.multi_agent_mode",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag retained as a no-op."
+  },
+  {
+   "key": "features.enable_fanout",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag for the deleted agent-job tools."
+  },
+  {
+   "key": "features.apps",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Enable apps."
+  },
+  {
+   "key": "features.psp",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Route first-party ChatGPT requests through PSP."
+  },
+  {
+   "key": "features.enable_mcp_apps",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Enable MCP apps."
+  },
+  {
+   "key": "features.mcp_2026_07_28",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Enable MCP protocol version 2026-07-28 support."
+  },
+  {
+   "key": "features.mcp_tool_list_changed",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Honor ordinary MCP server tool-list notifications within a turn."
+  },
+  {
+   "key": "features.mcp_connection_sharing",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Discover and share eligible local stdio connections across chats."
+  },
+  {
+   "key": "features.mcp_lazy_stdio_startup",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Defer optional stdio server startup in regular chats with a warm tool catalog."
+  },
+  {
+   "key": "features.multi_environment_mcp",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Keep same-named HTTP servers discovered on different executors separate."
+  },
+  {
+   "key": "features.apps_early_resource_discovery",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Let host-owned Apps catalog reads overlap the initial tool inventory."
+  },
+  {
+   "key": "features.codex_apps_mcp_2026_07_28",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Enable MCP protocol version 2026-07-28 for the host-owned Codex Apps server."
+  },
+  {
+   "key": "features.mcp_oauth_refresh_coordination",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Let RMCP coordinate OAuth refresh through the configured credential store."
+  },
+  {
+   "key": "features.use_xaa",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Enable enterprise refresh-token authorization for configured MCP resources."
+  },
+  {
+   "key": "features.apps_mcp_path_override",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag for the legacy Apps MCP path override."
+  },
+  {
+   "key": "features.tool_search",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag retained as a no-op now that tool_search is always enabled."
+  },
+  {
+   "key": "features.tool_search_always_defer_mcp_tools",
+   "type": "boolean",
+   "stage": "removed",
+   "default": true,
+   "en": "Removed compatibility flag. MCP tools are always deferred when tool_search is available."
+  },
+  {
+   "key": "features.deferred_tool_world_state",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Describe deferred tool namespaces in the model-visible world state."
+  },
+  {
+   "key": "features.command_sessions_world_state",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Publish retained command sessions through incremental world state."
+  },
+  {
+   "key": "features.incremental_tools",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Track top-level tool definitions in world state and emit incremental context updates."
+  },
+  {
+   "key": "features.incremental_tools_legacy",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Publish incremental tool declarations on regular Amazon Bedrock Responses."
+  },
+  {
+   "key": "features.incremental_tools_legacy_gcp",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Publish incremental tool declarations on regular GCP Responses."
+  },
+  {
+   "key": "features.suppress_model_change_announcements",
+   "type": "boolean",
+   "stage": "stable",
+   "default": false,
+   "en": "Suppress the model ID announcement in incremental context after a model switch."
+  },
+  {
+   "key": "features.prediction_preserve_parent_tools",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Preserve inherited tool declarations in MCP-disabled prediction forks."
+  },
+  {
+   "key": "features.incremental_exec_tools",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Diff CodeModeOnly exec definitions within the incremental tool catalog."
+  },
+  {
+   "key": "features.non_prefixed_mcp_tool_names",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Expose MCP model-visible namespaces without the legacy `mcp__` prefix."
+  },
+  {
+   "key": "features.unavailable_dummy_tools",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag for the deleted unavailable-tool placeholder backfill."
+  },
+  {
+   "key": "features.tool_suggest",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Enable discoverable tool suggestions for apps."
+  },
+  {
+   "key": "features.recommended_plugins",
+   "type": "boolean",
+   "stage": "stable",
+   "default": false,
+   "en": "Include recommended plugins in model-visible context."
+  },
+  {
+   "key": "features.plugins",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Enable plugins."
+  },
+  {
+   "key": "features.simplified_selection_hints",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Use concise developer hints for explicitly selected plugins."
+  },
+  {
+   "key": "features.executor_capability_discovery",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Discover selected-root plugin and skill manifests through one high-level exec-server RPC."
+  },
+  {
+   "key": "features.executor_capability_discovery_v2",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Acquire V2 executor inventories without publishing or activating their capabilities."
+  },
+  {
+   "key": "features.skip_host_skill_discovery",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Skip host skill snapshots when no registered contributor requires them."
+  },
+  {
+   "key": "features.plugin_hooks",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag for plugin-bundled lifecycle hooks."
+  },
+  {
+   "key": "features.in_app_browser",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Allow the in-app browser pane in desktop apps.  Requirements-only gate: this should be set from requirements, not user config."
+  },
+  {
+   "key": "features.browser_annotation_api",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Allow websites to open and customize annotation tools in desktop apps. Ordinary user-driven annotation is independent of this gate.  Requirements-only gate: this should be set from requirements, not user config."
+  },
+  {
+   "key": "features.in_app_chat",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Allow the in-app chat pane in desktop apps.  Requirements-only gate: this should be set from requirements, not user config."
+  },
+  {
+   "key": "features.in_app_dictation",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Allow in-app dictation in desktop apps.  Requirements-only gate: this should be set from requirements, not user config."
+  },
+  {
+   "key": "features.in_app_voice",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Allow in-app Voice in desktop apps.  Requirements-only gate: this should be set from requirements, not user config. Permission does not establish Voice availability or provider support."
+  },
+  {
+   "key": "features.in_app_local_automation",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Allow desktop apps to run local automations.  Requirements-only gate: this should be set from requirements, not user config."
+  },
+  {
+   "key": "features.in_app_updates",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Allow desktop apps to perform in-app updates.  Requirements-only gate: this should be set from requirements, not user config."
+  },
+  {
+   "key": "features.browser_use",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Allow Browser Use agent integration in desktop apps.  Requirements-only gate: this should be set from requirements, not user config."
+  },
+  {
+   "key": "features.browser_use_full_cdp_access",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Allow Browser Use integration to access the full Chrome DevTools Protocol surface.  Requirements-only gate: this should be set from requirements, not user config."
+  },
+  {
+   "key": "features.browser_use_external",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Allow Browser Use integration with external browsers.  Requirements-only gate: this should be set from requirements, not user config."
+  },
+  {
+   "key": "features.computer_use",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Allow Codex Computer Use.  Requirements-only gate: this should be set from requirements, not user config."
+  },
+  {
+   "key": "features.remote_plugin",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Enable the PS-backed remote plugin catalog."
+  },
+  {
+   "key": "features.plugin_discovery_prefetch",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag for plugin discovery prefetch."
+  },
+  {
+   "key": "features.plugin_sharing",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Enable remote plugin sharing flows."
+  },
+  {
+   "key": "features.external_migration",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag retained as a no-op."
+  },
+  {
+   "key": "features.image_generation",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Enable extension-backed image generation."
+  },
+  {
+   "key": "features.image_generation_animation",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Allow the image-generation tool to request a backend-assembled GIF."
+  },
+  {
+   "key": "features.omit_app_server_notification_media",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Omit inline image and audio content from app-server item notifications."
+  },
+  {
+   "key": "features.image_resize_notice",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Tell the model when a prompt image was resized and include its dimensions."
+  },
+  {
+   "key": "features.unified_image_budget",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Apply one shared pixel and token budget to every image, regardless of legacy detail hints."
+  },
+  {
+   "key": "features.resize_all_images",
+   "type": "boolean",
+   "stage": "removed",
+   "default": true,
+   "en": "Removed compatibility flag for always-on centralized image preparation."
+  },
+  {
+   "key": "features.item_ids",
+   "type": "boolean",
+   "stage": "removed",
+   "default": true,
+   "en": "Removed compatibility flag for always-on response item IDs."
+  },
+  {
+   "key": "features.concurrent_reasoning_summaries",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Request sequential cutoff reasoning summary delivery."
+  },
+  {
+   "key": "features.output_token_replay",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Request encrypted sampled output for token-preserving replay."
+  },
+  {
+   "key": "features.skill_mcp_dependency_install",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Allow prompting and installing missing MCP dependencies."
+  },
+  {
+   "key": "features.omit_skill_descriptions",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Omit descriptions from the model-visible available-skills catalog."
+  },
+  {
+   "key": "features.skill_search",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Run cheap skill-search methods in shadow mode and emit experiment metrics."
+  },
+  {
+   "key": "features.skill_catalog_deltas",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Append skill additions and edits within a cumulative context budget."
+  },
+  {
+   "key": "features.skill_env_var_dependency_prompt",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag for deleted skill env var dependency prompting."
+  },
+  {
+   "key": "features.mentions_v2",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Enable the unified mention popup used by default in the TUI."
+  },
+  {
+   "key": "features.steer",
+   "type": "boolean",
+   "stage": "removed",
+   "default": true,
+   "en": "Steer feature flag - when enabled, Enter submits immediately instead of queuing. Kept for config backward compatibility; behavior is always steer-enabled."
+  },
+  {
+   "key": "features.default_mode_request_user_input",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Allow request_user_input in Default collaboration mode."
+  },
+  {
+   "key": "features.send_async_message",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag for model-enabled async user messaging."
+  },
+  {
+   "key": "features.send_message_to_user_async",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Allow root agents to send async user messages without model catalog support."
+  },
+  {
+   "key": "features.terminal_visualization_instructions",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Add terminal-specific visualization guidance to TUI developer instructions."
+  },
+  {
+   "key": "features.guardian_approval",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Enable automatic review for approval prompts."
+  },
+  {
+   "key": "features.guardian_include_additional_context",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Include standalone additional-context tool outputs in Guardian review history."
+  },
+  {
+   "key": "features.guardian_recorded_items",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Forward private reviewer items and interruptions to raw-event observers."
+  },
+  {
+   "key": "features.guardianv2.thread_context",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag for always-on thread-owned Guardian context."
+  },
+  {
+   "key": "features.guardian_reuse_parent_compaction",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Reuse encrypted parent compaction when restarting Guardian review sessions. When disabled, retain an independent review transcript across parent compaction."
+  },
+  {
+   "key": "features.guardian_root_handoff_context",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Limit worker Guardian root evidence to preceding root communication windows."
+  },
+  {
+   "key": "features.guardian_native_multi_agent_history",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Review state-changing MAv2 calls and preserve native calls in Guardian history."
+  },
+  {
+   "key": "features.guardian_enhanced_node_repl_transcripts",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Include completed node_repl or cua_repl Code Mode responses in Guardian reviews."
+  },
+  {
+   "key": "features.guardian_node_repl_transcript_images",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Include completed node_repl or cua_repl Code Mode response images in Guardian reviews."
+  },
+  {
+   "key": "features.guardian_trust_orchestrator_connectors",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Trust connector identities from the plugin service orchestrator in Guardian V2."
+  },
+  {
+   "key": "features.guardian_conversation_history_tools",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Give Guardian access to the root conversation's message history tools."
+  },
+  {
+   "key": "features.guardian_denial_reconsideration",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Resample a synchronous Guardian denial once before publishing it."
+  },
+  {
+   "key": "features.guardianv2",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Enable Guardian V2 automatic approval reviews."
+  },
+  {
+   "key": "features.guardianv2_decisions_comparison",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Run Decisions alongside Guardian V2 for measurement without changing approvals."
+  },
+  {
+   "key": "features.guardianv3",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Enable Guardian V3 integrations."
+  },
+  {
+   "key": "features.guardian_ext",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag for the unused Guardian extension prototype."
+  },
+  {
+   "key": "features.goals",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Enable persisted thread goals and automatic goal continuation."
+  },
+  {
+   "key": "features.token_budget",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Add current context-window metadata to model-visible context."
+  },
+  {
+   "key": "features.context_management",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Enables experimental context management."
+  },
+  {
+   "key": "features.rollout_budget",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Track and report a shared token budget across a session's agent threads."
+  },
+  {
+   "key": "features.reasoning_effort_override",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Append trusted response configuration items when the selected reasoning effort changes."
+  },
+  {
+   "key": "features.current_time_reminder",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Add current-time reminders to model-visible context."
+  },
+  {
+   "key": "features.nonfatal_clock_read_errors",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Report failed clock reads to the model without failing the turn."
+  },
+  {
+   "key": "features.collaboration_modes",
+   "type": "boolean",
+   "stage": "removed",
+   "default": true,
+   "en": "Enable collaboration modes (Plan, Default). Kept for config backward compatibility; behavior is always collaboration-modes-enabled."
+  },
+  {
+   "key": "features.tool_call_mcp_elicitation",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Route MCP tool approval prompts through the MCP elicitation request path."
+  },
+  {
+   "key": "features.auth_elicitation",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Prompt Codex Apps connector auth failures through MCP URL elicitations."
+  },
+  {
+   "key": "features.bedrock_setup_wizard",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Offer Amazon Bedrock setup during TUI sign-in onboarding."
+  },
+  {
+   "key": "features.gcp_setup_wizard",
+   "type": "boolean",
+   "stage": "stable",
+   "default": false,
+   "en": "Offer Google Cloud Vertex AI setup during TUI sign-in onboarding."
+  },
+  {
+   "key": "features.gateway_setup_wizard",
+   "type": "boolean",
+   "stage": "stable",
+   "default": false,
+   "en": "Offer custom gateway setup during TUI sign-in onboarding."
+  },
+  {
+   "key": "features.personality",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag retained as a no-op."
+  },
+  {
+   "key": "features.artifact",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Enable native artifact tools."
+  },
+  {
+   "key": "features.fast_mode",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Enable Fast mode selection in the TUI and request layer."
+  },
+  {
+   "key": "features.ultrafast_mode",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Enable Ultra Fast mode independently of Fast mode."
+  },
+  {
+   "key": "features.step_model_switching",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Enable explicitly requested model changes for later step captures."
+  },
+  {
+   "key": "features.realtime_conversation",
+   "type": "boolean",
+   "stage": "removed",
+   "default": true,
+   "en": "Removed compatibility flag. TUI voice availability follows platform support."
+  },
+  {
+   "key": "features.remote_control",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag for the deleted remote control feature."
+  },
+  {
+   "key": "features.image_detail_original",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag retained as a no-op so old wrappers can still pass `--enable image_detail_original`."
+  },
+  {
+   "key": "features.tui_app_server",
+   "type": "boolean",
+   "stage": "removed",
+   "default": true,
+   "en": "Removed compatibility flag. The TUI now always uses the app-server implementation."
+  },
+  {
+   "key": "features.workspace_owner_usage_nudge",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility flag retained as a no-op now that workspace owner usage nudges are always enabled."
+  },
+  {
+   "key": "features.responses_websockets",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Legacy rollout flag for Responses API WebSocket transport experiments."
+  },
+  {
+   "key": "features.responses_websockets_v2",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Legacy rollout flag for Responses API WebSocket transport v2 experiments."
+  },
+  {
+   "key": "features.remote_compaction_v2",
+   "type": "boolean",
+   "stage": "removed",
+   "default": false,
+   "en": "Removed compatibility key, still advertised to the Responses API."
+  },
+  {
+   "key": "features.async_compaction",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Prepare remote compaction in the background before the foreground limit is reached."
+  },
+  {
+   "key": "features.async_compaction_root_only",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Restrict background compaction to the root session."
+  },
+  {
+   "key": "features.compaction_image_budget",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Include retained images in the remote compaction context budget."
+  },
+  {
+   "key": "features.retain_client_developer_messages",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Retain client-authored developer messages across compacted context windows."
+  },
+  {
+   "key": "features.retain_client_tool_outputs",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Honor client-requested tool-output retention across context windows."
+  },
+  {
+   "key": "features.use_agent_identity",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Use Agent Identity for ChatGPT-authenticated sessions."
+  },
+  {
+   "key": "features.runtime_agent_instances",
+   "type": "boolean",
+   "stage": "under development",
+   "default": false,
+   "en": "Register an ephemeral runtime for OpenAI request authentication."
+  },
+  {
+   "key": "features.workspace_dependencies",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true,
+   "en": "Enable workspace dependency support."
+  },
+  {
+   "key": "features.connectors",
+   "type": "boolean",
+   "stage": "deprecated",
+   "en": "Legacy alias of `apps`.",
+   "aliasOf": "apps",
+   "deprecated": true
+  },
+  {
+   "key": "features.enable_experimental_windows_sandbox",
+   "type": "boolean",
+   "stage": "deprecated",
+   "en": "Legacy alias of `experimental_windows_sandbox`.",
+   "aliasOf": "experimental_windows_sandbox",
+   "deprecated": true
+  },
+  {
+   "key": "features.experimental_use_unified_exec_tool",
+   "type": "boolean",
+   "stage": "deprecated",
+   "en": "Legacy alias of `unified_exec`.",
+   "aliasOf": "unified_exec",
+   "deprecated": true
+  },
+  {
+   "key": "features.request_permissions",
+   "type": "boolean",
+   "stage": "deprecated",
+   "en": "Legacy alias of `exec_permission_approvals`.",
+   "aliasOf": "exec_permission_approvals",
+   "deprecated": true
+  },
+  {
+   "key": "features.web_search",
+   "type": "boolean",
+   "stage": "deprecated",
+   "en": "Legacy alias of `web_search_request`.",
+   "aliasOf": "web_search_request",
+   "deprecated": true
+  },
+  {
+   "key": "features.imagegenext",
+   "type": "boolean",
+   "stage": "deprecated",
+   "en": "Legacy alias of `image_generation`.",
+   "aliasOf": "image_generation",
+   "deprecated": true
+  },
+  {
+   "key": "features.collab",
+   "type": "boolean",
+   "stage": "deprecated",
+   "en": "Legacy alias of `multi_agent`.",
+   "aliasOf": "multi_agent",
+   "deprecated": true
+  },
+  {
+   "key": "features.memory_tool",
+   "type": "boolean",
+   "stage": "deprecated",
+   "en": "Legacy alias of `memories`.",
+   "aliasOf": "memories",
+   "deprecated": true
+  },
+  {
+   "key": "features.telepathy",
+   "type": "boolean",
+   "stage": "deprecated",
+   "en": "Legacy alias of `chronicle`.",
+   "aliasOf": "chronicle",
+   "deprecated": true
+  },
+  {
+   "key": "features.codex_hooks",
+   "type": "boolean",
+   "stage": "deprecated",
+   "en": "Legacy alias of `hooks`.",
+   "aliasOf": "hooks",
+   "deprecated": true
+  },
+  {
+   "key": "features.prevent_idle_sleep",
+   "type": "boolean",
+   "stage": "experimental",
+   "default": false
+  },
+  {
+   "key": "features.secret_auth_storage",
+   "type": "boolean",
+   "stage": "stable",
+   "default": true
+  }
+ ]
+}

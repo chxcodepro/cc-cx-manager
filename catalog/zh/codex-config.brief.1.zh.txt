@@ -1,0 +1,118 @@
+# Codex config.toml 一句话说明（第 2 部分）
+features.request_permissions_tool | 让模型可以主动申请更多权限（开发中）
+features.windows_sandbox_service | 通过系统服务初始化 Windows 沙箱（开发中）
+features.prefer_mxc | 优先使用 Windows 原生隔离沙箱（开发中）
+features.daybreak_program_propagation | 保存 Daybreak 选择供辅助程序使用（开发中）
+features.model_catalog_in_context | 子代理模型列表放到上下文中（开发中）
+features.defer_mailbox_preemption | 代理消息不打断当前思考（开发中）
+features.mcp_connection_sharing | 多个对话共享本地 MCP 连接（开发中）
+features.mcp_lazy_stdio_startup | 用到时才启动本地 MCP 服务器（开发中）
+features.codex_apps_mcp_2026_07_28 | Codex Apps 使用新版 MCP 协议（开发中）
+features.incremental_exec_tools | 只发送变化的 exec 工具定义（开发中）
+features.non_prefixed_mcp_tool_names | MCP 工具名不再带 mcp__ 前缀（开发中）
+features.executor_capability_discovery | 一次性获取插件和技能清单（开发中）
+features.default_mode_request_user_input | 默认模式下也允许模型向你提问（开发中）
+features.guardian_root_handoff_context | 限制自动审查能看到的上下文（开发中）
+features.guardian_native_multi_agent_history | 自动审查也检查多代理操作（开发中）
+features.guardian_enhanced_node_repl_transcripts | 自动审查时参考 REPL 的运行结果（开发中）
+features.guardian_node_repl_transcript_images | 自动审查时参考 REPL 中的图片（开发中）
+features.guardian_trust_orchestrator_connectors | 自动审查信任插件服务提供的连接器（开发中）
+features.guardian_denial_reconsideration | 自动审查拒绝前再复核一次（开发中）
+features.guardianv2_decisions_comparison | 并行对比两种审查结果，用于测量（开发中）
+features.rollout_budget | 统计整个会话所有代理的 token 用量（开发中）
+features.use_agent_identity | ChatGPT 登录的会话使用代理身份（开发中）
+features.web_search_request | 已弃用，改用顶层 web_search = "live"
+features.web_search_cached | 已弃用，改用顶层 web_search = "cached"
+features.multi_agent | 已弃用，改用 [agents] 的 enabled
+features.use_legacy_landlock | 已弃用：Linux 改用旧版 Landlock 沙箱
+features.enable_experimental_windows_sandbox | 已无效果，改用 windows.sandbox
+features.request_permissions | 旧名称，改用 exec_permission_approvals
+features.web_search | 旧名称，改用顶层 web_search 设置
+features.transcript_v2 | 已移除，改用 tui.fullscreen_transcript
+features.local_thread_store_shared_compression | 已移除，改用 local_thread_store_compression
+features.use_linux_sandbox_bwrap | 已移除，bubblewrap 已是默认
+features.elevated_windows_sandbox | 已移除，改用 windows.sandbox = "elevated"
+web_search | 网页搜索：关闭、用缓存，还是实时联网搜索
+tools.client_search_provider | 模型没指定时用哪种搜索方式
+tools.web_search.context_size | 给模型多少搜索结果内容：越多越全，越费 token
+browser_use.origins | 按网站设置浏览器操作的权限
+computer_use.macos.bundle_ids | 允许或禁止操作哪些 macOS 应用
+file_opener | 点击回复中的文件时用哪个编辑器打开
+hide_agent_reasoning | 开启后不显示模型的思考过程
+show_raw_agent_reasoning | 显示模型原始的思考内容
+disable_paste_burst | 旧写法，改用 [tui] 中的 disable_paste_burst
+tui.theme | 代码高亮配色，可用 /theme 预览
+tui.notifications | 任务完成或需要批准时发桌面通知
+tui.notification_method | 通知用哪种终端信号发送
+tui.notification_condition | 只在终端不在前台时通知，还是总是通知
+tui.alternate_screen | 设为 never 可保留终端原生滚动和搜索
+tui.fullscreen_transcript | 由 Codex 接管对话记录的滚动和搜索
+tui.collapse_turn_details | 折叠已完成回合的工具调用，界面更简洁
+tui.auto_recap | 切到其他窗口时自动生成对话回顾
+tui.show_server_version_notice | 显示后台服务版本不一致的提示
+tui.copy_on_select | 用鼠标选中文字后自动复制
+tui.right_click_paste | 右键粘贴文字
+tui.mouse_scroll_speed | 鼠标滚轮滚动速度，小于 1 变慢
+tui.disable_paste_burst | 粘贴多行出错时开启
+tui.vim_mode_default | 输入框默认使用 Vim 按键
+tui.question_esc_back | 回答问题时按 Esc 返回输入框并保留草稿
+tui.status_line | 状态栏显示哪些信息，可用 /statusline 设置
+tui.session_picker_view | 会话列表宽松显示还是紧凑显示
+tui.resume_cwd | 恢复会话时用当前目录还是会话原来的目录
+tui.agents_overview_grouping | 代理总览按项目、状态还是模型分组（自动记录）
+tui.terminal_resize_reflow_max_rows | 调整窗口大小时重绘多少行
+tui.pet | 终端宠物
+tui.pet_anchor | 终端宠物显示在输入框旁还是屏幕底部
+tui.presets | 用数字键快速填入的常用输入
+tui.rendering.lists | 列表符号显示成更好看的图标
+tui.default_hosts | 新对话默认在哪台主机运行（自动记录）
+tui.screen_reader_detection_done | 已完成读屏软件检测（自动写入）
+agents.enabled | 是否允许 Codex 使用子代理协作
+agents.max_concurrent_threads_per_session | 每个会话最多同时运行多少个子代理
+auto_review.policy | 自动审查时额外遵守的规则，如禁止改 .github
+auto_review.timeout_ms | 一次自动审查最多用多久
+auto_review.circuit_break_action | 审查中断时的记录方式
+auto_review.conversation_history_max_output_tokens | 审查时每次读取历史最多多少 token
+marketplaces | 插件市场列表，通常由 codex plugin 命令维护
+marketplaces.*.ref | 使用插件市场的哪个分支或版本
+skills.max_context_tokens | 技能列表最多占用多少 token
+apps._default.enabled | 关闭后默认禁用所有 App
+apps._default.open_world_enabled | 默认允许会访问外部的工具
+apps_mcp_product_sku | Apps 请求附带的产品标识（内部用）
+hooks.state | 记录哪些 hook 已被你信任（自动写入）
+memories.generate_memories | 关闭后不再从新会话中生成记忆
+memories.disable_on_external_context | 引用外部内容的会话不用于生成记忆
+memories.min_rate_limit_remaining_percent | 剩余额度低于这个百分比时暂停生成记忆
+memories.min_rollout_idle_hours | 会话空闲多少小时后才生成记忆
+history.persistence | 设为 none 不保存输入历史
+log_dir | 日志目录，设置后还会写入 codex-tui.log
+sqlite_home | 数据库文件保存在哪个目录
+profile | 默认使用哪个配置档
+profiles | 多套配置档，用 codex --profile 名称 切换
+projects | 各项目的信任状态（自动写入）
+projects.*.trust_level | 是否信任这个项目，信任后才读取项目配置
+project_root_markers | 用哪些文件判断项目根目录，默认 .git
+notify | 需要通知时运行的命令，如发送桌面通知
+analytics.enabled | 关闭后不再发送使用分析数据
+feedback.enabled | 关闭后不再上传反馈
+otel.environment | 监控数据标注的环境名称
+otel.exporter | 日志发送到哪里
+otel.metrics_exporter | 指标数据发送到哪里，none 为关闭
+otel.log_agent_responses | 监控日志中记录模型回复
+otel.log_guardian_assessments | 监控日志中记录自动审查结论
+otel.log_sse_deltas | 监控日志中记录流式输出的每一段
+otel.tool_result.max_bytes | 工具结果最多记录多少字节
+otel.tracestate | 附加到追踪信息中的字段
+otel.headers_helper | 运行命令生成监控请求头
+realtime.type | 语音对话还是语音转文字
+audio.microphone_channel | 使用麦克风的哪些声道
+desktop | 桌面端自动保存的界面设置，一般不用手动改
+windows.sandbox | Windows 沙箱用哪种方式实现
+windows.allow_mxc | 关闭后不使用 Windows 隔离容器沙箱
+experimental_realtime_ws_base_url | 实验选项，请勿使用
+experimental_realtime_webrtc_call_base_url | 实验选项，请勿使用
+experimental_realtime_ws_model | 实验选项，请勿使用
+experimental_realtime_ws_backend_prompt | 实验选项，请勿使用
+experimental_realtime_ws_startup_context | 实验选项，请勿使用
+check_for_update_on_startup | 启动时检查 Codex 有没有新版本
+responses_api_metadata | 请求附带的元数据（内部用）

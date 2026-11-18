@@ -1,0 +1,122 @@
+# Codex config.toml 一句话说明：改这个参数有什么效果（显示在界面「?」的第一行）
+# 格式：key | 说明（尽量 30 字以内，最多 40 字）
+model | Codex 使用的模型，如 gpt-5.5
+model_reasoning_effort | 思考强度：越高越仔细，但更慢、更费额度
+plan_mode_reasoning_effort | 规划模式单独使用的思考强度
+model_reasoning_summary | 是否显示模型思考过程的摘要
+model_verbosity | 回复详细程度：low 简短，high 详细
+service_tier | fast 更快但更费额度，flex 更便宜但更慢
+personality | 已弃用：设为 none 可去掉内置的个性说明
+model_catalog_json | 自定义模型列表文件，让 /model 显示你的模型
+daybreak | Daybreak 访问计划的默认偏好（内部功能）
+model_provider | 使用哪个模型服务商，第三方服务填你定义的 ID
+chatgpt_base_url | ChatGPT 请求使用的地址
+oss_provider | --oss 本地模型优先用 lmstudio 还是 ollama
+model_providers | 添加第三方或企业的模型服务商
+model_providers.*.base_url | 服务商的接口地址，通常以 /v1 结尾
+model_providers.*.env_key | 存放 API Key 的环境变量名，Key 写在 .env 中
+model_providers.*.wire_api | 接口协议，目前只支持 responses
+model_providers.*.requires_openai_auth | 开启后需要先登录 OpenAI 账号
+model_providers.*.experimental_bearer_token | 直接写在配置里的令牌，不安全，建议用 env_key
+model_providers.*.env_http_headers | 从环境变量取值的请求头
+model_providers.*.query_params | 接口地址后附加的参数，如 Azure 的 api-version
+model_providers.*.supports_websockets | 服务商是否支持 WebSocket 连接
+model_providers.*.model_catalog_url | 服务商的模型列表地址
+model_providers.*.credential_file | Google 凭据文件位置
+model_providers.*.project_id | Google Cloud 项目 ID
+model_providers.*.location | Google Cloud 区域，默认 global
+model_providers.*.auth.command | 运行命令获取访问令牌
+model_providers.*.auth.refresh_interval_ms | 令牌多久重新获取一次
+model_providers.*.aws.profile | 使用哪个 AWS 配置档
+model_providers.*.capabilities.cyber_access_programs | 服务商是否支持访问计划选择
+model_providers.*.capabilities.remote_compaction | 服务商是否支持远程压缩上下文
+forced_login_method | 只允许用 ChatGPT 账号或 API Key 登录
+forced_chatgpt_workspace_id | 只允许登录指定的 ChatGPT 工作区
+cli_auth_credentials_store | 登录凭据存在文件、钥匙串还是只放内存
+mcp_oauth_credentials_store | MCP 登录凭据存在哪里
+approval_policy | 什么时候需要你批准命令，交互使用选 on-request
+approvals_reviewer | 审批请求由你确认，还是交给自动审查
+sandbox_mode | 命令能改哪些文件：只读、仅项目目录或不限制
+sandbox_workspace_write.network_access | 允许沙箱内的命令联网，如安装依赖
+sandbox_workspace_write.exclude_tmpdir_env_var | 开启后不能写入 $TMPDIR 目录
+sandbox_workspace_write.exclude_slash_tmp | 开启后不能写入 /tmp
+default_permissions | 默认使用哪套权限配置
+permissions | 自定义权限配置，配合 default_permissions 使用
+allow_symlinked_codex_home | 允许 CODEX_HOME 使用软链接（macOS 沙箱）
+shell_environment_policy.inherit | 命令能拿到哪些环境变量：全部、核心或都不给
+shell_environment_policy.ignore_default_excludes | 开启后含 KEY、TOKEN 的变量也会传给命令
+shell_environment_policy.filters | 按名称过滤传给命令的环境变量
+allow_login_shell | 关闭后命令一律不用登录 Shell
+background_terminal_max_timeout | 等待后台终端输出的最长时间
+experimental_use_unified_exec_tool | 已弃用，改用功能开关 unified_exec
+developer_instructions | 给 Codex 的额外指示，如「回复使用中文」
+model_instructions_file | 替换内置指令的文件，官方不建议使用
+project_doc_max_bytes | AGENTS.md 最多读取多少字节
+project_doc_fallback_filenames | 没有 AGENTS.md 时改读这些文件
+include_collaboration_mode_instructions | 是否加入协作模式说明
+include_environment_context | 是否告诉模型当前目录、沙箱等环境信息
+include_permissions_instructions | 是否加入权限说明
+model_context_window | 告诉 Codex 模型的上下文有多大，第三方模型需要
+model_auto_compact_token_limit_scope | 压缩阈值按全部上下文还是新增部分计算
+model_post_turn_compact_threshold_percent | 回合结束时上下文用到多少百分比就压缩
+thread_unload_delay_secs | 空闲会话多久后从内存卸载
+mcp_servers | 添加 MCP 服务器，给 Codex 更多工具
+mcp_servers.*.env_vars | 传给 MCP 服务器的环境变量
+mcp_servers.*.url | 远程 MCP 服务器的地址
+mcp_servers.*.auth | 远程 MCP 服务器的登录方式
+mcp_servers.*.oauth.callback_port | 这个服务器登录回调使用的端口
+mcp_servers.*.oauth.token_endpoint_auth_method | 企业登录客户端的认证方式
+mcp_servers.*.required | 开启后服务器启动失败会直接报错
+mcp_servers.*.startup_readiness | 启动时必须连上，还是可先用缓存的工具列表
+mcp_servers.*.default_tools_approval_mode | 这个服务器的工具默认是否需要你批准
+mcp_servers.*.tool_input_schema_max_bytes | 工具参数说明超过多大时压缩
+mcp_servers.*.omit_tools_from | 在哪些模式下不提供这个服务器的工具
+mcp_oauth_callback_port | MCP 登录回调使用的固定端口
+mcp_oauth_callback_url | MCP 登录使用的回调地址
+mcp_optional_startup_grace_ms | 启动时等待可选 MCP 服务器多久
+mcp_enterprise_managed_auth.idp.token_endpoint_auth_method | 企业托管认证的客户端认证方式
+features.shell_tool | 关闭后 Codex 不能执行任何命令
+features.unified_exec | 支持交互式和长时间运行的命令
+features.hooks | 开启后会运行 hooks.json 中的钩子
+features.memories | 让 Codex 跨会话记住你的偏好
+features.unified_image_budget | 所有图片统一按同一预算处理
+features.guardian_approval | 允许自动审查审批请求
+features.guardian_include_additional_context | 自动审查时参考额外的上下文
+features.tool_call_mcp_elicitation | MCP 工具审批以弹窗方式询问
+features.auth_elicitation | 连接器需要登录时弹出提示
+features.mcp_oauth_refresh_coordination | 统一刷新 MCP 登录令牌，避免冲突
+features.enable_request_compression | 压缩发出的请求，节省流量
+features.secret_auth_storage | 用钥匙串存储时加密登录凭据
+features.api_key_model_discovery | 用 API Key 登录时自动获取可用模型
+features.api_key_cyber_access_programs | 用 API Key 时传递访问计划选择
+features.cli_daybreak | 在命令行中启用 Daybreak 控制
+features.incremental_tools | 只发送变化的工具定义，节省上下文
+features.incremental_tools_legacy | Bedrock 上只发送变化的工具定义
+features.code_mode_host | 在独立进程中运行 Code Mode
+features.code_mode_host_grpc | Code Mode 进程通过 gRPC 通信
+features.multi_agent_v2 | 启用新版多代理协作
+features.bedrock_setup_wizard | 登录时提供 Amazon Bedrock 设置向导
+features.gcp_setup_wizard | 登录时提供 Google Cloud 设置向导
+features.in_app_browser | 桌面端内置浏览器，应由管理员设置
+features.browser_annotation_api | 允许网站在桌面端打开标注工具，应由管理员设置
+features.in_app_chat | 桌面端内置聊天，应由管理员设置
+features.in_app_local_automation | 桌面端本地自动化，应由管理员设置
+features.in_app_updates | 桌面端应用内更新，应由管理员设置
+features.browser_use | 桌面端浏览器操作，应由管理员设置
+features.browser_use_full_cdp_access | 浏览器操作的完整调试权限，应由管理员设置
+features.browser_use_external | 操作外部浏览器，应由管理员设置
+features.computer_use | 让 Codex 操作桌面应用，应由管理员设置
+features.respect_system_proxy | Codex 使用系统代理联网（macOS、Windows）
+features.login_shell_package_path | 登录 Shell 下也能使用内置的 ripgrep 等工具
+features.analytics_plan_history | 在 /analytics 中查看额度使用历史
+features.app_server_websocket_compression | 压缩 app-server 的连接数据（开发中）
+features.powershell_shell_version | 告诉模型 PowerShell 的版本（开发中）
+features.shell_snapshot_v2 | 新版 Shell 环境快照（开发中）
+features.executed_tool_call_metadata | 记录模型尝试的工具调用（开发中）
+features.code_mode | 启用 JavaScript Code Mode（开发中）
+features.instant_interrupt | 你一输入就立即打断当前回复（开发中）
+features.code_mode_only | 模型只能通过 Code Mode 使用工具（开发中）
+features.code_mode_only_strict_3p_tools | Code Mode 下第三方工具按需加载（开发中）
+features.local_thread_store_compression | 压缩旧的会话记录文件（开发中）
+features.chronicle | 记录屏幕内容作为记忆（开发中）
+features.apply_patch_streaming_events | 修改文件时实时显示进度（开发中）

@@ -1,0 +1,211 @@
+# Claude Code 环境变量中文叠加层（对应 Claude Code 2.1.327，来源 https://code.claude.com/docs/en/env-vars）
+# 这些变量写入 settings.json 的 env 对象，值一律是字符串；也可以在系统 / Shell 环境中设置
+
+@category auth | 认证与 API | 10 | API Key、Token、接口地址与请求头
+@category model | 模型选择 | 20 | 默认模型、别名对应的模型、自定义模型选项
+@category thinking | 推理与输出 | 30 | 思考预算、推理强度、输出长度
+@category provider | 第三方云平台 | 40 | Amazon Bedrock、Google Cloud、Microsoft Foundry、Claude Platform on AWS
+@category network | 网络与代理 | 50 | 代理、证书、超时与重试
+@category tools | 工具与 Shell | 60 | Bash / PowerShell 命令、搜索、文件工具
+@category mcp | MCP | 70 | MCP 服务器超时、输出上限、工具搜索
+@category agents | 子代理与后台任务 | 75 | 子代理、后台任务、工作流、定时任务
+@category hooks | Hooks | 77 | Hook 超时与阻止次数
+@category notifications | 通知 | 102 | 桌面与移动端通知
+@category context | 上下文与压缩 | 80 | 自动压缩、上下文窗口、记忆文件
+@category features | 功能开关 | 90 | 开启或关闭各项功能
+@category ui | 界面与终端 | 100 | 渲染方式、鼠标、屏幕阅读器、终端标题
+@category remote | 远程与云端 | 105 | Remote Control、云端会话、Artifacts
+@category privacy | 遥测与隐私 | 110 | 遥测、错误上报、非必要网络流量
+@category telemetry | OpenTelemetry 监控 | 120 | 用量与成本监控导出
+@category updates | 更新与安装 | 130 | 自动更新、安装位置
+@category paths | 路径与目录 | 140 | 配置目录、临时目录、Shell 路径
+@category sandbox | 安全与沙箱 | 150 | 删除保护、沙箱、子进程环境清理
+@category ide | IDE 集成 | 160 | VS Code / JetBrains 等 IDE 连接
+@category debug | 调试与诊断 | 170 | 调试日志、诊断输出
+@category enterprise | 企业部署 | 180 | 托管策略、身份联合、网关
+@category other | 其他 | 190
+
+@prefix ANTHROPIC_DEFAULT_ => model
+@prefix ANTHROPIC_BEDROCK => provider
+@prefix ANTHROPIC_VERTEX => provider
+@prefix ANTHROPIC_FOUNDRY => provider
+@prefix ANTHROPIC_GOOGLE_CLOUD => provider
+@prefix ANTHROPIC_AWS => provider
+@prefix VERTEX_REGION => provider
+@prefix AWS_ => provider
+@prefix OTEL_ => telemetry
+@prefix CLAUDE_CODE_DISABLE_ => features
+@prefix CLAUDE_CODE_ENABLE_ => features
+@prefix DISABLE_ => features
+@prefix ENABLE_ => features
+@prefix MCP_ => mcp
+@prefix BASH_ => tools
+@prefix CLAUDE_CODE_OTEL => telemetry
+
+# ---------------- 认证与 API ----------------
+ANTHROPIC_API_KEY | API Key | auth | 以 X-Api-Key 请求头发送的 API Key。设置后即使已登录 Pro / Max / Team 等订阅，也会改用这个 Key 计费；交互模式下首次使用会询问是否批准。 | | 密钥建议放在系统环境变量或密码管理器中，避免写进会提交到仓库的项目设置 | s ;; ph=<YOUR_API_KEY>
+ANTHROPIC_AUTH_TOKEN | Authorization 令牌 | auth | 自定义 Authorization 请求头的值（会自动加上 Bearer 前缀）。使用 LLM 网关或第三方中转服务时常用它代替 API Key。 | | | ;; s ;; ph=<YOUR_AUTH_TOKEN>
+ANTHROPIC_BASE_URL | API 地址 | auth | 覆盖 API 接口地址，把请求转发到代理、网关或中转服务。自 2.1.196 起，指向非官方地址时 Remote Control 会被禁用。 | | 使用中转时填写服务商提供的地址 | ph=<YOUR_BASE_URL>
+ANTHROPIC_CUSTOM_HEADERS | 自定义请求头 | auth | 附加到请求上的自定义请求头，格式为「名称: 值」，多个请求头用换行分隔。名称或值包含 HTTP 不允许的字符时请求会失败。 | | | ;; ex="X-Team: platform"
+ANTHROPIC_BETAS | 额外 Beta 头 | auth | 逗号分隔的额外 anthropic-beta 请求头值，用于在 Claude Code 原生支持之前抢先启用某个 API Beta 功能。 | | | ;; tags=advanced ;; ex="context-1m-2025-08-07"
+ANTHROPIC_PROFILE | Anthropic 配置档 | auth | 用于认证的 Anthropic 配置档名称，例如由 ant auth login 创建的配置档。 | | |
+ANTHROPIC_ORGANIZATION_ID | 组织 ID（身份联合） | enterprise | 工作负载身份联合（Workload Identity Federation）使用的组织 ID，需与 ANTHROPIC_FEDERATION_RULE_ID 一起设置。 | | | ;; tags=enterprise
+ANTHROPIC_FEDERATION_RULE_ID | 联合规则 ID | enterprise | 工作负载身份联合的规则 ID；与 ANTHROPIC_ORGANIZATION_ID 同时设置后，联合凭据优先于 /login 登录凭据。 | | | ;; tags=enterprise
+ANTHROPIC_WORKSPACE_ID | 工作区 ID（身份联合） | enterprise | 联合规则作用于多个工作区时，指定令牌交换的目标工作区。 | | | ;; tags=enterprise
+CLAUDE_CODE_API_KEY_HELPER_TTL_MS | API Key 脚本刷新间隔 | auth | 使用 apiKeyHelper 时重新获取凭据的间隔（毫秒）。 | | | ;; u=ms ;; ex=3600000
+API_TIMEOUT_MS | 请求超时 | network | 每次 API 请求等待响应头的时间（毫秒），不限制之后流式输出的时长。默认 600000（10 分钟），最大 2147483647。 | | 网络慢或中转服务排队久时可适当调大 | u=ms ;; def="600000"
+API_FORCE_IDLE_TIMEOUT | 流式空闲超时 | network | 覆盖流式响应 5 分钟无数据即中止的空闲超时。设为 0 关闭该超时（适合本地模型或很慢的网关两段输出间隔超过 5 分钟的情况）。 | | | ;; ex="0"
+
+# ---------------- 模型选择 ----------------
+ANTHROPIC_MODEL | 使用的模型 | model | 要使用的模型设置名称，可以是别名（opus、sonnet、haiku、fable 等）或完整模型 ID。使用第三方中转时通常填服务商的模型名。 | | | ;; ex="claude-opus-5-5"
+ANTHROPIC_DEFAULT_MODEL | 新会话默认模型 | model | 新会话启动时默认使用的模型。需要 2.1.236 及以上版本。 | | | ;; since=2.1.236
+ANTHROPIC_DEFAULT_OPUS_MODEL | opus 别名对应模型 | model | opus 别名解析到的模型 ID，opusplan 在规划模式下也使用它。使用中转或第三方平台时，用它把别名映射到可用的模型。 | | | ;; ex="claude-opus-5-5"
+ANTHROPIC_DEFAULT_OPUS_MODEL_NAME | opus 显示名称 | model | /model 选择器中固定的 Opus 模型的显示名称。 | | |
+ANTHROPIC_DEFAULT_OPUS_MODEL_DESCRIPTION | opus 显示描述 | model | /model 选择器中固定的 Opus 模型的描述文字。 | | |
+ANTHROPIC_DEFAULT_OPUS_MODEL_SUPPORTED_CAPABILITIES | opus 支持的能力 | model | 固定的 Opus 模型支持的能力，逗号分隔，例如 effort,thinking。 | | | ;; ex="effort,thinking"
+ANTHROPIC_DEFAULT_SONNET_MODEL | sonnet 别名对应模型 | model | sonnet 别名解析到的模型 ID，opusplan 在非规划模式下使用它。 | | | ;; ex="claude-sonnet-5-5"
+ANTHROPIC_DEFAULT_SONNET_MODEL_NAME | sonnet 显示名称 | model | /model 选择器中固定的 Sonnet 模型的显示名称。 | | |
+ANTHROPIC_DEFAULT_SONNET_MODEL_DESCRIPTION | sonnet 显示描述 | model | /model 选择器中固定的 Sonnet 模型的描述文字。 | | |
+ANTHROPIC_DEFAULT_SONNET_MODEL_SUPPORTED_CAPABILITIES | sonnet 支持的能力 | model | 固定的 Sonnet 模型支持的能力，逗号分隔，例如 effort,thinking。 | | | ;; ex="effort,thinking"
+ANTHROPIC_DEFAULT_HAIKU_MODEL | haiku 别名对应模型 | model | haiku 别名解析到的模型 ID，后台功能（如生成标题、摘要）也使用它。 | | | ;; ex="claude-haiku-5-5"
+ANTHROPIC_DEFAULT_HAIKU_MODEL_NAME | haiku 显示名称 | model | /model 选择器中固定的 Haiku 模型的显示名称。 | | |
+ANTHROPIC_DEFAULT_HAIKU_MODEL_DESCRIPTION | haiku 显示描述 | model | /model 选择器中固定的 Haiku 模型的描述文字。 | | |
+ANTHROPIC_DEFAULT_HAIKU_MODEL_SUPPORTED_CAPABILITIES | haiku 支持的能力 | model | 固定的 Haiku 模型支持的能力，逗号分隔。 | | | ;; ex="effort,thinking"
+ANTHROPIC_DEFAULT_FABLE_MODEL | fable 别名对应模型 | model | fable 别名解析到的模型 ID；在第三方平台上，Claude Code 也据此识别 Fable 模型以便自动回退。 | | | ;; ex="claude-fable-5-2"
+ANTHROPIC_DEFAULT_FABLE_MODEL_NAME | fable 显示名称 | model | /model 选择器中固定的 Fable 模型的显示名称。 | | |
+ANTHROPIC_DEFAULT_FABLE_MODEL_DESCRIPTION | fable 显示描述 | model | /model 选择器中固定的 Fable 模型的描述文字。 | | |
+ANTHROPIC_DEFAULT_FABLE_MODEL_SUPPORTED_CAPABILITIES | fable 支持的能力 | model | 固定的 Fable 模型支持的能力，逗号分隔。 | | | ;; ex="effort,thinking"
+ANTHROPIC_CUSTOM_MODEL_OPTION | 自定义模型选项 | model | 在 /model 选择器中额外添加的模型 ID，让非标准或网关专用的模型可选，同时不替换内置别名。 | | | ;; ex="my-gateway/claude-opus"
+ANTHROPIC_CUSTOM_MODEL_OPTION_NAME | 自定义模型名称 | model | 自定义模型条目在 /model 中的显示名称。 | | |
+ANTHROPIC_CUSTOM_MODEL_OPTION_DESCRIPTION | 自定义模型描述 | model | 自定义模型条目的描述，默认为「Custom model (<模型 ID>)」。 | | |
+ANTHROPIC_CUSTOM_MODEL_OPTION_SUPPORTED_CAPABILITIES | 自定义模型能力 | model | 自定义模型支持的能力，逗号分隔，例如 effort,thinking。 | | | ;; ex="effort,thinking"
+ANTHROPIC_SMALL_FAST_MODEL | 小型快速模型（旧） | model | 已弃用：后台任务使用的 Haiku 级模型名称。 | | | ;; dep=请改用 ANTHROPIC_DEFAULT_HAIKU_MODEL ;; by=ANTHROPIC_DEFAULT_HAIKU_MODEL
+ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION | 小型模型 AWS 区域 | provider | 在 Bedrock / Bedrock Mantle 上为 Haiku 级模型单独指定 AWS 区域（Bedrock 上需同时设置 ANTHROPIC_DEFAULT_HAIKU_MODEL 才生效）。 | | | ;; ex="us-east-1"
+CLAUDE_CODE_DISABLE_LEGACY_MODEL_REMAP | 禁止旧模型自动映射 | model | 设为 1 阻止在 Anthropic API 上把 Opus 4 / 4.1 自动映射到当前 Opus 版本。 | | |
+CLAUDE_CODE_AUTO_MODE_MODEL | 自动模式分类模型 | model | 自动权限模式中分类器请求使用的模型（完整模型 ID，如 claude-sonnet-4-6）。需要 2.1.302 及以上。 | | | ;; ex="claude-sonnet-4-6"
+CLAUDE_CODE_DISABLE_MODEL_ACCESS_FALLBACK | 禁止无权限时回退旧模型 | provider | 设为 1 后，在 Bedrock 和 Google Cloud 上会话中途失去模型权限时直接报错，而不是切换到较旧的模型。 | | |
+
+# ---------------- 推理与输出 ----------------
+CLAUDE_CODE_ALWAYS_ENABLE_EFFORT | 总是发送推理强度 | thinking | 设为 1 后每个请求都带上 effort 参数，即使 Claude Code 不认识该模型 ID。通过网关或第三方以自定义名称提供模型时使用。 | | 使用中转且模型名不是官方 ID 时开启，否则 /effort 可能不生效
+CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING | 关闭自适应思考 | thinking | 设为 1 在 Opus 4.6 / Sonnet 4.6 上关闭自适应推理，改用 MAX_THINKING_TOKENS 控制的固定思考预算。对 Fable、Sonnet 5 及更新、Haiku 5.5、Opus 4.7 及更新的模型无效。 | | |
+CLAUDE_CODE_DISABLE_ADVISOR_TOOL | 禁用顾问工具 | features | 设为 1 禁用顾问（advisor）工具：/advisor 不可用，advisorModel 被忽略。 | | |
+
+# ---------------- 第三方云平台 ----------------
+ANTHROPIC_AWS_API_KEY | AWS 平台 API Key | provider | Claude Platform on AWS 的工作区 API Key（在 AWS 控制台生成），以 x-api-key 发送，优先于 AWS SigV4 签名。 | | | ;; s ;; ph=<YOUR_API_KEY>
+ANTHROPIC_AWS_BASE_URL | AWS 平台接口地址 | provider | 覆盖 Claude Platform on AWS 的接口地址（自定义区域或经 LLM 网关转发时使用）。默认为 https://aws-external-anthropic.{region}.api.aws。 | | | ;; ph=<YOUR_BASE_URL>
+ANTHROPIC_AWS_WORKSPACE_ID | AWS 平台工作区 ID | provider | Claude Platform on AWS 必填，每个请求都以 anthropic-workspace-id 请求头发送。 | | |
+ANTHROPIC_BEDROCK_BASE_URL | Bedrock 接口地址 | provider | 覆盖 Amazon Bedrock 接口地址（自定义端点或经 LLM 网关转发）。 | | | ;; ph=<YOUR_BASE_URL>
+ANTHROPIC_BEDROCK_MANTLE_BASE_URL | Bedrock Mantle 地址 | provider | 覆盖 Amazon Bedrock Mantle 接口地址。 | | | ;; ph=<YOUR_BASE_URL>
+ANTHROPIC_BEDROCK_REGION_PREFIX | 跨区域推理前缀 | provider | 优先尝试的跨区域推理配置前缀（us、eu、apac、jp、au 或 global），代替根据 AWS 区域推导的前缀。GovCloud 区域忽略。需要 2.1.224 及以上。 | | | ;; type=enum ;; enum=us:美国,eu:欧洲,apac:亚太,jp:日本,au:澳大利亚,global:全球
+ANTHROPIC_BEDROCK_SERVICE_TIER | Bedrock 服务等级 | provider | Amazon Bedrock 服务等级：default、flex 或 priority。 | | | ;; type=enum ;; enum=default:默认,flex:弹性,priority:优先
+AWS_BEARER_TOKEN_BEDROCK | Bedrock API Key | provider | 用于认证的 Amazon Bedrock API Key。 | | | ;; s ;; ph=<YOUR_API_KEY>
+CLAUDE_CODE_AWS_CHAIN_RESOLVE_TIMEOUT_MS | AWS 凭据链超时 | provider | 等待 AWS 默认凭据链给出凭据的时间（毫秒，默认 60000），超时则请求失败。凭据链中某一步（如 SSO）较慢时可调大。 | | | ;; u=ms ;; def="60000"
+CLAUDE_CODE_DISABLE_BEDROCK_CONTENT_TYPE_DEFAULT | 不推断 Bedrock 内容类型 | provider | 设为 1 后，Bedrock 流式响应缺少 Content-Type 时不再默认按二进制事件流处理。 | | | ;; tags=advanced
+CLAUDE_CODE_DISABLE_BEDROCK_CONTENT_TYPE_GUARD | 跳过 Bedrock 内容类型检查 | provider | 设为 1 跳过「Bedrock 流式响应必须是 application/vnd.amazon.eventstream」的检查，适用于会改写响应头的网关。 | | | ;; tags=advanced
+ANTHROPIC_VERTEX_BASE_URL | Vertex 接口地址 | provider | 覆盖 Google Cloud Agent Platform（原 Vertex AI）的接口地址。 | | | ;; ph=<YOUR_BASE_URL>
+ANTHROPIC_VERTEX_PROJECT_ID | Vertex 项目 ID | provider | Google Cloud Agent Platform 请求所属的 GCP 项目 ID。 | | |
+ANTHROPIC_GOOGLE_CLOUD_BASE_URL | Google Cloud 托管版地址 | provider | 覆盖「Google Cloud 上的 Claude 模型（Anthropic 托管）」接口地址，例如经 LLM 网关转发时。 | | | ;; ph=<YOUR_BASE_URL>
+ANTHROPIC_GOOGLE_CLOUD_LOCATION | Google Cloud 托管版位置 | provider | 请求 URL 中使用的 Google Cloud 位置，默认 global。 | | | ;; def="global"
+ANTHROPIC_GOOGLE_CLOUD_PROJECT | Google Cloud 托管版项目 | provider | 「Google Cloud 上的 Claude 模型（Anthropic 托管）」使用的项目 ID。 | | |
+ANTHROPIC_GOOGLE_CLOUD_WORKSPACE_ID | Google Cloud 托管版工作区 | provider | 托管版的工作区 ID；2.1.307 起若设置了 ANTHROPIC_GOOGLE_CLOUD_BASE_URL 则可省略。 | | |
+ANTHROPIC_FOUNDRY_API_KEY | Foundry API Key | provider | Microsoft Foundry 认证用的 API Key。 | | | ;; s ;; ph=<YOUR_API_KEY>
+ANTHROPIC_FOUNDRY_AUTH_TOKEN | Foundry 令牌 | provider | Microsoft Foundry 的 Bearer 令牌（如 Entra 访问令牌），优先于 ANTHROPIC_FOUNDRY_API_KEY 和 Azure 默认凭据。 | | | ;; s ;; ph=<YOUR_AUTH_TOKEN>
+ANTHROPIC_FOUNDRY_BASE_URL | Foundry 地址 | provider | Microsoft Foundry 资源的完整地址，例如 https://my-resource.services.ai.azure.com/anthropic，可代替 ANTHROPIC_FOUNDRY_RESOURCE。 | | | ;; ph=<YOUR_BASE_URL>
+ANTHROPIC_FOUNDRY_RESOURCE | Foundry 资源名 | provider | Microsoft Foundry 资源名称（如 my-resource，不能写 URL）。未设置 ANTHROPIC_FOUNDRY_BASE_URL 时必填。 | | | ;; ex="my-resource"
+
+# ---------------- 网络 ----------------
+CLAUDE_CODE_CERT_STORE | CA 证书来源 | network | TLS 连接使用的 CA 证书来源，逗号分隔：bundled 为内置的 Mozilla 证书集，system 为操作系统证书库。默认 bundled,system。 | | 公司网络有自签证书时确保包含 system | def="bundled,system"
+CLAUDE_CODE_CLIENT_CERT | mTLS 客户端证书 | network | 双向 TLS 认证使用的客户端证书文件路径。 | | | ;; tags=enterprise
+CLAUDE_CODE_CLIENT_KEY | mTLS 客户端私钥 | network | 双向 TLS 认证使用的客户端私钥文件路径。 | | | ;; tags=enterprise
+CLAUDE_CODE_CLIENT_KEY_PASSPHRASE | 私钥口令 | network | 加密的 CLAUDE_CODE_CLIENT_KEY 的口令（可选）。 | | | ;; s ;; tags=enterprise
+CLAUDE_CODE_DISABLE_MTLS_RELOAD_ON_STALE_CONNECTION | 连接异常时不重载证书 | network | 设为 1 后，请求遇到连接重置、TLS 握手失败等错误时不再重新读取 mTLS 证书和私钥。 | | | ;; tags=advanced
+CLAUDE_BYTE_STREAM_IDLE_TIMEOUT_MS | 字节流空闲超时 | network | 字节级流式空闲监控的超时（毫秒），设置后优先于 CLAUDE_STREAM_IDLE_TIMEOUT_MS。 | | | ;; u=ms ;; tags=advanced
+CLAUDE_CODE_DISABLE_NONSTREAMING_FALLBACK | 禁用非流式回退 | network | 设为 1 禁用「流式请求中途失败时改用非流式重试」。代理或网关导致回退后工具被重复执行时使用。 | | |
+CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS | 去掉实验性 Beta 头 | network | 设为 1 从请求中移除预发布的 anthropic-beta 头及配套字段（如 defer_loading）。代理网关或第三方中转不支持这些 Beta 功能、报 400 错误时使用。 | | 用第三方中转遇到请求参数错误时首先尝试开启
+
+# ---------------- 工具与 Shell ----------------
+BASH_DEFAULT_TIMEOUT_MS | 命令默认超时 | tools | 前台 Bash / PowerShell 命令的默认超时（毫秒），默认 120000（2 分钟）。 | "300000" | 构建、测试经常超过 2 分钟，调到 5 分钟可减少命令被中断 | type=integer ;; u=ms ;; def="120000"
+BASH_MAX_TIMEOUT_MS | 命令最大超时 | tools | 模型可以为前台 Bash / PowerShell 命令设置的最大超时（毫秒），默认 600000（10 分钟）。 | | | ;; type=integer ;; u=ms ;; def="600000"
+BASH_MAX_OUTPUT_LENGTH | 命令输出读取上限 | tools | Claude Code 读回命令结果的最大字符数（默认 30000，最大 150000）。如果设置了 bashOutputMaxChars，则忽略此变量。 | | | ;; type=integer ;; u=字符 ;; def="30000"
+CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR | 命令后回到项目目录 | tools | 设为 1 后主会话中每条 Bash / PowerShell 命令执行完都回到原工作目录，避免 cd 影响后续命令。 | | 可避免 Claude 执行 cd 后在错误目录继续操作 | type=boolean ;; et=1
+CLAUDE_CODE_BASH_EDIT_DIFF | 命令改动差异 | tools | 设为 0 关闭 Bash 命令改动文件的差异显示，设为 1 在所有权限模式下记录。优先于 bashEditDiffEnabled 设置。 | | | ;; type=enum ;; enum=0:关闭,1:总是记录
+CLAUDE_CODE_BS_AS_CTRL_BACKSPACE | 退格键解释 | ui | 设为 0 把 0x08（^H）当作普通退格，设为 1 当作 Ctrl+Backspace（删除整个单词）。Windows 上默认按 Ctrl+Backspace 处理。 | | 按退格一次删掉一个词时设为 0 | type=enum ;; enum=0:普通退格,1:Ctrl+Backspace
+CLAUDE_CODE_DISABLE_ATTACHMENTS | 禁用 @ 附件展开 | tools | 设为 1 后 @ 提及的文件以纯文本发送，不再展开为文件内容。项目和本地设置中无效。 | | |
+CLAUDE_CODE_DISABLE_FILE_MENTIONS | 不展开 @ 文件 | tools | 设为 1 后不展开 @ 提及的文件和目录，Claude 只收到路径并用文件工具自行读取。项目和本地设置中无效。 | | |
+CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD | 加载 --add-dir 的记忆文件 | context | 设为 1 后也加载 --add-dir 指定目录中的 CLAUDE.md、.claude/CLAUDE.md、.claude/rules/*.md 和 CLAUDE.local.md（默认不加载）。 | | |
+CLAUDE_CODE_DISABLE_CLAUDE_MDS | 不加载 CLAUDE.md | context | 设为 1 不加载任何 CLAUDE.md 记忆文件（用户、项目和自动记忆都不加载）。 | | |
+CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS | 移除内置 Git 指令 | context | 设为 1 从上下文中移除内置的提交与 PR 工作流指令和 git 状态快照，优先于 includeGitInstructions 设置。 | | |
+CLAUDE_CODE_AUTOMOUNT_ROOTS | 跳过的自动挂载根目录 | paths | 向上查找 CLAUDE.md、技能、.mcp.json 时跳过的自动挂载根目录（如 NFS 挂载点），避免查找时等待挂载。多个用分隔符隔开。 | | | ;; tags=advanced ;; ex="/net:/home"
+
+# ---------------- 子代理与后台 ----------------
+CLAUDE_ASYNC_AGENT_STALL_TIMEOUT_MS | 子代理停滞超时 | agents | 子代理（2.1.286 起也包括工作流代理）无进展时的超时（毫秒），默认 600000（10 分钟）。 | | | ;; u=ms ;; def="600000"
+CLAUDE_AUTO_BACKGROUND_TASKS | 长任务自动转后台 | agents | 设为 1 强制开启：子代理运行约两分钟后自动转入后台。 | | |
+CLAUDE_AGENT_SDK_DISABLE_BUILTIN_AGENTS | 禁用内置子代理（SDK） | agents | 设为 1 禁用所有内置子代理类型（Explore、Plan、general-purpose 等），仅在非交互模式（-p）生效，适合 SDK 用户从零定制。 | | | ;; tags=sdk
+CLAUDE_AGENT_SDK_MCP_NO_PREFIX | 不加 MCP 工具前缀（SDK） | agents | 设为 1 后 SDK 创建的 MCP 服务器工具不加 mcp__<服务器>__ 前缀，使用原名。仅 SDK 使用。 | | | ;; tags=sdk
+CLAUDE_CODE_DISABLE_EXPLORE_PLAN_AGENTS | 禁用 Explore / Plan 子代理 | agents | 设为 1 禁用内置的 Explore 和 Plan 子代理，Claude 改用搜索工具或通用子代理探索代码。 | | |
+CLAUDE_CODE_DISABLE_BACKGROUND_TASKS | 禁用后台任务 | agents | 设为 1 移除 Bash、PowerShell 和子代理工具的 run_in_background 参数，关闭 Ctrl+B 快捷键，也不再自动把长任务转入后台。 | | |
+CLAUDE_CODE_BG_TASKS_REPORT_RUNNING | 后台任务运行状态上报 | agents | 设为 0 后，非交互会话即使仍有后台任务，也在每个回合结束时向宿主报告空闲状态。 | | | ;; type=enum ;; enum=0:回合结束即报告空闲 ;; tags=advanced
+CLAUDE_CODE_DISABLE_BG_EXIT_HANDOFF | 后台会话不交接 | agents | 设为 1 后，后台会话的进程被停止、重启或更新时直接终止进行中的工作，而不是交给下一个进程继续。 | | | ;; tags=advanced
+CLAUDE_CODE_DISABLE_BG_SHELL_PRESSURE_REAP | 内存紧张时不终止后台命令 | agents | 设为 1 后，在 macOS 和 Linux 上系统报告内存严重不足时，不再自动终止后台 Shell 命令。 | | | ;; p=macos,linux
+CLAUDE_CODE_DISABLE_BG_STABLE_PATH | 后台会话不用固定路径 | agents | 仅 macOS 原生安装：设为 1 让后台会话直接从安装的程序运行，而不是 ~/.local/share/claude/ClaudeCode.app；macOS 可能因此再次请求文件夹访问等权限。 | | | ;; p=macos ;; tags=advanced
+CLAUDE_CODE_DISABLE_AGENT_VIEW | 禁用代理视图 | agents | 设为 1 关闭后台代理与代理视图（claude agents、--bg、/background、按需守护进程），等同于 disableAgentView 设置。 | | |
+CLAUDE_CODE_DISABLE_CRON | 禁用定时任务 | agents | 设为 1 禁用会话内的定时任务：/loop 和 CronCreate 不可用，已安排的任务也会停止。 | | |
+CLAUDE_CODE_DISABLE_MCP_TASK_BACKGROUND | MCP 任务前台等待 | mcp | 设为 1 后交互会话中会等待 MCP 任务的结果（开启自动后台时仍会在两分钟后转入后台）。需要 2.1.304 及以上。 | | | ;; type=boolean ;; et=1
+
+# ---------------- 上下文与压缩 ----------------
+CLAUDE_AUTOCOMPACT_PCT_OVERRIDE | 自动压缩触发百分比 | context | 自动压缩窗口用到百分之多少时触发压缩（1~100）。只能调低（更早压缩），高于默认值的会被忽略。 | | 想更早压缩、保持回复质量时可设 70~80 | type=integer ;; u=% ;; min=1 ;; max=100
+CLAUDE_CODE_AUTO_COMPACT_WINDOW | 自动压缩窗口 | context | 自动压缩窗口大小：上下文达到多少 token 前触发压缩，范围 100000~1000000。2.1.304 起支持 200k 这样的写法。 | | 用 1M 上下文模型但想控制每次请求开销时，可设 200000~400000 | ex="400000"
+CLAUDE_CODE_DISABLE_1M_CONTEXT | 关闭 1M 上下文 | context | 设为 1 关闭 1M 上下文窗口：从模型选择器移除 [1m] 变体，默认使用 1M 窗口的模型也限制在 200K。 | | 中转服务不支持 1M 上下文、出现报错时开启
+CLAUDE_CODE_DISABLE_AUTO_MEMORY | 禁用自动记忆 | context | 设为 1 禁用自动记忆；设为 0 即使在 --bare 模式或 autoMemoryEnabled 为 false 时也强制开启。 | | | ;; ef=0
+CLAUDE_CODE_DISABLE_FILE_CHECKPOINTING | 禁用文件检查点 | context | 设为 1 禁用文件检查点，/rewind 将无法恢复代码改动。优先于 fileCheckpointingEnabled 设置。 | | 不建议开启
+
+# ---------------- 功能开关 ----------------
+CCR_FORCE_BUNDLE | 云端会话上传本地代码 | remote | 设为 1 让 claude --cloud 打包上传本地仓库，而不是从远程仓库克隆。 | | 本地有未推送改动时使用 |
+CLAUDE_CODE_DISABLE_ARTIFACT | 禁用 Artifact 工具 | remote | 设为 1 关闭 Artifact 工具（把会话输出发布为 claude.ai 上的私有网页），设置后任何 settings 文件都无法再开启。 | | | ;; dep=也可以在 settings 中设置 enableArtifact: false ;; by=enableArtifact
+CLAUDE_CODE_ARTIFACT_AUTO_OPEN | 新 Artifact 自动打开 | remote | 设为 0 发布新 Artifact 时不自动打开浏览器。 | | | ;; type=enum ;; enum=0:不自动打开
+CLAUDE_CODE_ARTIFACT_COMMENTS | 读取 Artifact 评论 | remote | 设为 0 后 Claude 不再读取和回复 Artifact 上的评论。需要 2.1.221 及以上。 | | | ;; type=enum ;; enum=0:关闭
+CLAUDE_CODE_ARTIFACT_COMMENTS_AUTOREACT | 自动回复评论 | remote | 设为 0 后 Claude 不会主动回复发给它的评论。需要 2.1.228 及以上。 | | | ;; type=enum ;; enum=0:关闭
+CLAUDE_CODE_ARTIFACT_PUBLISH_EDITS | 发布时顺带修改 | remote | 设为 0 后发布 Artifact 时不顺带做小改动，改为先用文件工具编辑再单独发布。需要 2.1.300 及以上。 | | | ;; type=enum ;; enum=0:关闭
+CLAUDE_CODE_AUTO_MODE_SERVER | 自动模式服务端审核 | features | 设为 0 不请服务端审核自动模式操作，改用 Claude Code 自己的分类器请求。直连 Anthropic API 时需要 2.1.281 及以上。 | | | ;; type=enum ;; enum=0:使用本地分类器
+CLAUDE_CODE_DISABLE_BUNDLED_SKILLS | 禁用内置技能 | features | 设为 1 移除 Claude Code 自带的技能与工作流；/init 等内置命令仍可输入但对模型隐藏。 | | |
+CLAUDE_CODE_DISABLE_CFC_PROMPT | 省略 Chrome 提示 | features | 供嵌入 Claude Code 的宿主使用：设为 1 保留 Claude in Chrome 浏览器工具，但省略系统提示中的 Chrome 段落和对应内置技能。 | | | ;; tags=advanced
+CLAUDE_CODE_DISABLE_DANGEROUS_RM_TIMEOUT | 关闭危险删除限时 | sandbox | 设为 1 关闭 auto 与 bypassPermissions 模式下对关键路径删除的限时与拒绝，改为交给分类器或弹出不限时确认。 | | 不建议开启 | tags=security
+CLAUDE_CODE_DISABLE_INLINE_SHELL_RM_PROMPT | 不检查 -c 脚本中的删除 | sandbox | 设为 1 后不再读取 bash -c '…' 这类内联脚本来检测关键路径删除（仍会检查变量与位置参数目标）。 | | 不建议开启 | tags=security
+CLAUDE_CODE_DISABLE_MOUNTED_DRIVE_RM_PROMPT | 关闭挂载盘删除提示 | sandbox | 设为 1 关闭对 /Volumes/USB 这类挂载盘路径删除的确认。必须在启动 Claude Code 的环境中设置，写在 settings 的 env 中无效。 | | | ;; tags=security
+CLAUDE_CODE_DISABLE_FAST_MODE | 禁用快速模式 | features | 设为 1 禁用快速模式。 | | |
+CLAUDE_CODE_DISABLE_FEATURE_FLAGS | 禁止拉取功能开关 | privacy | 设为 1 关闭功能开关拉取（需要 2.1.319 及以上），Remote Control 等依赖功能开关的特性将不可用；遥测事件记录不受影响。 | | |
+CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY | 关闭满意度调查 | privacy | 设为 1 关闭「How is Claude doing?」会话质量调查。设置了 DISABLE_TELEMETRY、DO_NOT_TRACK 或 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC 时也会关闭。 | true | 减少打扰，不影响任何功能
+CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC | 关闭非必要网络流量 | privacy | 设为任意非空值（如 1）关闭非必要流量：自动更新、遥测、错误上报、/feedback、模型起草的反馈、更新日志、PR 状态徽章检查等。 | | 注重隐私时开启；自动更新也会关闭，需手动 claude update | type=boolean ;; et=1
+CLAUDE_CODE_DISABLE_NOTIFICATION_PRESENCE_CHECK | 通知不检测是否在场 | notifications | 设为 1 后，即使你正在终端中输入，也会发送 PushNotification 的桌面通知。默认检测到最近有键盘输入时跳过通知。 | | |
+CLAUDE_CODE_DISABLE_OFFICIAL_MARKETPLACE_AUTOINSTALL | 不自动添加官方插件市场 | features | 设为 1 禁止首次启动时自动注册官方插件市场。 | | |
+CLAUDE_CODE_ATTRIBUTION_HEADER | 系统提示署名块 | privacy | 设为 0 从系统提示开头省略署名块（包含客户端版本和提示指纹）。直连 Anthropic API 时不影响缓存；部分第三方网关因该块变化导致缓存失效时可设为 0。 | | 使用第三方中转且发现缓存命中率低时设为 0 | type=enum ;; enum=0:不发送署名块
+
+# ---------------- 界面与终端 ----------------
+CLAUDE_CODE_ACCESSIBILITY | 无障碍光标 | ui | 设为 1 保持终端原生光标可见，关闭反色光标指示，便于 macOS 缩放等屏幕放大工具跟踪光标。 | | |
+CLAUDE_AX_SCREEN_READER | 屏幕阅读器模式 | ui | 设为 1 输出适合屏幕阅读器的纯文本（无装饰边框和动画）；设为 0 即使 axScreenReader 为 true 也强制关闭。--ax-screen-reader 参数优先。 | | | ;; ef=0
+CLAUDE_AX_PREPARK_MS | 读屏写入延迟 | ui | 屏幕阅读器模式下写入新行或变化行前等待的毫秒数，默认 0，最大 5000。 | | | ;; u=ms ;; def="0"
+CLAUDE_AX_STARTUP_QUIET_MS | 读屏启动静默时间 | ui | 屏幕阅读器模式下，启动确认行之后推迟首次界面渲染的毫秒数（默认 3000），让读屏软件先完整朗读。 | | | ;; u=ms ;; def="3000"
+CLAUDE_CODE_ALT_SCREEN_FULL_REPAINT | 全屏模式整屏重绘 | ui | 设为 1 在全屏渲染下每帧重绘整个屏幕，而不是增量更新。全屏模式出现残留或错位的文字时使用。 | | |
+CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN | 禁用全屏渲染 | ui | 设为 1 禁用全屏渲染，使用传统渲染器，对话保留在终端原生滚动区，Cmd+F 和 tmux 复制模式照常可用。优先于 CLAUDE_CODE_NO_FLICKER。 | | |
+CLAUDE_CODE_DISABLE_MOUSE | 禁用鼠标 | ui | 设为 1 在全屏渲染下关闭鼠标跟踪（PgUp / PgDn 键盘滚动仍可用），保留终端原生的选中即复制。 | | 习惯用鼠标选中复制文本时开启
+CLAUDE_CODE_DISABLE_MOUSE_CLICKS | 禁用鼠标点击 | ui | 设为 1 在全屏渲染下关闭点击、拖拽和悬停处理，保留滚轮滚动。 | | |
+
+# ---------------- 远程与云端 ----------------
+CLAUDE_CLIENT_PRESENCE_FILE | 在场标记文件 | remote | 外部工具（如锁屏监听程序）在解锁时创建、锁屏时删除的文件路径。文件存在时跳过 Remote Control 的手机推送，避免人在电脑前还收到通知。 | | | ;; tags=advanced
+CLAUDE_CODE_BRIDGE_SESSION_ID | 远程会话 ID（自动） | remote | 会话有活动的 Remote Control 连接时，Claude Code 自动在 Bash 与 hook 子进程中设置为会话 ID（session_ 开头），无需手动设置。 | | 由 Claude Code 自动设置 | tags=internal
+
+# ---------------- 自动设置的标识 ----------------
+CLAUDECODE | 运行在 Claude Code 中（自动） | other | Claude Code 在它启动的子进程（Bash / PowerShell 工具、tmux、hook、状态栏命令、stdio MCP 服务器）中自动设为 1，IDE 插件的集成终端也会设置。脚本可据此判断是否由 Claude Code 调用。 | | 由 Claude Code 自动设置，无需手动配置 | tags=internal
+CLAUDE_CODE_CHILD_SESSION | 子会话标识（自动） | other | Claude Code 在 Bash、PowerShell、Monitor 工具、hook 和状态栏命令的子进程中自动设为 1（stdio MCP 服务器子进程不设置）。 | | 由 Claude Code 自动设置 | tags=internal
+
+# ---------------- 调试与诊断 ----------------
+CLAUDE_CODE_DEBUG_LOGS_DIR | 调试日志文件路径 | debug | 覆盖调试日志文件路径（虽然名字叫 DIR，实际是文件路径）。需另外通过 --debug、/debug 或 DEBUG 环境变量开启调试。默认 ~/.claude/debug/<会话 ID>.txt。 | | | ;; ex="~/claude-debug.txt"
+CLAUDE_CODE_DEBUG_LOG_LEVEL | 调试日志级别 | debug | 写入调试日志的最低级别：verbose、debug（默认）、info、warn、error。 | | | ;; type=enum ;; enum=verbose:最详细,debug:调试（默认）,info:信息,warn:警告,error:错误
+CLAUDE_CODE_CONFIG_LOCK_WAIT_MS | 配置锁等待时间 | debug | claude mcp add 等修改 user / local 范围 MCP 服务器的命令，等待 ~/.claude.json 文件锁的毫秒数（不设置约 10~20 秒）。 | | | ;; u=ms ;; tags=advanced
+
+# ---------------- 企业 ----------------
+BETA_TRACING_ENDPOINT | Beta 追踪地址 | telemetry | 详细 Beta 追踪的 OTLP/HTTP 地址：配合 ENABLE_BETA_TRACING_DETAILED=1，日志和追踪改发到这里。项目和本地设置中无效。 | | | ;; ph=<YOUR_OTLP_ENDPOINT> ;; tags=advanced
+CLAUDE_CODE_AUTO_CONNECT_IDE | 自动连接 IDE | ide | 覆盖自动连接 IDE 的行为：默认在支持的 IDE 集成终端中启动时自动连接；false 阻止连接，true 在自动检测失败时强制尝试。 | | | ;; type=enum ;; enum=true:强制连接,false:不连接
+CLAUDE_CODE_DISABLE_AUTH_REFRESH_LOCK | 各自运行认证刷新 | provider | 设为 1 让每个 Claude Code 进程自己运行 gcpAuthRefresh / awsAuthRefresh，而不是等待其他进程运行完。需要 2.1.286 及以上。 | | | ;; tags=advanced
+CLAUDE_CODE_AUTO_BACKGROUND_WORKER_CHECKIN_SECONDS | 后台工作者签到（旧） | agents | 已在 2.1.283 移除。 | | | ;; dep=请改用 CLAUDE_CODE_WORKER_CHECKIN_SCHEDULE ;; by=CLAUDE_CODE_WORKER_CHECKIN_SCHEDULE
+CLAUDE_CODE_CONNECT_TIMEOUT_MS | 连接超时（旧） | network | 已在 2.1.186 移除，现在无效。 | | | ;; dep=请改用 API_TIMEOUT_MS ;; by=API_TIMEOUT_MS

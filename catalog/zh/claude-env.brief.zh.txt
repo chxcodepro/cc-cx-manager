@@ -1,0 +1,97 @@
+# Claude Code 环境变量 一句话说明：改这个变量有什么效果（显示在界面「?」的第一行）
+# 格式：key | 说明（尽量 30 字以内，最多 40 字）
+ANTHROPIC_API_KEY | 用这个 API Key 调用 Claude，按 API 计费
+ANTHROPIC_AUTH_TOKEN | 中转或网关的访问令牌，代替 API Key
+ANTHROPIC_BASE_URL | 把请求发到这个地址，用于中转或网关
+ANTHROPIC_CUSTOM_HEADERS | 每个请求附加的自定义请求头
+ANTHROPIC_BETAS | 抢先启用某些 API Beta 功能
+ANTHROPIC_PROFILE | 用哪个 Anthropic 配置档登录
+CLAUDE_CODE_API_KEY_HELPER_TTL_MS | apiKeyHelper 脚本多久重新获取一次密钥
+CLAUDE_CODE_OAUTH_TOKEN | 用令牌代替 /login 登录，适合自动化
+CLAUDE_CODE_OAUTH_REFRESH_TOKEN | 用刷新令牌登录，不用打开浏览器
+CLAUDE_CODE_OAUTH_SCOPES | 刷新令牌的权限范围，配合刷新令牌使用
+ANTHROPIC_MODEL | 使用哪个模型，中转时填服务商的模型名
+ANTHROPIC_DEFAULT_MODEL | 新会话默认使用的模型
+ANTHROPIC_DEFAULT_OPUS_MODEL | 选 opus 时实际使用的模型
+ANTHROPIC_DEFAULT_OPUS_MODEL_SUPPORTED_CAPABILITIES | 告诉 Claude Code 这个 Opus 模型支持哪些能力
+ANTHROPIC_DEFAULT_SONNET_MODEL | 选 sonnet 时实际使用的模型
+ANTHROPIC_DEFAULT_SONNET_MODEL_SUPPORTED_CAPABILITIES | 告诉 Claude Code 这个 Sonnet 模型支持哪些能力
+ANTHROPIC_DEFAULT_HAIKU_MODEL | 选 haiku 时实际使用的模型，后台小任务也用它
+ANTHROPIC_DEFAULT_FABLE_MODEL | 选 fable 时实际使用的模型
+ANTHROPIC_CUSTOM_MODEL_OPTION | 在 /model 列表里多加一个自定义模型
+ANTHROPIC_CUSTOM_MODEL_OPTION_DESCRIPTION | 自定义模型在列表里显示的说明
+ANTHROPIC_CUSTOM_MODEL_OPTION_SUPPORTED_CAPABILITIES | 自定义模型支持哪些能力
+CLAUDE_CODE_DISABLE_LEGACY_MODEL_REMAP | 不再把旧版 Opus 自动换成新版
+CLAUDE_CODE_AUTO_MODE_MODEL | 自动权限模式用哪个模型判断操作是否安全
+CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK | 消息被拦截时不再自动换模型
+CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY | 从网关获取可用模型列表，显示在 /model 中
+CLAUDE_CODE_ENABLE_OPUS_4_7_FAST_MODE | 已无效果，可以删除
+CLAUDE_CODE_GATEWAY_MODEL_DISCOVERY_TIMEOUT_MS | 从网关获取模型列表的超时时间
+CLAUDE_CODE_OPUS_4_6_FAST_MODE_OVERRIDE | 已无效果，可以删除
+CLAUDE_CODE_PROMPT_CACHE_TTL | 提示缓存保留 5 分钟还是 1 小时，影响费用
+CLAUDE_CODE_SUBAGENT_MODEL | 子代理默认使用的模型
+CLAUDE_CODE_SUBAGENT_MODEL_FORCE | 所有子代理强制使用同一个模型
+CLAUDE_CODE_SUBAGENT_PROMPT_CACHE_TTL | 子代理等后台请求的提示缓存时长
+DISABLE_PROMPT_CACHING | 关闭提示缓存，费用会明显增加
+ENABLE_PROMPT_CACHING_1H | 缓存保留 1 小时，频繁停顿时更省钱
+ENABLE_PROMPT_CACHING_1H_BEDROCK | 已弃用，改用 ENABLE_PROMPT_CACHING_1H
+FORCE_PROMPT_CACHING_5M | 强制只缓存 5 分钟
+CLAUDE_CODE_ALWAYS_ENABLE_EFFORT | 总是发送思考强度参数，适合网关自定义模型
+CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING | 改用固定的思考预算（仅部分旧模型有效）
+CLAUDE_CODE_DISABLE_THINKING | 完全不让模型思考，兼容不支持的网关
+CLAUDE_CODE_DISABLE_ULTRATHINK | 提示里写 ultrathink 不再加强思考
+CLAUDE_CODE_EFFORT_LEVEL | 思考强度：越高越仔细，但更慢、更费 token
+CLAUDE_CODE_MAX_OUTPUT_TOKENS | 每次回复最多输出多少 token
+DISABLE_INTERLEAVED_THINKING | 兼容不支持交错思考的网关
+MAX_THINKING_TOKENS | 思考最多用多少 token，新模型一般不用设
+ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION | 已弃用：Haiku 级模型单独使用的 AWS 区域
+CLAUDE_CODE_DISABLE_MODEL_ACCESS_FALLBACK | 模型无权限时直接报错，不换旧模型
+ANTHROPIC_AWS_API_KEY | Claude Platform on AWS 的 API Key
+ANTHROPIC_AWS_BASE_URL | Claude Platform on AWS 的接口地址
+ANTHROPIC_AWS_WORKSPACE_ID | Claude Platform on AWS 的工作区 ID，必填
+ANTHROPIC_BEDROCK_BASE_URL | Bedrock 的接口地址，用于自定义端点或网关
+ANTHROPIC_BEDROCK_REGION_PREFIX | 优先使用的跨区域推理前缀，如 us、eu
+ANTHROPIC_BEDROCK_SERVICE_TIER | Bedrock 服务等级，如 flex 更便宜但更慢
+CLAUDE_CODE_AWS_CHAIN_RESOLVE_TIMEOUT_MS | 获取 AWS 凭据最多等多久
+CLAUDE_CODE_DISABLE_BEDROCK_CONTENT_TYPE_DEFAULT | Bedrock 兼容选项，一般不用设置
+CLAUDE_CODE_DISABLE_BEDROCK_CONTENT_TYPE_GUARD | 网关改写响应头时跳过 Bedrock 格式检查
+ANTHROPIC_VERTEX_BASE_URL | Vertex 的接口地址
+ANTHROPIC_VERTEX_PROJECT_ID | Vertex 使用的 GCP 项目 ID
+ANTHROPIC_GOOGLE_CLOUD_BASE_URL | Google Cloud 托管版的接口地址
+ANTHROPIC_GOOGLE_CLOUD_LOCATION | Google Cloud 托管版使用的位置
+ANTHROPIC_GOOGLE_CLOUD_PROJECT | Google Cloud 托管版使用的项目 ID
+ANTHROPIC_GOOGLE_CLOUD_WORKSPACE_ID | Google Cloud 托管版的工作区 ID
+ANTHROPIC_FOUNDRY_API_KEY | Microsoft Foundry 的 API Key
+ANTHROPIC_FOUNDRY_AUTH_TOKEN | Microsoft Foundry 的访问令牌
+ANTHROPIC_FOUNDRY_BASE_URL | Microsoft Foundry 资源的完整地址
+ANTHROPIC_FOUNDRY_RESOURCE | Microsoft Foundry 资源名称
+CLAUDE_CODE_DISABLE_AUTH_REFRESH_LOCK | 每个进程各自刷新云平台登录，不互相等待
+CLAUDE_CODE_SKIP_ANTHROPIC_AWS_AUTH | 跳过 AWS 平台认证，由网关负责
+CLAUDE_CODE_SKIP_ANTHROPIC_GOOGLE_CLOUD_AUTH | 跳过 Google Cloud 托管版认证，由网关负责
+CLAUDE_CODE_SKIP_AWS_CRED_CACHE | 每次请求都重新获取 AWS 凭据
+CLAUDE_CODE_SKIP_BEDROCK_AUTH | 跳过 Bedrock 认证，由网关负责
+CLAUDE_CODE_SKIP_FOUNDRY_AUTH | 跳过 Foundry 认证，由网关负责
+CLAUDE_CODE_SKIP_MANTLE_AUTH | 跳过 Mantle 认证，由网关负责
+CLAUDE_CODE_SKIP_MODEL_ACCESS_MEMORY | 不记住哪些模型没有权限
+CLAUDE_CODE_SKIP_VERTEX_AUTH | 跳过 Vertex 认证，由网关负责
+CLAUDE_CODE_USE_ANTHROPIC_AWS | 改用 Claude Platform on AWS 调用 Claude
+CLAUDE_CODE_USE_ANTHROPIC_GOOGLE_CLOUD | 改用 Google Cloud 托管版调用 Claude
+CLAUDE_CODE_USE_BEDROCK | 改用 Amazon Bedrock 调用 Claude
+CLAUDE_CODE_USE_FOUNDRY | 改用 Microsoft Foundry 调用 Claude
+CLAUDE_CODE_USE_MANTLE | 改用 Bedrock Mantle 调用 Claude
+CLAUDE_CODE_USE_VERTEX | 改用 Google Vertex 调用 Claude
+CLAUDE_ENABLE_BYTE_WATCHDOG_BEDROCK | 监控 Bedrock 响应是否卡住
+VERTEX_REGION_CLAUDE_3_5_HAIKU | Vertex 上 Claude 3.5 Haiku 使用的区域
+VERTEX_REGION_CLAUDE_3_5_SONNET | Vertex 上 Claude 3.5 Sonnet 使用的区域
+VERTEX_REGION_CLAUDE_3_7_SONNET | Vertex 上 Claude 3.7 Sonnet 使用的区域
+VERTEX_REGION_CLAUDE_4_0_OPUS | Vertex 上 Claude Opus 4 使用的区域
+VERTEX_REGION_CLAUDE_4_0_SONNET | Vertex 上 Claude Sonnet 4 使用的区域
+VERTEX_REGION_CLAUDE_4_1_OPUS | Vertex 上 Claude Opus 4.1 使用的区域
+VERTEX_REGION_CLAUDE_4_5_OPUS | Vertex 上 Claude Opus 4.5 使用的区域
+VERTEX_REGION_CLAUDE_4_5_SONNET | Vertex 上 Claude Sonnet 4.5 使用的区域
+VERTEX_REGION_CLAUDE_4_6_OPUS | Vertex 上 Claude Opus 4.6 使用的区域
+VERTEX_REGION_CLAUDE_4_6_SONNET | Vertex 上 Claude Sonnet 4.6 使用的区域
+VERTEX_REGION_CLAUDE_4_7_OPUS | Vertex 上 Claude Opus 4.7 使用的区域
+VERTEX_REGION_CLAUDE_4_8_OPUS | Vertex 上 Claude Opus 4.8 使用的区域
+VERTEX_REGION_CLAUDE_5_5_OPUS | Vertex 上 Claude Opus 5.5 使用的区域
+VERTEX_REGION_CLAUDE_5_5_SONNET | Vertex 上 Claude Sonnet 5.5 使用的区域

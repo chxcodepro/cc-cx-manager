@@ -1,0 +1,224 @@
+# Claude Code settings.json 中文叠加层（对应 Claude Code 2.1.327）
+# 格式：key | 标题 | 分类 | 说明 | 推荐值(JSON) | 推荐理由 | 扩展（;; 分隔）
+# 适用文件：~/.claude/settings.json（用户）、.claude/settings.json（项目）、.claude/settings.local.json（本地）、managed-settings.json（托管）
+
+@category general | 通用 | 10 | 最常用的基础设置
+@category model | 模型与推理 | 20 | 默认模型、推理强度、思考与快速模式
+@category permissions | 权限 | 30 | 工具调用的允许 / 询问 / 拒绝规则与权限模式
+@category sandbox | 沙箱 | 40 | 在隔离环境中执行 Bash 命令（文件系统与网络隔离）
+@category hooks | Hooks | 50 | 在工具调用、会话等事件前后自动运行的命令
+@category mcp | MCP 服务器 | 60 | 项目 .mcp.json 服务器审批与 MCP 访问控制
+@category plugins | 插件与市场 | 70 | 插件启用、插件市场来源
+@category ui | 界面与显示 | 80 | 主题、状态栏、提示、动画、输入等终端界面
+@category context | 上下文与记忆 | 90 | 自动压缩、CLAUDE.md、自动记忆
+@category git | Git 与署名 | 100 | 提交 / PR 署名、worktree、PR 链接
+@category shell | Shell 与工具 | 110 | Bash 输出、默认 Shell、文件选择
+@category agents | 子代理与工作流 | 120 | 主线程代理、工作流（Workflows）、多代理
+@category remote | 远程与多端 | 130 | 云端会话、Remote Control、SSH、移动端推送
+@category notifications | 通知 | 140 | 系统通知、移动端通知
+@category updates | 更新与版本 | 150 | 自动更新通道与版本约束
+@category auth | 认证与登录 | 160 | 登录方式、API Key 辅助脚本、云厂商凭据刷新
+@category privacy | 隐私与数据 | 170 | 会话记录保留、反馈调查、同步
+@category enterprise | 企业与托管策略 | 180 | 通常只在 managed-settings.json 中生效的管理员策略
+@category other | 其他 | 190
+
+@prefix permissions. => permissions
+@prefix sandbox. => sandbox
+@prefix statusLine. => ui
+@prefix spinner => ui
+@prefix voice. => ui
+@prefix worktree. => git
+@prefix attribution. => git
+@prefix autoMode. => permissions
+@prefix modelSettings. => model
+@prefix modelPricing. => model
+@prefix modelPicker. => model
+@prefix remote. => remote
+@prefix remoteControl. => remote
+@prefix remoteTools. => remote
+@prefix spellcheck. => ui
+@prefix breakReminder. => ui
+@prefix quietHours. => ui
+@prefix policyHelper. => enterprise
+@prefix autoCompactOfferAnswer. => context
+@prefix fileSuggestion. => shell
+@prefix subagentStatusLine. => ui
+
+# ---------------- 认证与登录 ----------------
+apiKeyHelper | API Key 辅助脚本 | auth | 一个脚本的路径，Claude Code 运行它来获取认证值（输出到标准输出），结果作为 X-Api-Key 和 Authorization: Bearer 请求头发送。适合使用会过期的临时密钥、从密码管理器或公司网关取 token 的场景。刷新间隔由环境变量 CLAUDE_CODE_API_KEY_HELPER_TTL_MS 控制。 | | 只在密钥会过期时使用；固定 Key 直接用 ANTHROPIC_API_KEY | ph=/bin/generate_temp_api_key.sh ;; ex="~/.claude/get-key.sh" ;; tags=security ;; pn.windows=Windows 上可写 .cmd / .ps1 脚本的完整路径，例如 C:\\Users\\me\\get-key.cmd
+proxyAuthHelper | 代理认证辅助命令 | auth | 一条 Shell 命令，输出 Proxy-Authorization 请求头的值，用于需要认证的企业 HTTP 代理（早期体验功能）。 | | | ;; tags=enterprise,advanced ;; ph=get-proxy-auth
+awsCredentialExport | AWS 凭据导出脚本 | auth | 使用 Amazon Bedrock 时，一个输出 AWS 凭据（JSON）的脚本路径，Claude Code 用它获取临时凭据。 | | 仅 Bedrock 用户需要 | ph=/bin/generate_aws_grant.sh
+awsAuthRefresh | AWS 认证刷新脚本 | auth | 使用 Amazon Bedrock 时，用于刷新 AWS 登录状态（如 aws sso login）的脚本或命令，会修改 .aws 目录。凭据过期时自动执行。 | | 仅 Bedrock 用户需要 | ex="aws sso login --profile myprofile"
+gcpAuthRefresh | GCP 认证刷新命令 | auth | 使用 Google Cloud（Vertex / Agent Platform）时，用于刷新 GCP 凭据的命令，例如 gcloud auth application-default login。 | | 仅 Vertex 用户需要 | ex="gcloud auth application-default login"
+forceLoginMethod | 强制登录方式 | auth | 限制只能用某种方式登录：claudeai 为 Claude 订阅账号（个人 / Team / Enterprise），console 为 Console（API 计费），gateway 为企业云网关 OIDC 设备流程。 | | 个人用户无需设置 | enum=claudeai:Claude 订阅账号,console:Console API 计费,gateway:企业云网关 ;; tags=enterprise
+forceLoginGatewayUrl | 预填网关地址 | auth | 配合 forceLoginMethod 为 gateway 使用：登录时预先填好的云网关地址。仅在托管设置中生效；没有任何托管设置的机器上也可写在用户设置里。 | | | ;; scopes=user,managed ;; tags=enterprise ;; ph=<YOUR_GATEWAY_URL>
+gatewayInternalNetworks | 网关所在内网段 | auth | 企业云网关所在的公网 IPv4 网段（最多 4 个，/8 到 /32，不能重叠），让 /login 能访问位于这些网段内的网关。私有网段无需配置。 | | | ;; tags=enterprise,advanced ;; ex=["203.0.113.0/24"]
+forceLoginOrgUUID | 限定登录组织 | auth | 要求 OAuth 登录的账号必须属于指定组织（UUID，可写单个字符串或数组）。在托管设置中设置后，不属于这些组织的账号会登录失败。 | | | ;; tags=enterprise ;; ex="00000000-0000-0000-0000-000000000000"
+allowNestedModelAccessUnderForceLogin | 允许嵌套使用模型权限 | auth | 仅用于自托管 runner 主机：在本机托管设置限制了登录组织或方式时，允许由 runner 会话命令启动的 Claude Code 借用 runner 的模型访问权限（--nested-model-access）。 | | | ;; tags=enterprise,advanced
+otelHeadersHelper | OTel 请求头脚本 | auth | 一个脚本路径，输出 OpenTelemetry 导出时附带的动态请求头（JSON），常用于带过期 token 的监控后端。 | | 只有启用 OTel 监控且需要动态认证时才设置 | ph=/bin/generate_otel_headers.sh ;; tags=advanced
+
+# ---------------- 企业 / 托管 ----------------
+processWrapper | 企业启动器前缀 | enterprise | 企业启动器的命令前缀（argv），用于后台代理守护进程、其托管的会话与工作进程等后台进程。与环境变量 CLAUDE_CODE_PROCESS_WRAPPER 等价，环境变量优先。 | | | ;; tags=enterprise,advanced ;; ex="/usr/local/bin/corp-launcher --"
+policyHelper | 策略辅助程序 | enterprise | 启动时运行的可执行程序，由它计算并输出托管设置。只在管理员控制的策略来源中生效。 | | | ;; scopes=managed ;; tags=enterprise,managed-only
+policyHelper.path | 程序路径 | enterprise | 策略辅助程序的绝对路径。 | | | ;; scopes=managed ;; tags=enterprise,managed-only
+policyHelper.timeoutMs | 超时时间 | enterprise | 等待策略辅助程序输出的最长时间，最少 1000 毫秒。 | | | ;; u=ms ;; scopes=managed ;; tags=enterprise,managed-only
+policyHelper.refreshIntervalMs | 刷新间隔 | enterprise | 重新运行策略辅助程序的间隔（毫秒），也可以是特殊字面值。 | | | ;; scopes=managed ;; tags=enterprise,managed-only ;; ex=3600000
+policyHelpers | 分平台策略辅助程序 | enterprise | policyHelper 的分平台版本，按 macos / linux / windows / wsl 分别配置，另有可选的 default 条目（静态的托管设置对象）。内部功能。 | | | ;; scopes=managed ;; tags=enterprise,managed-only,internal ;; ex={"macos":{"path":"/usr/local/bin/policy-helper"}}
+wslInheritsWindowsSettings | WSL 继承 Windows 策略 | enterprise | 在 Windows 管理员策略源（HKLM 注册表或 C:\\Program Files\\ClaudeCode\\managed-settings.json）中设为 true 后，WSL 内的 Claude Code 除 /etc/claude-code 外，还会读取整条 Windows 策略链，且 Windows 来源优先。 | | | ;; scopes=managed ;; tags=enterprise,managed-only ;; p=windows,linux ;; pn.linux=只在 WSL 中有意义
+attributionProjectPolicy | 默认用量归属项目 | enterprise | 组织层面 attributionProject 的默认值。只在托管设置中生效。 | | | ;; scopes=managed ;; tags=enterprise,managed-only
+attributionProjectPolicy.default | 默认项目 | enterprise | 当环境变量 CLAUDE_CODE_ATTRIBUTION_PROJECT 和 attributionProject 都没有指定时使用的项目 ID（claude_proj_ 或 chan_ 开头，或其 UUID）。 | | | ;; scopes=managed ;; tags=enterprise,managed-only
+allowManagedHooksOnly | 只允许托管 Hooks | enterprise | 在托管设置中设为 true 时，只运行托管设置中的 hooks 和托管设置启用的插件 hooks；用户、项目、本地设置里的 hooks 以及用户自行安装插件的 hooks 都会被忽略。 | | | ;; scopes=managed ;; tags=enterprise,managed-only,security
+allowedHttpHookUrls | HTTP Hook 地址白名单 | enterprise | HTTP 类型 hook 允许请求的 URL 模式列表，支持 * 通配符（如 https://hooks.example.com/*）。设置后不匹配的地址会被拦截；空数组表示禁止所有 HTTP hook；不设置则不限制。 | | | ;; tags=enterprise,security ;; ex=["https://hooks.example.com/*"]
+httpHookAllowedEnvVars | HTTP Hook 可用变量白名单 | enterprise | HTTP hook 可以插入到请求头中的环境变量名白名单。设置后，每个 hook 实际可用的变量是其 allowedEnvVars 与此列表的交集。 | | | ;; tags=enterprise,security ;; ex=["MY_HOOK_TOKEN"]
+allowManagedPermissionRulesOnly | 只允许托管权限规则 | enterprise | 在托管设置中设为 true 时，忽略用户、项目、本地设置及 --allowedTools 中的权限规则，只有托管设置可以添加允许规则。 | | | ;; scopes=managed ;; tags=enterprise,managed-only,security
+allowManagedMcpServersOnly | 只用托管 MCP 白名单 | enterprise | 在托管设置中设为 true 时，allowedMcpServers 只从托管设置读取；deniedMcpServers 仍会合并所有来源，用户可以自行再禁用服务器。 | | | ;; scopes=managed ;; tags=enterprise,managed-only
+allowAllClaudeAiMcps | 允许 claude.ai 云端连接器 | enterprise | 在托管设置中设为 true 时，即使存在 managed-mcp.json 的独占锁定，也允许 claude.ai 的云端 MCP 连接器同时加载。 | | | ;; scopes=managed ;; tags=enterprise,managed-only
+allowClaudeInChromeWithManagedMcp | 允许 Claude in Chrome | enterprise | 在设备托管设置中设为 true 时，内置的 Claude in Chrome MCP 服务器可以与 managed-mcp.json 同时运行，而不被其独占锁定拦截。 | | | ;; scopes=managed ;; tags=enterprise,managed-only
+strictPluginOnlyCustomization | 只允许插件方式定制 | enterprise | 在托管设置中设置后，对列出的类别（skills、agents、hooks、mcp）只允许通过插件定制，屏蔽 ~/.claude 与项目 .claude 下的同类文件、settings.json 中的 hooks、.mcp.json 等来源。true 表示锁定全部四类，false 表示不锁定。 | | | ;; scopes=managed ;; tags=enterprise,managed-only ;; ex=["skills","hooks"]
+managedMcpServers | 组织下发的 MCP 服务器 | enterprise | 组织为每个用户提供的 MCP 服务器，按名称为键，结构同 .mcp.json；只接受 http 和 sse 类型。用户无法移除，deniedMcpServers 仍然生效。只在托管设置中生效。 | | | ;; scopes=managed ;; tags=enterprise,managed-only ;; ex={"docs":{"type":"http","url":"<YOUR_MCP_URL>"}}
+allowedMcpServers | MCP 服务器白名单 | enterprise | 企业允许用户使用的 MCP 服务器列表，约束用户自行添加的服务器（用户 / 项目 / 本地配置、--mcp-config、插件、claude.ai 连接器等）。每项可按 serverName、serverCommand 或 serverUrl 匹配。 | | | ;; tags=enterprise,security ;; ex=[{"serverName":"github"},{"serverUrl":"https://mcp.example.com/*"}]
+deniedMcpServers | MCP 服务器黑名单 | enterprise | 明确禁止的 MCP 服务器列表，在所有范围（包括企业范围）内都会被拦截；同时出现在白名单和黑名单时以黑名单为准。个人也可以用它禁用某个服务器。 | | | ;; tags=security ;; ex=[{"serverName":"filesystem"}]
+prependPlugins | 优先执行的托管插件 | enterprise | 托管插件（plugin@marketplace）中需要最先、最外层执行其 hooks 的列表，按顺序排列。只在托管设置中生效。 | | | ;; scopes=managed ;; tags=enterprise,managed-only ;; ex=["audit@corp-tools"]
+appendPlugins | 最后执行的托管插件 | enterprise | 托管插件中需要在其他插件之后、最内层执行 hooks 的列表。只在托管设置中生效。 | | | ;; scopes=managed ;; tags=enterprise,managed-only ;; ex=["formatter@corp-tools"]
+strictKnownMarketplaces | 插件市场来源白名单 | enterprise | 企业严格限定可添加的插件市场来源。在托管设置中设置后，只能添加列表中的来源；github 来源可用 owner/* 通配整个账号。 | | | ;; scopes=managed ;; tags=enterprise,managed-only,security ;; ex=[{"source":"github","repo":"my-org/*"}]
+allowedMarketplaces | 市场白名单（别名） | enterprise | strictKnownMarketplaces 的别名，仅托管设置可用。不要和 strictKnownMarketplaces 同时设置，旧版本客户端不识别此别名。 | | | ;; scopes=managed ;; tags=enterprise,managed-only ;; by=strictKnownMarketplaces ;; ex=[{"source":"github","repo":"my-org/*"}]
+blockedMarketplaces | 插件市场黑名单 | enterprise | 在托管设置中禁止添加的插件市场来源，github 来源同样支持 owner/* 通配。 | | | ;; scopes=managed ;; tags=enterprise,managed-only,security ;; ex=[{"source":"github","repo":"untrusted/*"}]
+disableCommandPluginSources | 禁用命令型插件源 | enterprise | 控制 command 类型的插件来源（插件目录由市场声明的命令在本机生成）：true 永不安装或更新这类插件（命令不会执行），false 明确允许；不设置时跟随 allowManagedHooksOnly。 | | | ;; tags=enterprise,security
+disableSideloadFlags | 禁用侧载启动参数 | enterprise | 在托管设置中设为 true 时，启动时拒绝 --plugin-dir、--plugin-url、--agents 和非 SDK 的 --mcp-config 参数，堵住绕过市场白名单的途径。 | | | ;; scopes=managed ;; tags=enterprise,managed-only,security
+pluginSuggestionMarketplaces | 插件推荐市场白名单 | enterprise | 允许出现在上下文安装建议中的插件市场名称；不在名单内的市场声明的建议不会显示。只在托管设置中生效。 | | | ;; scopes=managed ;; tags=enterprise,managed-only ;; ex=["corp-tools"]
+parentSettingsBehavior | 父级设置合并方式 | enterprise | 控制 SDK 父级设置（Options.managedSettings / --managed-settings）是否叠加在管理员设置之下。first-wins（默认）丢弃父级设置，只用管理员来源；merge 则合并。 | | | ;; scopes=managed ;; tags=enterprise,managed-only,advanced ;; enum=first-wins:只用最高来源,merge:合并
+managedSourcesBehavior | 托管来源合并方式 | enterprise | 多个托管来源（服务端下发 > MDM / 注册表 > managed-settings.json）同时存在时的组合方式：first-wins（默认）只使用优先级最高的那个；merge 按固定优先级深度合并。需要 2.1.242 及以上版本。 | | | ;; scopes=managed ;; tags=enterprise,managed-only,advanced ;; enum=first-wins:只用最高来源,merge:深度合并 ;; since=2.1.242
+allowedProviders | 允许的 API 提供方 | enterprise | 仅托管设置可用：限定本机可以使用的 API 提供方，例如 anthropic（Anthropic 官方 API）、customEndpoint（自定义地址）、bedrock、vertex、foundry、anthropicAws、mantle、gateway。 | | | ;; scopes=managed ;; tags=enterprise,managed-only,security ;; enum=anthropic:Anthropic 官方,customEndpoint:自定义端点,bedrock:Amazon Bedrock,vertex:Google Vertex,foundry:Microsoft Foundry,anthropicAws:Claude Platform on AWS,mantle:Mantle,gateway:企业网关
+forceRemoteSettingsRefresh | 启动前强制拉取远程策略 | enterprise | 在托管设置中设置后，CLI 启动时会阻塞，直到成功获取最新的远程托管设置；获取失败则直接退出。 | | | ;; scopes=managed ;; tags=enterprise,managed-only
+requiredMinimumVersion | 最低允许版本 | enterprise | 允许启动的最低 Claude Code 版本，低于此版本会在启动时退出并提示升级。只在托管设置中生效。 | | | ;; scopes=managed ;; tags=enterprise,managed-only ;; ex="2.1.300"
+requiredMaximumVersion | 最高允许版本 | enterprise | 允许启动的最高 Claude Code 版本，高于此版本会退出并提示安装批准的版本。只在托管设置中生效。 | | | ;; scopes=managed ;; tags=enterprise,managed-only ;; ex="2.1.327"
+claudeMd | 组织级 CLAUDE.md | enterprise | 以组织托管记忆的形式注入的 CLAUDE.md 风格指令文本。只在托管设置中生效。 | | | ;; scopes=managed ;; tags=enterprise,managed-only
+pluginTrustMessage | 插件信任提示附言 | enterprise | 在安装插件前的信任警告后追加的自定义说明，例如「内部市场的插件均已审核」。只在托管设置中生效。 | | | ;; scopes=managed ;; tags=enterprise,managed-only
+channelsEnabled | 允许频道推送 | enterprise | 组织层面是否允许频道通知（具备 claude/channel 能力的 MCP 服务器向会话推送消息）。claude.ai Team / Enterprise 默认关闭；Console 在没有托管设置时默认开启。开启后用户可用 --channels 选择服务器。 | | | ;; tags=enterprise
+allowedChannelPlugins | 允许推送的频道插件 | enterprise | 组织允许推送消息的频道插件白名单，设置后替换默认的 Anthropic 白名单。需要 channelsEnabled 为 true。 | | | ;; scopes=managed ;; tags=enterprise,managed-only ;; ex=["notify@corp-tools"]
+skipWebFetchPreflight | 跳过 WebFetch 预检 | enterprise | 跳过 WebFetch 的域名黑名单预检请求，适用于安全策略严格、无法访问预检服务的企业网络。 | | 只有在 WebFetch 因预检失败而无法使用时再开启 | tags=enterprise
+sshConfigs | 预置 SSH 连接 | remote | 远程环境的 SSH 连接配置，通常由企业管理员在托管设置中预置给团队成员。 | | | ;; tags=enterprise ;; ex=[{"id":"dev","name":"开发机","sshHost":"dev.example.com","sshUser":"me"}]
+sshHostCommands | 命令生成的 SSH 主机 | remote | Claude Desktop 中主机地址由命令生成的 SSH 连接列表，每项含 id、name、command，可选 sshIdentityFile、startDirectory。创建连接时在本机执行 command 获取主机。 | | | ;; tags=desktop,advanced ;; ex=[{"id":"cloud-dev","name":"云开发机","command":"get-dev-host"}]
+
+# ---------------- 通用 ----------------
+env | 环境变量 | general | 为 Claude Code 会话设置的环境变量（键值对）。在管理器左侧「环境变量」页可逐项编辑全部 400 多个变量，并附中文说明。 | | 在「环境变量」页编辑 | ex={"HTTPS_PROXY":"http://127.0.0.1:7890"}
+language | 回复语言 | general | Claude 回复和语音听写使用的首选语言，填写语言名称即可，例如 chinese、japanese、spanish。 | "chinese" | 让 Claude 默认使用中文回复（也可以写「简体中文」）
+outputStyle | 输出风格 | general | 回复的输出风格，对应 /output-style 中的风格名称（如 Explanatory、Learning，或你在 ~/.claude/output-styles 中自定义的风格）。 | | 保持默认即可；想要更多讲解时可选 Explanatory | ex="Explanatory"
+cleanupPeriodDays | 会话记录保留天数 | privacy | 本机聊天记录自动清理前保留的天数（默认 30 天，最小 1）。想长期保留就设大一点；如果完全不想写入记录，应使用 --no-session-persistence 参数而不是设为 0。清理只删除本机数据。 | 90 | 保留三个月，方便用 claude --resume 找回旧会话 | u=天 ;; def=30
+desktopSessionCleanupPeriodDays | 桌面端会话保留上限 | privacy | 由 Claude Desktop / Cowork 创建或最后写入的会话记录默认不受 cleanupPeriodDays 清理；此项为它们设置保留上限（天）。0（默认）表示不设上限。 | | | ;; u=天 ;; def=0 ;; tags=desktop
+syncClaudeAiSkills | 同步 claude.ai 技能 | privacy | 设为 false 关闭从 claude.ai 同步你启用的技能：不再下载，已同步的技能（~/.claude/skills/synced）不能再运行，并在下次启动时移到回收目录。 | | 想完全本地化管理技能时可关闭 | scopes=user,managed
+syncClaudeAiPlugins | 同步 claude.ai 插件 | privacy | 设为 false 关闭从 claude.ai 同步你启用的插件：不再下载，已同步的插件（~/.claude/plugins/synced）会被隐藏并在下次启动时移到回收目录。 | | | ;; scopes=user,managed
+feedbackSurveyRate | 会话质量调查频率 | privacy | 满足条件时弹出会话质量调查的概率（0~1）。设为 0 则不再弹出。 | 0 | 不再弹出会话质量调查，减少打扰 | min=0 ;; max=1
+feedbackDrafts | 模型起草反馈 | privacy | 模型起草反馈（SendFeedback 工具）的行为：notify（默认）排队时显示一行提示；quiet 只在页脚计数；off 完全禁用该工具。 | | | ;; enum=notify:提示,quiet:静默计数,off:关闭 ;; def="notify"
+autoUploadSessions | 自动上传会话 | privacy | 把本地会话以只读形式镜像到 claude.ai（不能远程控制）。 | | 会把对话内容上传到 claude.ai，按需开启 | tags=security
+
+# ---------------- 模型与推理 ----------------
+model | 默认模型 | model | 覆盖 Claude Code 默认使用的模型。可以写别名（default、opus、sonnet、haiku、opusplan 等）或完整模型 ID（如 claude-opus-5-5）。也可以在会话中用 /model 切换。 | | 按订阅与预算选择；使用第三方中转时填中转商提供的模型名 | ex="opus" ;; ph=opus / sonnet / 完整模型 ID
+fallbackModel | 备用模型 | model | 主模型过载或不可用时依次尝试的备用模型列表，每项可写模型名或别名，"default" 表示默认模型。命令行参数 --fallback-model 优先。 | | | ;; ex=["sonnet"]
+availableModels | 可选模型白名单 | model | 用户可以选择的模型白名单。支持家族别名（"opus" 允许所有 opus 版本）、版本前缀（"opus-4-5"）和完整 ID。不设置则全部可用；空数组则只能用默认模型。 | | 个人用户通常不需要 | tags=enterprise ;; ex=["opus","sonnet"]
+enforceAvailableModels | 默认模型也受白名单约束 | model | 为 true 且 availableModels 非空时，「Default」选项也受约束：若当前账户档位的默认模型不在白名单中，则改用白名单的第一项。 | | | ;; tags=enterprise
+availableModelsMatch | 白名单匹配方式 | model | availableModels 的匹配方式：prefix（默认）条目也允许以它开头的模型 ID；exact 则模型 ID 条目不放行其他版本。 | | | ;; enum=prefix:前缀匹配,exact:精确匹配 ;; def="prefix" ;; tags=enterprise
+deniedModels | 禁用模型 | model | 即使白名单允许也不能选择的模型。家族别名会禁用整个家族；模型 ID 会禁用该版本的所有写法（日期、-fast 及提供方前缀都会忽略）。 | | | ;; tags=enterprise ;; ex=["haiku"]
+modelOverrides | 模型 ID 映射 | model | 把 Anthropic 模型 ID（如 claude-opus-4-6）映射为提供方专用的模型 ID（如 Bedrock 推理配置 ARN）。通常由企业管理员在托管设置中配置。 | | | ;; tags=enterprise ;; ex={"claude-opus-5-5":"arn:aws:bedrock:us-east-1:123456789012:inference-profile/xxx"}
+modelPicker | /model 选择器定制 | model | 定制 /model 选择器：按顺序列出模型并使用你自己的名称，不受内置列表和版本更新影响。只在托管设置、--settings / SDK 与用户设置中生效（项目设置无效）。 | | | ;; scopes=user,managed ;; tags=advanced
+modelPicker.options | 选择器条目 | model | 在 /model 选择器中按顺序显示的条目，每项含模型 ID 与显示名称等。 | | | ;; scopes=user,managed ;; ex=[{"model":"claude-opus-5-5","label":"Opus 5.5（主力）"}]
+modelPicker.replaceBuiltInOptions | 替换内置条目 | model | 为 true 时选择器只显示 Default 和你的条目，隐藏内置列表、网关发现的模型和 ANTHROPIC_CUSTOM_MODEL_OPTION；否则你的条目追加在内置列表之后。 | | | ;; scopes=user,managed
+modelPricing | 自定义计价 | model | 用组织签约价格而不是公开价格估算花费，影响 /cost、状态栏、SDK total_cost_usd、--max-budget-usd 以及 OpenTelemetry 成本指标（仍为美元估算，不是账单）。 | | | ;; tags=enterprise,advanced
+modelPricing.multiplier | 价格倍率 | model | 对所有模型的公开价格统一乘以此倍率（0~10），例如 0.8 表示八折。 | | | ;; min=0 ;; max=10 ;; tags=advanced
+modelPricing.overrides | 按模型覆盖价格 | model | 按模型分别指定每百万 token 的输入、输出、缓存读取、缓存写入价格（美元）。 | | | ;; tags=advanced
+modelPricing.overrides.*.input | 输入单价 | model | 每百万输入 token 的价格（美元）。 | | | ;; u=$/MTok
+modelPricing.overrides.*.output | 输出单价 | model | 每百万输出 token 的价格（美元）。 | | | ;; u=$/MTok
+modelPricing.overrides.*.cacheRead | 缓存读取单价 | model | 每百万缓存读取 token 的价格（美元）。 | | | ;; u=$/MTok
+modelPricing.overrides.*.cacheWrite | 缓存写入单价 | model | 每百万缓存写入 token 的价格（美元）。 | | | ;; u=$/MTok
+effortLevel | 推理强度 | model | 为支持的模型持久保存的推理强度：low、medium、high、xhigh。强度越高思考越充分，但更慢、消耗更多 token。会话中可用 /effort 调整。 | "high" | 写代码时质量与速度的平衡点；遇到复杂问题可临时 /effort xhigh | enum=low:低,medium:中,high:高,xhigh:超高
+maxEffortLevel | 推理强度上限 | model | 推理强度的上限，任何来源（/effort、/model、--effort、CLAUDE_CODE_EFFORT_LEVEL、模型默认值）高于它都会被压到此值，对所有提供方生效。 | | 想控制成本时可设上限 | enum=low:低,medium:中,high:高,xhigh:超高,max:最高
+modelSettings | 按模型单独设置 | model | 以规范模型名为键，为单个模型分别设置推理强度、强度上限和自动压缩窗口。规范名也匹配其带日期、[1m]、Bedrock 等写法的变体。 | | | ;; ex={"claude-opus-5-5":{"effortLevel":"high"}}
+modelSettings.*.effortLevel | 推理强度 | model | 此模型持久保存的推理强度。 | | | ;; enum=low:低,medium:中,high:高,xhigh:超高
+modelSettings.*.maxEffortLevel | 推理强度上限 | model | 此模型的推理强度上限；在同一文件中替代顶层 maxEffortLevel，max 表示不限制。跨文件时取最低值。 | | | ;; enum=low:低,medium:中,high:高,xhigh:超高,max:不限制
+modelSettings.*.autoCompactWindow | 自动压缩窗口 | model | 此模型的自动压缩窗口（token，至少 100000），或 "auto" 使用为该模型调优的窗口。/autocompact 会保存到这里。 | | | ;; ex="auto"
+alwaysThinkingEnabled | 启用扩展思考 | model | 为 false 时关闭思考；不设置或为 true 时，支持的模型会自动启用思考。 | | 保持默认（开启）即可，关闭会明显降低复杂任务质量 |
+showThinkingSummaries | 显示思考摘要 | model | 向 API 请求思考摘要，并显示在对话和记录视图（ctrl+o）中。显式设置可覆盖安装默认值。 | true | 能看到 Claude 的推理过程，方便理解和及时纠偏
+fastMode | 快速模式 | model | 为 true 时启用快速模式（同模型更快的输出，计费更高）；不设置或 false 为关闭。在 Vertex 上保存的值会被忽略，需每次用 /fast 开启。 | | 按预算决定；需要时用 /fast 临时开启更灵活 |
+fastModePerSessionOptIn | 快速模式不跨会话 | model | 为 true 时快速模式不会在会话之间保留，每个新会话都从关闭开始。 | | 想避免忘记关闭快速模式而多花费时可开启 |
+advisorModel | 顾问模型 | model | 服务端 advisor 工具使用的顾问模型。 | | | ;; tags=advanced ;; ph=模型 ID 或别名
+promptCacheTtl | 主对话缓存时长 | model | 主对话（交互、-p、SDK 轮次及同步辅助请求）的提示缓存时长：5m 或 1h。不设置时自动选择：Claude 订阅在用量范围内为 1 小时，API Key / Bedrock / Vertex / Foundry 为 5 分钟。1 小时缓存写入的单价更高。 | | API Key 用户若经常停顿超过 5 分钟再继续，设为 1h 往往更省钱 | enum=5m:5 分钟,1h:1 小时
+subagentPromptCacheTtl | 子代理缓存时长 | model | 主对话之外（子代理、工作流、后台与辅助请求）的提示缓存时长：5m 或 1h。不设置时为 5 分钟（除非设置 ENABLE_PROMPT_CACHING_1H=1）。环境变量 CLAUDE_CODE_SUBAGENT_PROMPT_CACHE_TTL 优先。 | | | ;; enum=5m:5 分钟,1h:1 小时 ;; tags=advanced
+ultracode | Ultracode 模式 | agents | 为会话启用 ultracode：在任何推理强度下持续使用动态工作流编排。属于会话级设置，通常通过 --settings 提供，交互式开关不会保存它。需要启用工作流且模型支持。 | | | ;; tags=advanced
+switchModelsOnFlag | 被拦截时自动换模型 | model | 安全机制标记某条消息时，自动切换到其他模型继续对话；关闭则暂停会话。 | | |
+autoContinueAtUsageLimit | 额度重置后自动继续 | model | claude.ai 用量上限中断会话时，等待额度重置后自动继续任务；关闭则在提示框中让你选择是否等待。 | | 夜间跑长任务时开启很实用 |
+
+# ---------------- 权限 ----------------
+permissions | 权限配置 | permissions | 工具调用的权限规则。规则格式为 工具名(说明符)，例如 Bash(npm run test:*)、Read(./.env)、Edit(src/**)、WebFetch(domain:github.com)、mcp__github。判定顺序：deny 优先，其次 ask，最后 allow。
+permissions.allow | 允许规则 | permissions | 无需确认即可执行的操作规则列表。例如 Bash(npm run lint) 精确匹配，Bash(npm run test:*) 前缀匹配，Edit(src/**) 允许编辑 src 下所有文件。 | | 只放行你确定安全、经常用的命令 | ex=["Bash(npm run lint)","Bash(npm run test:*)","Bash(git status)","Bash(git diff:*)"]
+permissions.deny | 拒绝规则 | permissions | 一律拒绝的操作规则列表，优先级最高。常用于保护密钥文件和危险命令。 | ["Read(./.env)","Read(./.env.*)","Read(./secrets/**)","Bash(rm -rf:*)"] | 防止 Claude 读取项目里的密钥文件，并拦截递归强制删除 | tags=security
+permissions.ask | 询问规则 | permissions | 无论当前权限模式如何，执行前总是询问的操作规则列表。 | | 适合 git push、发布、数据库迁移等不可逆操作 | ex=["Bash(git push:*)","Bash(npm publish:*)"]
+permissions.defaultMode | 默认权限模式 | permissions | 启动时的默认权限模式：default 每次首次使用工具都询问；acceptEdits 自动接受文件编辑；plan 只读规划模式；auto 由分类器自动判断；dontAsk 不询问，未放行的直接拒绝；bypassPermissions 跳过所有权限确认（危险）。也接受 manual 作为 default 的别名。 | "acceptEdits" | 文件编辑自动通过、命令仍需确认，配合 git 可随时回退 | enum=default:默认（逐项询问）,acceptEdits:自动接受编辑,plan:规划模式（只读）,auto:自动模式,dontAsk:不询问（未放行即拒绝）,bypassPermissions:跳过权限（危险） ;; enumd.bypassPermissions=跳过所有权限检查，只建议在隔离的容器或虚拟机中使用 ;; enumd.auto=由分类器判断每个操作是否安全，可通过 autoMode 定制规则 ;; tags=security
+permissions.disableBypassPermissionsMode | 禁止跳过权限模式 | permissions | 设为 "disable" 后无法进入 bypassPermissions 模式，也会忽略 --dangerously-skip-permissions 参数。 | | 团队或企业环境建议在托管设置中开启 | enum=disable:禁止 ;; tags=security
+permissions.disableAutoMode | 禁用自动模式 | permissions | 设为 "disable" 禁用自动（auto）权限模式。 | | | ;; enum=disable:禁用
+permissions.blockReadsOutsideWorkingDirectories | 禁止读取工作目录外文件 | permissions | 在所有权限模式下拒绝文件工具（Read、Grep、Glob、LSP）读取工作目录之外的文件，任何设置来源设为 true 即生效，allow 规则也无法解除。提到工作目录外路径的 Shell 命令也会被要求确认。 | | 处理敏感代码库时可开启 | tags=security
+permissions.blockWritesOutsideWorkingDirectories | 禁止写入工作目录外文件 | permissions | 在所有权限模式下拒绝文件工具（Write、Edit、NotebookEdit）写入工作目录之外的文件；Claude Code 自己的计划文件、草稿目录、本项目自动记忆等不受影响。 | true | 防止 Claude 修改项目外的文件，误操作风险更低 | tags=security
+permissions.blockFileToolReadsOutsideWorkingDirectories | 拒绝文件工具读取外部文件 | permissions | 仅供启动 Claude Code 的宿主程序通过 --settings 传入；写在任何 settings 文件中都无效。 | | 写在设置文件中无效 | tags=internal
+permissions.blockReadsExemptPaths | 外部读取豁免路径 | permissions | 仅从 --settings 或宿主程序运行时下发的设置中读取，写在 settings 文件中无效：blockReadsOutsideWorkingDirectories 额外放行的绝对路径。 | | 写在设置文件中无效 | tags=internal
+permissions.workingDirectoriesAsGiven | 原样工作目录 | permissions | 仅从 --settings 或宿主程序下发的设置中读取，写在 settings 文件中无效：按原样（含大小写）传入的工作目录绝对路径。 | | 写在设置文件中无效 | tags=internal
+permissions.denyInsteadOfPrompting | 需确认时直接拒绝 | permissions | 不再等待人回答权限提示：本来需要询问的调用会立即被拒绝，告知模型后继续。效果等同于 -p 模式下的 --permission-prompts none，对子代理和代理团队同样生效。 | | 适合无人值守运行；交互使用时不建议开启 |
+permissions.additionalDirectories | 额外工作目录 | permissions | 除当前项目外，允许 Claude 访问的额外目录（等同于 --add-dir）。 | | | ;; ex=["../shared-lib","~/notes"] ;; pn.windows=Windows 路径可写 D:/work/shared 或 D:\\work\\shared
+skipDangerousModePermissionPrompt | 已确认跳过权限警告 | permissions | 记录你已经接受过 bypassPermissions 模式的警告对话框，设为 true 后不再弹出。通常由 Claude Code 自动写入。 | | 不建议手动开启 | tags=security
+skipAutoPermissionPrompt | 已确认自动模式说明 | permissions | 记录你已经接受过自动模式的启用说明对话框。通常由 Claude Code 自动写入。 | | |
+useAutoModeDuringPlan | 规划模式使用自动模式 | permissions | 自动模式可用时，规划（plan）模式是否采用自动模式的判定逻辑（默认 true）。 | | | ;; def=true
+disableAutoMode | 禁用自动模式（顶层） | permissions | 设为 "disable" 禁用自动权限模式。与 permissions.disableAutoMode 作用相同。 | | | ;; enum=disable:禁用
+autoMode | 自动模式规则 | permissions | 定制自动（auto）权限模式分类器的提示规则。各列表中写入字面量 "$defaults" 表示在该位置继承内置规则。
+autoMode.allow | 允许规则 | permissions | 自动模式分类器的「允许」规则（自然语言描述），写 "$defaults" 继承内置规则。 | | | ;; ex=["$defaults","运行本仓库 scripts 目录下的脚本"]
+autoMode.soft_deny | 软拦截规则 | permissions | 「软拦截」规则：破坏性或不可逆、但用户明确意图可以放行的操作。写 "$defaults" 继承内置规则。 | | | ;; ex=["$defaults","删除 dist 以外的目录"]
+autoMode.hard_deny | 硬拦截规则 | permissions | 「硬拦截」规则：即使用户表达了意图也不能越过的安全边界。写 "$defaults" 继承内置规则。 | | | ;; tags=security ;; ex=["$defaults","向生产数据库写入数据"]
+autoMode.environment | 环境说明 | permissions | 提供给自动模式分类器的环境背景信息（例如可信的仓库、存储桶、域名）。写 "$defaults" 继承内置条目。 | | | ;; ex=["$defaults","github.com/my-org 下的仓库都是可信的"]
+autoMode.classifyAllShell | Shell 命令全部走分类器 | permissions | 为 true 时，自动模式下所有 Bash / PowerShell 的 allow 规则暂停生效，每条命令都交给分类器判断（更安全，但分类调用更多）。默认 false。 | | | ;; def=false ;; tags=security
+
+# ---------------- 沙箱 ----------------
+sandbox | 沙箱 | sandbox | Bash 命令沙箱：在受限环境中执行命令，限制可读写的文件和可访问的网络域名。macOS 使用 Seatbelt，Linux / WSL2 使用 bubblewrap，Windows 使用独立沙箱账户或 MXC。
+sandbox.enabled | 启用沙箱 | sandbox | 在沙箱中运行 Bash 命令。默认 false。托管设置或 --settings 要求强制沙箱时，项目设置中的 false 会被忽略。 | | macOS / Linux 上推荐开启，命令在隔离环境运行更安全 | rp.macos=true ;; rp.linux=true ;; pn.windows=Windows 需要先完成沙箱账户初始化（或使用 MXC 后端），请参考官方沙箱文档 ;; pn.linux=需要安装 bubblewrap（bwrap）与 socat ;; tags=security
+sandbox.failIfUnavailable | 沙箱不可用时退出 | sandbox | sandbox.enabled 为 true 但沙箱无法启动（缺少依赖或平台不支持）时，启动即报错退出。默认 false：显示警告后以非沙箱方式运行命令。 | | 企业把沙箱作为硬性要求时开启 | tags=enterprise,security
+sandbox.autoAllowBashIfSandboxed | 沙箱内命令免确认 | sandbox | 仅 macOS 与 Linux / WSL：将在沙箱内运行的 Bash 命令无需权限确认即可执行（deny 规则、针对该命令的 ask 规则或安全检查仍然生效）。默认 false。 | | 开启沙箱后推荐打开：既安全又能大幅减少确认弹窗 | rp.macos=true ;; rp.linux=true ;; p=macos,linux
+sandbox.allowUnsandboxedCommands | 允许绕过沙箱 | sandbox | 是否允许命令通过 dangerouslyDisableSandbox 参数在沙箱外运行。为 false 时该参数被完全忽略，所有命令都必须在沙箱内运行。默认 true。 | | 安全要求高时设为 false | def=true ;; tags=security
+sandbox.network | 网络隔离 | sandbox | 沙箱内命令的网络访问控制。
+sandbox.network.allowedDomains | 允许访问的域名 | sandbox | 沙箱内命令无需确认即可访问的域名，支持 *.example.com 通配；会与 WebFetch(domain:…) 允许规则以及各设置来源合并。 | | 把常用的包管理源加进来，减少联网确认 | ex=["registry.npmjs.org","*.github.com","pypi.org","files.pythonhosted.org"]
+sandbox.network.deniedDomains | 禁止访问的域名 | sandbox | 一律禁止访问的域名，即使匹配 allowedDomains 也会被拦截，支持同样的通配语法。 | | | ;; ex=["*.internal.example.com"] ;; tags=security
+sandbox.network.strictAllowlist | 严格白名单 | sandbox | 为 true 时，沙箱直接拒绝不在 allowedDomains 中的主机，而不是弹出确认。只对沙箱内命令生效（WebFetch 等进程内工具不受影响）。只在用户、托管或 --settings 中生效。 | | | ;; scopes=user,managed ;; tags=security
+sandbox.network.allowManagedDomainsOnly | 只用托管域名白名单 | sandbox | 在托管设置中设为 true 时，只认托管设置里的 allowedDomains 和 WebFetch 允许规则，其他来源的域名被忽略（禁止域名仍合并所有来源）。 | | | ;; scopes=managed ;; tags=enterprise,managed-only
+sandbox.network.allowUnixSockets | 允许的 Unix 套接字 | sandbox | 仅 macOS：允许访问的 Unix 套接字路径（如 Docker 的 /var/run/docker.sock）。Linux 上无效（seccomp 无法按路径过滤）。 | | | ;; p=macos ;; ex=["/var/run/docker.sock"]
+sandbox.network.allowAllUnixSockets | 允许所有 Unix 套接字 | sandbox | 为 true 时允许所有 Unix 套接字（两个平台都取消拦截）。 | | 会削弱隔离，尽量用 allowUnixSockets 精确放行 | tags=security
+sandbox.network.allowLocalBinding | 允许绑定本地端口 | sandbox | 仅 macOS：为 true 时沙箱内命令可以监听 localhost 端口（例如启动开发服务器）。 | | 需要在沙箱内跑本地开发服务器时开启 | p=macos
+sandbox.network.allowMachLookup | 允许的 Mach 服务 | sandbox | 仅 macOS：额外允许查找的 XPC / Mach 服务名，支持结尾通配（如 com.apple.CoreSimulator.*），iOS 模拟器、Playwright 等工具需要。每一项都会让沙箱内命令接触沙箱外的服务。 | | | ;; p=macos ;; ex=["com.apple.CoreSimulator.*"] ;; tags=security
+sandbox.network.httpProxyPort | 自定义 HTTP 代理端口 | sandbox | 使用你自己的本地 HTTP 代理（指定端口）转发沙箱流量，取代 Claude Code 自带的代理。 | | | ;; tags=advanced ;; ex=8080
+sandbox.network.socksProxyPort | 自定义 SOCKS5 代理端口 | sandbox | 使用你自己的本地 SOCKS5 代理（指定端口）转发沙箱流量，取代 Claude Code 自带的代理。 | | | ;; tags=advanced ;; ex=1080
+sandbox.network.tlsTerminate | TLS 解密（实验性） | sandbox | 实验功能：在进程内终止 TLS，让逐请求过滤器能看到 HTTPS 请求体。可提供 CA 证书与私钥，或都不填由沙箱为会话生成临时 CA（原生 Windows 上临时 CA 无法通过信任检查）。 | | | ;; tags=experimental,advanced
+sandbox.network.tlsTerminate.caCertPath | CA 证书路径 | sandbox | 用于 TLS 解密的 CA 证书文件路径。 | | | ;; tags=experimental,advanced
+sandbox.network.tlsTerminate.caKeyPath | CA 私钥路径 | sandbox | 用于 TLS 解密的 CA 私钥文件路径。 | | | ;; tags=experimental,advanced,security
+sandbox.filesystem | 文件系统隔离 | sandbox | 沙箱内命令可读写的路径控制。路径可写 ~/ 开头、绝对路径或相对项目的路径。
+sandbox.filesystem.allowWrite | 额外可写路径 | sandbox | 沙箱内额外允许写入的路径，会与 Edit(...) 允许规则中的路径合并。 | | | ;; ex=["~/.npm","~/.cache"]
+sandbox.filesystem.denyWrite | 禁止写入路径 | sandbox | 沙箱内禁止写入的路径，会与 Edit(...) 拒绝规则合并。 | | | ;; ex=["./.git/hooks"] ;; tags=security
+sandbox.filesystem.denyRead | 禁止读取路径 | sandbox | 沙箱内禁止读取的路径，会与 Read(...) 拒绝规则合并。 | | 推荐屏蔽 SSH 密钥等敏感目录 | ex=["~/.ssh","~/.aws/credentials"] ;; tags=security
+sandbox.filesystem.allowRead | 重新允许读取路径 | sandbox | 在 denyRead 范围内重新放行读取的路径，对匹配路径优先于 denyRead。 | | | ;; ex=["~/.ssh/known_hosts"]
+sandbox.filesystem.allowManagedReadPathsOnly | 只用托管读取白名单 | sandbox | 在托管设置中设为 true 时，只使用托管设置里的 allowRead 路径。 | | | ;; scopes=managed ;; tags=enterprise,managed-only
+sandbox.filesystem.disabled | 关闭文件系统隔离 | sandbox | 仅 macOS 与 Linux / WSL：完全跳过文件系统隔离，但保留网络与 seccomp 隔离。原生 Windows 上忽略。 | | 会显著削弱隔离，一般不要开启 | p=macos,linux ;; tags=security
+sandbox.credentials | 凭据保护 | sandbox | 保护沙箱内命令能接触到的凭据：deny 直接屏蔽；mask 在沙箱内替换为占位值，由代理在出站请求中注入真实值。
+sandbox.credentials.files | 受保护的凭据文件 | sandbox | 需要保护的凭据文件或目录：deny 禁止在沙箱内读取；mask 在沙箱内替换为占位值，代理出站时再注入真实值。macOS 与 Windows 上 mask 会降级为 deny。 | | | ;; tags=security,advanced ;; ex=[{"path":"~/.npmrc","mode":"mask"}]
+sandbox.credentials.envVars | 受保护的环境变量 | sandbox | 需要保护的环境变量：deny 对沙箱内命令取消设置该变量；mask 替换为占位值并在代理处注入真实值。 | | | ;; tags=security,advanced ;; ex=[{"name":"GITHUB_TOKEN","mode":"mask"}]
+sandbox.credentials.allowPlaintextInject | 允许明文 HTTP 注入 | sandbox | 是否允许在明文 HTTP 代理路径上把占位值替换为真实凭据。默认 false：没有 TLS 终止时无法验证上游身份，凭据会以明文传输。只建议用于可信网络的测试环境。 | | | ;; scopes=user,managed ;; def=false ;; tags=security,advanced
+sandbox.credentials.awsPairs | AWS 凭据配对 | sandbox | 对非标准变量名的 AWS 凭据，显式说明哪些被屏蔽的环境变量组成一对，用于 SigV4 重新签名。标准的 AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY / AWS_SESSION_TOKEN 会自动配对。 | | | ;; scopes=user,managed ;; tags=advanced ;; ex=[{"accessKeyId":"MY_AWS_KEY","secretAccessKey":"MY_AWS_SECRET"}]
+sandbox.credentials.sigv4 | SigV4 特殊请求策略 | sandbox | 代理无法重新签名的 AWS SigV4 请求形态（流式、预签名、sigv4a）引用被屏蔽凭据时的处理策略：deny（默认）或 passthrough。 | | | ;; scopes=user,managed ;; tags=advanced
+sandbox.credentials.sigv4.streaming | 流式请求 | sandbox | 流式 SigV4 请求的处理策略。 | | | ;; enum=deny:拒绝,passthrough:放行 ;; def="deny" ;; tags=advanced
+sandbox.credentials.sigv4.presigned | 预签名请求 | sandbox | 预签名 URL 请求的处理策略。 | | | ;; enum=deny:拒绝,passthrough:放行 ;; def="deny" ;; tags=advanced
+sandbox.credentials.sigv4.sigv4a | SigV4A 请求 | sandbox | SigV4A（非对称签名）请求的处理策略。 | | | ;; enum=deny:拒绝,passthrough:放行 ;; def="deny" ;; tags=advanced
+sandbox.windows | Windows 沙箱 | sandbox | 原生 Windows 上的沙箱设置。 | | | ;; p=windows
+sandbox.windows.backend | 沙箱后端 | sandbox | 仅 Windows：sandboxuser（默认）以沙箱初始化时创建的专用账户运行命令；mxc 在 Microsoft eXecution Container 中运行，无需安装步骤（实验性）。 | | | ;; p=windows ;; enum=sandboxuser:专用沙箱账户,mxc:MXC 容器（实验） ;; def="sandboxuser"
+sandbox.ignoreViolations | 忽略的违规 | sandbox | 不上报的沙箱违规：命令模式（"*" 表示所有命令）到文件路径列表的映射。 | | | ;; tags=advanced ;; ex={"*":["/usr/local/share/.cache"]}
+sandbox.enableWeakerNestedSandbox | 弱化嵌套沙箱 | sandbox | 仅 Linux：不挂载新的 /proc，适用于无法创建 /proc 的非特权 Docker 容器。会降低安全性：宿主 /proc 对沙箱内命令可读。默认 false。 | | 只在容器内无法使用沙箱时开启 | p=linux ;; def=false ;; tags=security
+sandbox.allowNestedUserNamespaces | 允许嵌套用户命名空间 | sandbox | 仅 Linux / WSL：允许沙箱内命令创建自己的用户命名空间（Chromium / Electron 沙箱、嵌套 bubblewrap、unshare 需要）。会移除代码执行隔离。 | | 有明显安全代价，按需开启 | p=linux ;; tags=security
+sandbox.enableWeakerNetworkIsolation | 弱化网络隔离 | sandbox | 仅 macOS：允许访问 com.apple.trustd.agent，让 gh、gcloud、terraform 等 Go 工具在使用自定义 CA 的 MITM 代理时能校验证书。会降低安全性。 | | | ;; p=macos ;; tags=security
+sandbox.allowAppleEvents | 允许 Apple Events | sandbox | 仅 macOS：允许沙箱内命令发送 Apple Events，open、osascript 和打开浏览器的登录流程需要。会移除代码执行隔离（可无提示启动沙箱外程序）。 | | | ;; p=macos ;; tags=security
+sandbox.excludedCommands | 不进沙箱的命令 | sandbox | 在沙箱外运行的命令模式（Bash 权限规则语法）。管道或 a && b 中每个部分都要分别匹配才会离开沙箱。 | | 常见于 docker、需要访问硬件的命令 | ex=["docker:*","git push:*"]
+sandbox.ripgrep | 自定义 ripgrep | sandbox | 自定义沙箱使用的 ripgrep。只在用户、托管或 --settings 中生效。 | | | ;; scopes=user,managed ;; tags=advanced
+sandbox.ripgrep.command | ripgrep 命令 | sandbox | 自定义 ripgrep 可执行文件路径。 | | | ;; scopes=user,managed ;; tags=advanced ;; ex="/usr/local/bin/rg"
+sandbox.ripgrep.args | ripgrep 参数 | sandbox | 调用 ripgrep 时附加的参数。 | | | ;; scopes=user,managed ;; tags=advanced
+sandbox.bwrapPath | bwrap 路径 | sandbox | 仅 Linux / WSL：bubblewrap 可执行文件的绝对路径，覆盖 PATH 自动查找。只在管理员托管设置中生效。 | | | ;; p=linux ;; scopes=managed ;; tags=enterprise,managed-only
+sandbox.socatPath | socat 路径 | sandbox | 仅 Linux / WSL：沙箱网络代理使用的 socat 绝对路径，覆盖 PATH 自动查找。只在管理员托管设置中生效。 | | | ;; p=linux ;; scopes=managed ;; tags=enterprise,managed-only

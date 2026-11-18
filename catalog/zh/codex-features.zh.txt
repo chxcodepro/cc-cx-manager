@@ -1,0 +1,243 @@
+# Codex [features] 功能开关中文叠加层（对应 Codex CLI 0.170.0，来源 codex-rs/features/src/lib.rs 与 codex features list）
+# 用法：在 config.toml 的 [features] 表中写 名称 = true / false，或启动时用 --enable / --disable 名称
+# 阶段：stable 稳定；experimental 实验（可在 /experimental 中开启）；under development 开发中（不建议开启）；deprecated 已弃用；removed 已移除（无效果）
+
+@category features | 功能开关（features） | 85 | [features] 表中的功能开关；开发中和已移除的开关默认隐藏，可在工具栏勾选「开发中/已移除」显示
+
+@prefix features. => features
+
+# ---------------- 稳定（常用） ----------------
+features.shell_tool | Shell 工具 | | 启用默认的 Shell 命令工具。关闭后 Codex 无法执行命令。 | true | 保持开启
+features.unified_exec | 统一执行工具 | | 使用基于 PTY 的统一命令执行工具（支持交互式程序和长时间运行的命令）。 | true | 保持开启
+features.unified_exec_tty | 统一执行分配终端 | | 允许统一执行的命令分配交互式终端。 | |
+features.shell_snapshot | Shell 环境快照 | | 对 Shell 环境做快照，加快命令启动并保持环境一致。 | |
+features.view_image | 本地图片查看 | | 启用内置的本地图片查看工具，让模型可以查看截图等图片。 | |
+features.sleep_tool | 等待工具 | | 允许注册内置的 sleep（等待）工具。 | |
+features.hooks | Hooks 钩子 | | 启用从 hooks.json 加载的生命周期钩子（类似 Claude Code hooks）。 | | 想用 hooks 时保持开启
+features.memories | 记忆 | | 启用启动时记忆提取与基于文件的记忆整理，让 Codex 跨会话记住偏好。 | |
+features.goals | 目标 | | 启用持久化的线程目标与自动继续执行目标。 | |
+features.apps | Apps 连接器 | | 启用 Apps（连接器）。 | |
+features.plugins | 插件 | | 启用插件。 | |
+features.remote_plugin | 远程插件目录 | | 启用远程插件目录。 | |
+features.plugin_sharing | 插件分享 | | 启用远程插件分享流程。 | |
+features.recommended_plugins | 推荐插件 | | 在模型可见的上下文中包含推荐的插件（默认关闭）。 | |
+features.tool_suggest | 工具推荐 | | 为 Apps 启用可发现的工具推荐。 | |
+features.skill_mcp_dependency_install | 技能依赖自动安装 | | 允许提示并安装技能缺少的 MCP 依赖。 | |
+features.skill_search | 技能搜索实验 | | 以影子模式运行低成本技能搜索并上报实验指标。 | |
+features.mentions_v2 | 新版 @ 提及 | | 启用 TUI 默认使用的统一提及弹窗。 | |
+features.fast_mode | 快速模式 | | 在 TUI 和请求层启用 Fast 模式选择。 | |
+features.ultrafast_mode | 超快模式 | | 独立于 Fast 模式启用 Ultra Fast 模式。 | |
+features.reasoning_effort_override | 推理强度切换生效 | | 推理强度改变时追加可信的响应配置项，让切换立即生效。 | |
+features.image_generation | 图片生成 | | 启用基于扩展的图片生成工具。 | |
+features.unified_image_budget | 统一图片预算 | | 对所有图片使用同一套像素与 token 预算，不再理会旧的 detail 提示。 | |
+features.compaction_image_budget | 压缩计入图片 | | 远程压缩时把保留的图片计入上下文预算。 | |
+features.retain_client_tool_outputs | 保留客户端工具输出 | | 跨上下文窗口时遵循客户端要求保留的工具输出。 | |
+features.guardian_approval | 自动审查 | | 启用审批请求的自动审查（Guardian），配合 approvals_reviewer = "auto_review"。 | |
+features.guardian_include_additional_context | 审查包含额外上下文 | | 在 Guardian 审查历史中包含独立的附加上下文工具输出。 | |
+features.guardian_reuse_parent_compaction | 审查复用父级压缩 | | 重启 Guardian 审查会话时复用父会话的加密压缩结果。 | |
+features.write_stdin_approval | 向终端输入需审批 | | 向已提权的统一执行终端写入输入前需要审批。 | true | 保持开启更安全 | tags=security
+features.tool_call_mcp_elicitation | MCP 审批走信息请求 | | 通过 MCP elicitation 请求路径发出 MCP 工具审批提示。 | |
+features.auth_elicitation | 连接器认证提示 | | 通过 MCP URL elicitation 提示 Codex Apps 连接器的认证失败。 | |
+features.mcp_oauth_refresh_coordination | MCP OAuth 刷新协调 | | 让 MCP 客户端通过配置的凭据存储协调 OAuth 令牌刷新。 | |
+features.daemon_auto_start | 自动启动守护进程 | | 符合条件的交互启动时自动启动共享的本地守护进程。 | |
+features.enable_request_compression | 请求压缩 | | 向 codex-backend 发送流式请求时用 zstd 压缩请求体。 | |
+features.unbounded_connection_retries | 断网自动续连 | | 网络连接失败时让进行中的回合保持等待，直到网络恢复。 | |
+features.system_proxy_fallback | 系统代理回退 | | 正常路由失败后，符合条件的启动请求改走系统代理重试。 | |
+features.secret_auth_storage | 加密存储登录凭据 | | 选择 keyring 存储时，把 CLI 登录凭据存入加密的本地密钥后端。 | | | ;; tags=security
+features.api_key_model_discovery | API Key 模型发现 | | 使用 OpenAI API Key 认证时发现可用的模型目录。 | |
+features.api_key_cyber_access_programs | API Key 访问计划 | | 使用内置 OpenAI API Key 时转发显式的访问计划。 | |
+features.cli_daybreak | Daybreak 控制 | | 在 CLI 中启用 Daybreak 控制与自动访问计划选择。 | |
+features.workspace_dependencies | 工作区依赖 | | 启用工作区依赖支持。 | |
+features.content_item_kinds | 内容分类元数据 | | 在内部 Responses 元数据中发送每个内容条目的分类。 | | | ;; tags=internal
+features.untrusted_as_tool_output | 不可信上下文作为工具输出 | | 把客户端提供的不可信上下文渲染为独立的工具输出（安全隔离）。 | | | ;; tags=security
+features.deferred_tool_world_state | 延迟工具状态描述 | | 在模型可见的世界状态中描述延迟加载的工具命名空间。 | | | ;; tags=internal
+features.incremental_tools | 增量工具声明 | | 在世界状态中跟踪顶层工具定义并发送增量上下文更新，节省上下文。 | | | ;; tags=internal
+features.incremental_tools_legacy | Bedrock 增量工具 | | 在常规 Amazon Bedrock Responses 上发布增量工具声明。 | | | ;; tags=internal
+features.incremental_tools_legacy_gcp | GCP 增量工具 | | 在常规 GCP Responses 上发布增量工具声明。 | | | ;; tags=internal
+features.prediction_preserve_parent_tools | 预测分叉保留工具 | | 在禁用 MCP 的预测分叉中保留继承的工具声明。 | | | ;; tags=internal
+features.suppress_model_change_announcements | 不播报模型切换 | | 切换模型后，不在增量上下文中播报新模型 ID（默认关闭）。 | |
+features.code_mode_host | Code Mode 独立宿主 | | 在独立宿主进程中运行 JavaScript Code Mode。 | | | ;; tags=internal
+features.code_mode_host_grpc | Code Mode gRPC | | 进程宿主的 Code Mode 通过 stdio 上的 gRPC 通信。 | | | ;; tags=internal
+features.code_mode_host_output_truncation | Code Mode 输出截断 | | 在宿主进程中先截断 Code Mode 输出再发送给核心。 | | | ;; tags=internal
+features.code_mode_interrupt | Code Mode 可中断 | | 回合被中断时终止正在运行的 Code Mode 单元。 | |
+features.multi_agent_v2 | 多代理 V2 | | 启用基于任务路径的多代理路由（默认关闭）。开启后优先于 agents.enabled。 | | | ;; tags=experimental
+features.bedrock_setup_wizard | Bedrock 设置向导 | | 在 TUI 登录引导中提供 Amazon Bedrock 设置。 | |
+features.gcp_setup_wizard | GCP 设置向导 | | 在 TUI 登录引导中提供 Google Cloud Vertex AI 设置（默认关闭）。 | |
+features.gateway_setup_wizard | 网关设置向导 | | 在 TUI 登录引导中提供自定义网关设置（默认关闭）。 | | 使用企业网关或第三方 OpenAI 兼容服务时可开启，登录时引导配置
+features.in_app_browser | 桌面端内置浏览器 | | 允许桌面端 App 的内置浏览器窗格。这是只应由 requirements 设置的管控开关，不要写在用户配置中。 | | | ;; tags=desktop,enterprise
+features.browser_annotation_api | 网页标注接口 | | 允许网站在桌面端打开并定制标注工具。只应由 requirements 设置。 | | | ;; tags=desktop,enterprise
+features.in_app_chat | 桌面端内置聊天 | | 允许桌面端的内置聊天窗格。只应由 requirements 设置。 | | | ;; tags=desktop,enterprise
+features.in_app_dictation | 桌面端听写 | | 允许桌面端语音听写。只应由 requirements 设置。 | | | ;; tags=desktop,enterprise
+features.in_app_voice | 桌面端语音 | | 允许桌面端语音对话。只应由 requirements 设置。 | | | ;; tags=desktop,enterprise
+features.in_app_local_automation | 桌面端本地自动化 | | 允许桌面端运行本地自动化。只应由 requirements 设置。 | | | ;; tags=desktop,enterprise
+features.in_app_updates | 桌面端应用内更新 | | 允许桌面端应用内更新。只应由 requirements 设置。 | | | ;; tags=desktop,enterprise
+features.browser_use | 浏览器操作 | | 允许桌面端的 Browser Use 代理集成。只应由 requirements 设置。 | | | ;; tags=desktop,enterprise
+features.browser_use_full_cdp_access | 浏览器完整 CDP | | 允许 Browser Use 访问完整的 Chrome DevTools 协议。只应由 requirements 设置。 | | | ;; tags=desktop,enterprise,security
+features.browser_use_external | 外部浏览器操作 | | 允许 Browser Use 操作外部浏览器。只应由 requirements 设置。 | | | ;; tags=desktop,enterprise
+features.computer_use | 电脑操作 | | 允许 Codex Computer Use（操作桌面应用）。只应由 requirements 设置。 | | | ;; tags=desktop,enterprise
+
+# ---------------- 实验性 ----------------
+features.respect_system_proxy | 使用系统代理 | | 实验：Codex 自己的网络请求使用 macOS 或 Windows 的系统代理设置。 | | 在系统里开了代理软件（系统代理模式）但 Codex 连不上时可尝试开启 | tags=experimental ;; p=macos,windows
+features.network_proxy | 沙箱网络代理 | | 实验：对已允许联网的沙箱会话启动托管网络代理并应用网络限制。 | | | ;; tags=experimental,security
+features.prevent_idle_sleep | 防止系统休眠 | | 实验：Codex 执行任务期间阻止系统进入空闲休眠。 | | 跑长任务时可开启，避免电脑睡眠导致任务中断 | tags=experimental
+features.login_shell_package_path | 登录 Shell 保留内置工具 | | 实验：登录 Shell 重置 PATH 后，仍让 ripgrep 等内置工具可用。 | | | ;; tags=experimental
+features.analytics_plan_history | 用量历史预览 | | 实验：在 /analytics 中预览个人账号的五小时与每周额度历史。 | | | ;; tags=experimental
+
+# ---------------- 开发中 ----------------
+features.cli_resume_account_check | 恢复会话校验账号 | | 开发中：限制 CLI 只能恢复由自己创建的本地线程。 | | | ;; tags=experimental
+features.tui_workspace | TUI 工作区 | | 开发中：为 TUI 侧边对话启用工作区行为。 | | | ;; tags=experimental
+features.tui_multi_backend | TUI 多后端 | | 开发中：让 TUI 发现并选择多个对话后端。 | | | ;; tags=experimental
+features.tui_extensions_statusline | MCP 状态栏 | | 开发中：启用实验性的 MCP 状态栏提供者。 | | | ;; tags=experimental
+features.app_server_websocket_compression | app-server 连接压缩 | | 开发中：为 app-server 的 WebSocket 与 UDS 连接启用协商 zstd 压缩。 | | | ;; tags=experimental
+features.multi_env_copy_file | 跨环境复制文件 | | 开发中：在明确选择的执行环境之间复制文件。 | | | ;; tags=experimental
+features.powershell_shell_version | PowerShell 版本信息 | | 开发中：暴露所选 PowerShell 执行宿主的主 / 次版本号。 | | | ;; tags=experimental ;; p=windows
+features.shell_snapshot_v2 | Shell 快照 V2 | | 开发中：把按策略过滤的 Shell 快照完全保存在执行器内存中。 | | | ;; tags=experimental
+features.deferred_executor | 延迟执行器 | | 开发中：允许在执行器仍在启动时就开始回合。 | | | ;; tags=experimental
+features.cwd_relative_turn_diffs | 相对路径差异 | | 开发中：回合差异显示使用相对当前工作目录的路径。 | | | ;; tags=experimental
+features.executed_tool_call_metadata | 记录尝试的工具调用 | | 开发中：在内部 Responses 元数据中记录模型尝试的工具调用。 | | | ;; tags=experimental
+features.code_mode | Code Mode | | 开发中：启用基于独立宿主进程的 JavaScript Code Mode。 | | | ;; tags=experimental
+features.code_mode_tool_search | Code Mode 工具搜索 | | 开发中：在 Code Mode 内提供排序后的工具发现。 | | | ;; tags=experimental
+features.code_mode_prewarm | Code Mode 预热 | | 开发中：会话启动时预先建立 Code Mode 宿主连接。 | | | ;; tags=experimental
+features.instant_interrupt | 即时打断 | | 开发中（默认开启）：有新的用户输入时抢占回复并让出前台 Code Mode 观察。 | | | ;; tags=experimental
+features.interrupt_on_cancel | 取消即中断推理 | | 开发中：取消回合时同时中断上游推理。 | | | ;; tags=experimental
+features.code_mode_only | 仅 Code Mode | | 开发中：模型可见的工具只保留 Code Mode 入口（exec、wait）。 | | | ;; tags=experimental
+features.code_mode_only_strict_3p_tools | 仅 Code Mode 严格三方工具 | | 开发中：仅在 Code Mode Only 中把符合条件的 MCP / App / 动态工具保持延迟加载。 | | | ;; tags=experimental
+features.standalone_web_search | 独立网页搜索工具 | | 开发中：暴露基于扩展的独立网页搜索工具。 | | | ;; tags=experimental
+features.hosted_search_policy | 托管搜索策略 | | 开发中：让宿主按回合策略独立授权 MCP 搜索与原生搜索。 | | | ;; tags=experimental
+features.runtime_metrics | 运行时指标 | | 开发中：通过手动读取器启用运行时指标快照。 | | | ;; tags=experimental
+features.critical_path_timing | 关键路径计时 | | 开发中：记录内部直接工具依赖路径用于回合归因。 | | | ;; tags=experimental
+features.external_agent_memory_import | 导入外部代理记忆 | | 开发中：允许从外部代理导入项目级记忆。 | | | ;; tags=experimental
+features.local_thread_store_compression | 线程存储压缩 | | 开发中：压缩冷的本地线程记录文件。要求所有读取该 Codex 主目录的程序都支持压缩。 | | | ;; tags=experimental
+features.background_paginated_rollout_migration | 后台迁移历史 | | 开发中：在后台把旧的本地记录文件迁移为分页历史。 | | | ;; tags=experimental
+features.chronicle | Chronicle 屏幕记忆 | | 开发中：启用 Chronicle 侧车，被动记录屏幕上下文作为记忆。 | | | ;; tags=experimental,security
+features.apply_patch_streaming_events | 补丁流式进度 | | 开发中：生成 apply_patch 输入时流式输出结构化进度。 | | | ;; tags=experimental
+features.exec_permission_approvals | 执行时申请权限 | | 开发中：允许执行工具在保持沙箱的前提下申请额外权限。 | | | ;; tags=experimental
+features.request_permissions_tool | 申请权限工具 | | 开发中：暴露内置的 request_permissions 工具。 | | | ;; tags=experimental
+features.windows_sandbox_service | Windows 沙箱服务 | | 开发中：尝试通过已安装的服务完成提权 Windows 沙箱的初始化。 | | | ;; tags=experimental ;; p=windows
+features.prefer_mxc | 优先使用 MXC | | 开发中：可用时优先使用本机原生 Windows 沙箱（MXC），并保留旧实现作为回退。 | | | ;; tags=experimental ;; p=windows
+features.daybreak_program_propagation | Daybreak 传递 | | 开发中：为本地辅助程序及其回合记录保存的 Daybreak 选择。 | | | ;; tags=experimental
+features.credential_masking | 凭据屏蔽 | | 开发中：屏蔽凭据并通过已启用的网络代理注入真实值。 | | | ;; tags=experimental,security
+features.model_catalog_in_context | 模型目录放上下文 | | 开发中：把创建子代理时的模型选择放在只追加的上下文中，而不是工具描述里。 | | | ;; tags=experimental
+features.multi_agent_v2_dynamic_tools | 子代理继承动态工具 | | 开发中：新的 V2 子代理继承客户端定义的动态工具。 | | | ;; tags=experimental
+features.subagent_thread_environments | 子代理继承线程环境 | | 开发中：子代理继承配置的线程环境，而不是临时的回合选择。 | | | ;; tags=experimental
+features.subagent_default_context_limits | 子代理默认上下文限制 | | 开发中：每个子代理使用其模型默认的上下文窗口与自动压缩阈值。 | | | ;; tags=experimental
+features.defer_mailbox_preemption | 延迟代理消息抢占 | | 开发中：收到代理消息时继续完成推理与说明，到下一个正常位置再投递。 | | | ;; tags=experimental
+features.wake_on_agent_messages | 代理消息唤醒 | | 开发中：允许代理消息在回合完成后唤醒空闲的根会话。 | | | ;; tags=experimental
+features.agent_message_board | 代理留言板 | | 开发中：为代理树启用共享讨论工具。 | | | ;; tags=experimental
+features.agent_message_board_mcp | 代理留言板 MCP | | 开发中：通过 HTTP MCP 暴露代理树范围的内存留言板。 | | | ;; tags=experimental
+features.psp | PSP 路由 | | 开发中：通过 PSP 转发第一方 ChatGPT 请求。 | | | ;; tags=experimental,internal
+features.enable_mcp_apps | MCP Apps | | 开发中：启用 MCP apps。 | | | ;; tags=experimental
+features.mcp_2026_07_28 | MCP 2026-07-28 协议 | | 开发中：支持 MCP 协议 2026-07-28 版本。 | | | ;; tags=experimental
+features.mcp_tool_list_changed | MCP 工具列表变更 | | 开发中：回合内遵循 MCP 服务器的工具列表变更通知。 | | | ;; tags=experimental
+features.mcp_connection_sharing | 共享 MCP 连接 | | 开发中：在多个对话间发现并共享符合条件的本地 stdio 连接。 | | | ;; tags=experimental
+features.mcp_lazy_stdio_startup | MCP 延迟启动 | | 开发中：工具目录已缓存时，延迟启动可选的 stdio 服务器。 | | | ;; tags=experimental
+features.multi_environment_mcp | 多环境 MCP | | 开发中：不同执行器上发现的同名 HTTP 服务器分开处理。 | | | ;; tags=experimental
+features.apps_early_resource_discovery | Apps 提前发现资源 | | 开发中：让宿主的 Apps 目录读取与初始工具清单并行。 | | | ;; tags=experimental
+features.codex_apps_mcp_2026_07_28 | Codex Apps 新协议 | | 开发中：为宿主的 Codex Apps 服务器启用 MCP 2026-07-28 协议。 | | | ;; tags=experimental
+features.use_xaa | 企业刷新令牌授权 | | 开发中：为配置的 MCP 资源启用企业刷新令牌授权。 | | | ;; tags=experimental,enterprise
+features.command_sessions_world_state | 命令会话状态 | | 开发中：通过增量世界状态发布保留的命令会话。 | | | ;; tags=experimental
+features.incremental_exec_tools | 增量 exec 工具 | | 开发中：在增量工具目录中比较 CodeModeOnly 的 exec 定义差异。 | | | ;; tags=experimental
+features.non_prefixed_mcp_tool_names | MCP 工具无前缀 | | 开发中：模型可见的 MCP 命名空间不再带旧的 mcp__ 前缀。 | | | ;; tags=experimental
+features.simplified_selection_hints | 简化插件选择提示 | | 开发中：对显式选择的插件使用简洁的开发者提示。 | | | ;; tags=experimental
+features.executor_capability_discovery | 执行器能力发现 | | 开发中：通过一次高层 RPC 发现所选根目录的插件与技能清单。 | | | ;; tags=experimental
+features.executor_capability_discovery_v2 | 执行器能力发现 V2 | | 开发中：获取 V2 执行器清单但不发布或激活其能力。 | | | ;; tags=experimental
+features.skip_host_skill_discovery | 跳过宿主技能发现 | | 开发中：没有注册的贡献者需要时跳过宿主技能快照。 | | | ;; tags=experimental
+features.image_generation_animation | 生成动图 | | 开发中：允许图片生成工具请求后端合成的 GIF。 | | | ;; tags=experimental
+features.omit_app_server_notification_media | 通知省略媒体 | | 开发中：app-server 条目通知中省略内联图片与音频。 | | | ;; tags=experimental
+features.image_resize_notice | 图片缩放提示 | | 开发中：告诉模型提示中的图片已被缩放及其尺寸。 | | | ;; tags=experimental
+features.concurrent_reasoning_summaries | 推理摘要分段 | | 开发中：请求按顺序分段交付推理摘要。 | | | ;; tags=experimental
+features.output_token_replay | 输出重放 | | 开发中：请求加密的采样输出以便保留 token 重放。 | | | ;; tags=experimental
+features.omit_skill_descriptions | 省略技能描述 | | 开发中：模型可见的可用技能目录中省略描述。 | | | ;; tags=experimental
+features.skill_catalog_deltas | 技能目录增量 | | 开发中：在累计上下文预算内追加技能的新增与修改。 | | | ;; tags=experimental
+features.default_mode_request_user_input | 默认模式可提问 | | 开发中：允许在默认协作模式下使用 request_user_input。 | | | ;; tags=experimental
+features.send_message_to_user_async | 异步发消息给用户 | | 开发中：允许根代理在没有模型目录支持时异步发送用户消息。 | | | ;; tags=experimental
+features.terminal_visualization_instructions | 终端可视化指引 | | 开发中：在 TUI 开发者指令中加入终端可视化指导。 | | | ;; tags=experimental
+features.guardian_recorded_items | 审查记录转发 | | 开发中：把审查器的私有条目与中断转发给原始事件观察者。 | | | ;; tags=experimental
+features.guardian_root_handoff_context | 审查根证据限制 | | 开发中：把工作者 Guardian 的根证据限制在之前的根通信窗口内。 | | | ;; tags=experimental
+features.guardian_native_multi_agent_history | 审查多代理调用 | | 开发中：审查改变状态的多代理 V2 调用并在历史中保留原生调用。 | | | ;; tags=experimental
+features.guardian_enhanced_node_repl_transcripts | 审查包含 REPL 记录 | | 开发中：在 Guardian 审查中包含已完成的 node_repl / cua_repl 响应。 | | | ;; tags=experimental
+features.guardian_node_repl_transcript_images | 审查包含 REPL 图片 | | 开发中：在 Guardian 审查中包含 REPL 响应中的图片。 | | | ;; tags=experimental
+features.guardian_trust_orchestrator_connectors | 审查信任编排器连接器 | | 开发中：Guardian V2 信任插件服务编排器提供的连接器身份。 | | | ;; tags=experimental
+features.guardian_conversation_history_tools | 审查读取对话历史 | | 开发中：让 Guardian 可以使用根对话的消息历史工具。 | | | ;; tags=experimental
+features.guardian_denial_reconsideration | 审查拒绝复核 | | 开发中：同步 Guardian 拒绝前重新采样一次再发布结论。 | | | ;; tags=experimental
+features.guardianv2 | Guardian V2 | | 开发中：启用 Guardian V2 自动审批审查。 | | | ;; tags=experimental
+features.guardianv2_decisions_comparison | Guardian V2 对比 | | 开发中：与 Guardian V2 并行运行 Decisions 以作测量，不改变审批结果。 | | | ;; tags=experimental
+features.guardianv3 | Guardian V3 | | 开发中：启用 Guardian V3 集成。 | | | ;; tags=experimental
+features.token_budget | 上下文窗口元数据 | | 开发中：在模型可见上下文中加入当前上下文窗口信息。 | | | ;; tags=experimental
+features.context_management | 上下文管理 | | 开发中：启用实验性的上下文管理。 | | | ;; tags=experimental
+features.rollout_budget | 会话共享预算 | | 开发中：跨会话内各代理线程跟踪并报告共享的 token 预算。 | | | ;; tags=experimental
+features.current_time_reminder | 当前时间提醒 | | 开发中：在模型可见上下文中加入当前时间提醒。 | | | ;; tags=experimental
+features.nonfatal_clock_read_errors | 时钟错误不致命 | | 开发中：读取时钟失败时告知模型而不是让回合失败。 | | | ;; tags=experimental
+features.artifact | Artifact 工具 | | 开发中：启用原生 artifact 工具。 | | | ;; tags=experimental
+features.step_model_switching | 分步切换模型 | | 开发中：允许在后续步骤中切换到显式请求的模型。 | | | ;; tags=experimental
+features.async_compaction | 后台预压缩 | | 开发中：在达到前台上限之前于后台准备远程压缩。 | | | ;; tags=experimental
+features.async_compaction_root_only | 仅根会话后台压缩 | | 开发中：后台压缩只用于根会话。 | | | ;; tags=experimental
+features.retain_client_developer_messages | 保留客户端开发者消息 | | 开发中：跨压缩的上下文窗口保留客户端编写的开发者消息。 | | | ;; tags=experimental
+features.use_agent_identity | 代理身份 | | 开发中：ChatGPT 认证的会话使用 Agent Identity。 | | | ;; tags=experimental
+features.runtime_agent_instances | 运行时代理实例 | | 开发中：为 OpenAI 请求认证注册临时运行时。 | | | ;; tags=experimental
+
+# ---------------- 已弃用 ----------------
+features.web_search_request | 网页搜索（旧） | | 已弃用：允许模型请求实时网页搜索。请改用顶层的 web_search = "live"。 | | | ;; dep=请改用顶层 web_search 设置 ;; by=web_search
+features.web_search_cached | 缓存网页搜索（旧） | | 已弃用：允许模型请求缓存的网页搜索。请改用顶层的 web_search = "cached"。 | | | ;; dep=请改用顶层 web_search 设置 ;; by=web_search
+features.multi_agent | 多代理（旧） | | 已弃用（默认开启）：启用协作工具。请改用 [agents] enabled 或 features.multi_agent_v2。 | | | ;; dep=请改用 agents.enabled ;; by=agents.enabled
+features.use_legacy_landlock | 旧版 Landlock 沙箱 | | 已弃用：在 Linux 上使用旧的 Landlock 沙箱，而不是默认的 bubblewrap。 | | | ;; dep=默认 bubblewrap 沙箱更完善 ;; p=linux
+features.connectors | connectors（旧别名） | | apps 的旧别名。 | | | ;; dep=请改用 features.apps ;; by=features.apps
+features.enable_experimental_windows_sandbox | 实验 Windows 沙箱（旧别名） | | experimental_windows_sandbox 的旧别名，已无效果。 | | | ;; dep=请改用 windows.sandbox ;; by=windows.sandbox
+features.experimental_use_unified_exec_tool | 统一执行（旧别名） | | unified_exec 的旧别名。 | | | ;; dep=请改用 features.unified_exec ;; by=features.unified_exec
+features.request_permissions | 申请权限（旧别名） | | exec_permission_approvals 的旧别名。 | | | ;; dep=请改用 features.exec_permission_approvals ;; by=features.exec_permission_approvals
+features.web_search | web_search（旧别名） | | web_search_request 的旧别名。注意这里是 [features] 中的开关，与顶层 web_search 设置不同。 | | | ;; dep=请改用顶层 web_search 设置 ;; by=web_search
+features.imagegenext | 图片生成（旧别名） | | image_generation 的旧别名。 | | | ;; dep=请改用 features.image_generation ;; by=features.image_generation
+features.collab | 协作（旧别名） | | multi_agent 的旧别名。 | | | ;; dep=请改用 agents.enabled ;; by=agents.enabled
+features.memory_tool | 记忆工具（旧别名） | | memories 的旧别名。 | | | ;; dep=请改用 features.memories ;; by=features.memories
+features.telepathy | telepathy（旧别名） | | chronicle 的旧别名。 | | | ;; dep=请改用 features.chronicle ;; by=features.chronicle
+features.codex_hooks | Hooks（旧别名） | | hooks 的旧别名。 | | | ;; dep=请改用 features.hooks ;; by=features.hooks
+
+# ---------------- 已移除（写了也无效果） ----------------
+features.transcript_v2 | 新版记录（已移除） | | 已移除，无效果；请改用 tui.fullscreen_transcript。 | | | ;; dep=请改用 tui.fullscreen_transcript ;; by=tui.fullscreen_transcript
+features.undo | 撤销（已移除） | | 已移除，仅为兼容旧配置保留。 | | | ;; dep=已无效果，可删除
+features.shell_zsh_fork | zsh 分支（已移除） | | 已移除：退役的 zsh 后端兼容开关。 | | | ;; dep=已无效果，可删除
+features.unified_exec_zsh_fork | 统一执行 zsh 分支（已移除） | | 已移除：退役的 zsh 后端兼容开关。 | | | ;; dep=已无效果，可删除
+features.js_repl | JS REPL（已移除） | | 已移除：JavaScript REPL 功能已删除。 | | | ;; dep=已无效果，可删除
+features.js_repl_tools_only | JS REPL 仅工具（已移除） | | 已移除。 | | | ;; dep=已无效果，可删除
+features.stable_environment_tools | 稳定环境工具（已移除） | | 已移除。 | | | ;; dep=已无效果，可删除
+features.code_mode_buffered_exec | Code Mode 缓冲执行（已移除） | | 已移除。 | | | ;; dep=已无效果，可删除
+features.code_mode_tool_description_first | Code Mode 描述顺序（已移除） | | 已移除。 | | | ;; dep=已无效果，可删除
+features.terminal_resize_reflow | 调整大小重排（已移除） | | 已移除：终端调整大小时的记录重排现在始终开启。 | | | ;; dep=已无效果，可删除
+features.search_tool | 搜索工具（已移除） | | 已移除：旧的搜索工具开关。 | | | ;; dep=已无效果，可删除
+features.codex_git_commit | Git 提交署名（已移除） | | 已移除：旧的 git 提交署名指引开关。 | | | ;; dep=已无效果，可删除
+features.sqlite | SQLite（已移除） | | 已移除：会话元数据现在始终保存到本地 SQLite。 | | | ;; dep=已无效果，可删除
+features.local_thread_store_shared_compression | 共享压缩（已移除） | | 已移除：统一由 local_thread_store_compression 控制。 | | | ;; dep=请改用 features.local_thread_store_compression ;; by=features.local_thread_store_compression
+features.apply_patch_freeform | 自由补丁（已移除） | | 已移除。 | | | ;; dep=已无效果，可删除
+features.apply_patch_preserve_line_endings | 保留换行符（已移除） | | 已移除：补丁现在始终保留原有换行符。 | | | ;; dep=已无效果，可删除
+features.use_linux_sandbox_bwrap | Linux bwrap 沙箱（已移除） | | 已移除：bubblewrap 已是默认，保留此开关只为兼容旧配置。 | | | ;; dep=已无效果，可删除 ;; p=linux
+features.request_rule | 请求规则（已移除） | | 已移除：允许模型申请审批并提出执行规则。 | | | ;; dep=已无效果，可删除
+features.experimental_windows_sandbox | 实验 Windows 沙箱（已移除） | | 已移除：请改用 windows.sandbox 设置。 | | | ;; dep=请改用 windows.sandbox ;; by=windows.sandbox ;; p=windows
+features.elevated_windows_sandbox | 提权 Windows 沙箱（已移除） | | 已移除：请改用 windows.sandbox = "elevated"。 | | | ;; dep=请改用 windows.sandbox ;; by=windows.sandbox ;; p=windows
+features.remote_models | 远程模型（已移除） | | 已移除：旧的远程模型开关。 | | | ;; dep=已无效果，可删除
+features.worktrees | Worktree（已移除） | | 已移除：托管 worktree 与仓库感知会话现在始终可用。 | | | ;; dep=已无效果，可删除
+features.multi_agent_mode | 多代理模式（已移除） | | 已移除。 | | | ;; dep=已无效果，可删除
+features.enable_fanout | 扇出（已移除） | | 已移除：代理任务工具已删除。 | | | ;; dep=已无效果，可删除
+features.apps_mcp_path_override | Apps MCP 路径（已移除） | | 已移除。 | | | ;; dep=已无效果，可删除
+features.tool_search | 工具搜索（已移除） | | 已移除：工具搜索现在始终开启。 | | | ;; dep=已无效果，可删除
+features.tool_search_always_defer_mcp_tools | MCP 工具总是延迟（已移除） | | 已移除：工具搜索可用时 MCP 工具始终延迟加载。 | | | ;; dep=已无效果，可删除
+features.unavailable_dummy_tools | 占位工具（已移除） | | 已移除。 | | | ;; dep=已无效果，可删除
+features.plugin_hooks | 插件 Hooks（已移除） | | 已移除：插件自带的生命周期钩子开关。 | | | ;; dep=已无效果，可删除
+features.plugin_discovery_prefetch | 插件发现预取（已移除） | | 已移除。 | | | ;; dep=已无效果，可删除
+features.external_migration | 外部迁移（已移除） | | 已移除。 | | | ;; dep=已无效果，可删除
+features.resize_all_images | 统一图片缩放（已移除） | | 已移除：集中式图片预处理现在始终开启。 | | | ;; dep=已无效果，可删除
+features.item_ids | 条目 ID（已移除） | | 已移除：响应条目 ID 现在始终开启。 | | | ;; dep=已无效果，可删除
+features.skill_env_var_dependency_prompt | 技能环境变量提示（已移除） | | 已移除。 | | | ;; dep=已无效果，可删除
+features.steer | 回车立即发送（已移除） | | 已移除：回车立即提交而不是排队，现在为固定行为。 | | | ;; dep=已无效果，可删除
+features.send_async_message | 异步消息（已移除） | | 已移除。 | | | ;; dep=已无效果，可删除
+features.guardianv2.thread_context | 线程上下文（已移除） | | 已移除：线程归属的 Guardian 上下文现在始终开启。 | | | ;; dep=已无效果，可删除
+features.guardian_ext | Guardian 扩展（已移除） | | 已移除。 | | | ;; dep=已无效果，可删除
+features.collaboration_modes | 协作模式（已移除） | | 已移除：协作模式（Plan、Default）现在始终开启。 | | | ;; dep=已无效果，可删除
+features.personality | 个性（已移除） | | 已移除。 | | | ;; dep=已无效果，可删除
+features.realtime_conversation | 实时对话（已移除） | | 已移除：TUI 语音是否可用取决于平台支持。 | | | ;; dep=已无效果，可删除
+features.remote_control | 远程控制（已移除） | | 已移除。 | | | ;; dep=已无效果，可删除
+features.image_detail_original | 原图细节（已移除） | | 已移除。 | | | ;; dep=已无效果，可删除
+features.tui_app_server | TUI app-server（已移除） | | 已移除：TUI 现在始终使用 app-server 实现。 | | | ;; dep=已无效果，可删除
+features.workspace_owner_usage_nudge | 工作区用量提醒（已移除） | | 已移除：现在始终开启。 | | | ;; dep=已无效果，可删除
+features.responses_websockets | Responses WebSocket（已移除） | | 已移除：旧的 WebSocket 传输实验开关。 | | | ;; dep=已无效果，可删除
+features.responses_websockets_v2 | Responses WebSocket V2（已移除） | | 已移除。 | | | ;; dep=已无效果，可删除
+features.remote_compaction_v2 | 远程压缩 V2（已移除） | | 已移除（仍向 Responses API 声明）。 | | | ;; dep=已无效果，可删除

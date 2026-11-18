@@ -1,0 +1,135 @@
+# Claude Code 环境变量中文叠加层（第 3 部分）
+
+CLAUDE_CODE_SUBAGENT_PROMPT_CACHE_TTL | 子代理缓存时长 | model | 主对话之外（子代理、工作流、后台任务）请求的提示缓存时长，只接受 5m 或 1h，优先于 subagentPromptCacheTtl 设置。 | | | ;; type=enum ;; enum=5m:5 分钟,1h:1 小时
+CLAUDE_CODE_SUBPROCESS_ENV_SCRUB | 子进程清除凭据 | sandbox | 设为 1 从 Claude Code 启动的子进程（Bash 命令、hooks、stdio MCP 服务器）环境中去除凭据，按变量名或值识别。 | | 防止命令或第三方脚本读到 API Key 等密钥 | tags=security
+CLAUDE_CODE_SYNC_PLUGIN_INSTALL | 同步安装插件 | features | 在非交互模式（-p）中设为 1，首个请求前等待插件安装完成；否则插件在后台安装，第一回合可能还不可用。 | | | ;; type=boolean ;; et=1 ;; tags=sdk
+CLAUDE_CODE_SYNC_PLUGIN_INSTALL_TIMEOUT_MS | 同步安装插件超时 | features | 同步安装插件的超时（毫秒），超时后不带插件继续并记录错误。不设置则一直等待安装完成。 | | | ;; u=ms ;; tags=sdk
+CLAUDE_CODE_SYNC_SKILLS | 下载 claude.ai 技能 | features | 设为 1 下载你的 claude.ai 账号启用的技能；-p 模式下首个请求还会等待技能列表（最多 CLAUDE_CODE_SYNC_SKILLS_WAIT_TIMEOUT_MS）。 | | |
+CLAUDE_CODE_SYNC_SKILLS_INSTALL_TIMEOUT_MS | 技能重新同步超时 | features | Agent SDK 应用重新加载技能时，会话中技能重新同步的超时（毫秒，默认 30000）。 | | | ;; u=ms ;; def="30000" ;; tags=sdk
+CLAUDE_CODE_SYNC_SKILLS_WAIT_TIMEOUT_MS | 首次等待技能超时 | features | 设置 CLAUDE_CODE_SYNC_SKILLS 时，首个请求等待初始技能列表的超时（毫秒，默认 5000）。 | | | ;; u=ms ;; def="5000"
+CLAUDE_CODE_SYNTAX_HIGHLIGHT | 差异语法高亮 | ui | 设为 false 关闭差异输出中的语法高亮（颜色与终端配置冲突时使用）。代码块与文件预览需用 syntaxHighlightingDisabled 设置。 | | | ;; type=enum ;; enum=false:关闭
+CLAUDE_CODE_TASK_LIST_ID | 共享任务列表 ID | agents | 在多个 Claude Code 实例中设置相同的 ID，即可在支持 Task 工具的会话间共享同一个任务列表协作。 | | | ;; ex="my-feature"
+CLAUDE_CODE_TMPDIR | 临时目录 | paths | 覆盖内部临时文件目录。Unix 上会追加 /claude-{uid}/，Windows 上追加 /claude/。macOS 默认 /tmp，Linux 和 Windows 默认系统临时目录。 | | | ;; pn.windows=例如 D:/Temp；系统盘空间紧张时可指向其他盘 ;; pn.linux=默认使用 os.tmpdir()，通常为 /tmp
+CLAUDE_CODE_TMUX_TRUECOLOR | tmux 真彩色 | ui | 设为任意非空值（如 1）允许在 tmux 中输出 24 位真彩色。注意：设为 0 或 false 仍然允许真彩色，要恢复 256 色需删除此变量。 | | | ;; type=boolean ;; et=1
+CLAUDE_CODE_TOOL_MEMORY_CGROUP_EXCLUDE | 内存上限排除项 | tools | 仅 Linux / WSL：不受工具内存上限约束的进程类型（逗号分隔，如 mcp、lsp）。none 表示全部受限，all-new 只限制 Bash、PowerShell 等。 | | | ;; p=linux ;; tags=advanced
+CLAUDE_CODE_TOOL_MEMORY_LIMIT | 工具命令内存上限 | tools | 仅 Linux / WSL：限制 Bash、PowerShell（2.1.246 起还有 Monitor）工具命令可用的内存，例如 4G。 | | 防止失控的构建或测试吃光内存 | p=linux ;; ex="4G"
+CLAUDE_CODE_TRANSCRIPT_LOCAL_GC | 限制长会话记录大小 | agents | 设为 1 限制长时间 -p 或 Agent SDK 会话的记录文件大小：每次压缩后若文件超过 5MB，删除压缩前的历史。 | | | ;; tags=sdk
+CLAUDE_CODE_USER_DIALOG_TIMEOUT_MS | 远程对话框截止时间 | remote | 转发给远程客户端（Remote Control、SDK 宿主）的对话框，以及跨会话消息审批框的取消截止时间（毫秒）。 | | | ;; u=ms
+CLAUDE_CODE_USE_ANTHROPIC_AWS | 使用 Claude Platform on AWS | provider | 设为 1 使用 Claude Platform on AWS（Anthropic 运营、AWS 认证与计费）。 | | | ;; type=boolean ;; et=1
+CLAUDE_CODE_USE_ANTHROPIC_GOOGLE_CLOUD | 使用 Google Cloud 托管版 | provider | 设为 1 使用「Google Cloud 上的 Claude 模型（Anthropic 托管）」。 | | | ;; type=boolean ;; et=1
+CLAUDE_CODE_USE_BEDROCK | 使用 Amazon Bedrock | provider | 设为 1 通过 Amazon Bedrock 调用 Claude，需要配置 AWS 凭据与区域（AWS_REGION）。 | | | ;; type=boolean ;; et=1 ;; doc=https://code.claude.com/docs/en/amazon-bedrock
+CLAUDE_CODE_USE_FOUNDRY | 使用 Microsoft Foundry | provider | 设为 1 通过 Microsoft Foundry 调用 Claude。 | | | ;; type=boolean ;; et=1 ;; doc=https://code.claude.com/docs/en/microsoft-foundry
+CLAUDE_CODE_USE_MANTLE | 使用 Bedrock Mantle | provider | 设为 1 使用 Amazon Bedrock Mantle 接口。 | | | ;; type=boolean ;; et=1
+CLAUDE_CODE_USE_VERTEX | 使用 Google Vertex | provider | 设为 1 通过 Google Cloud Agent Platform（原 Vertex AI）调用 Claude，需要配置 GCP 凭据、项目 ID 和区域。 | | | ;; type=boolean ;; et=1 ;; doc=https://code.claude.com/docs/en/google-vertex-ai
+CLAUDE_CODE_USE_POWERSHELL_TOOL | PowerShell 工具 | tools | 控制 PowerShell 工具：Windows 未安装 Git Bash 时自动开启（设为 0 关闭）；已安装 Git Bash 时 claude.ai 和 Console 账号默认开启。 | | | ;; p=windows ;; ef=0
+CLAUDE_CODE_WARN_DISK_FREE_GIB | 磁盘空间告警 | tools | 设为整数 GiB（如 10），工作目录所在磁盘剩余空间低于该值时提醒 Claude。 | | | ;; type=integer ;; u=GiB ;; ex="10"
+CLAUDE_CODE_WARN_MEMORY_FREE_GIB | 内存告警 | tools | 仅 Linux / WSL：设为整数 GiB（如 4），可用内存低于该值时提醒 Claude。 | | | ;; type=integer ;; u=GiB ;; p=linux ;; ex="4"
+CLAUDE_CODE_WEBFETCH_CACHE_TTL_MS | WebFetch 缓存时长 | tools | WebFetch 对每个 URL 响应的缓存时间（毫秒，默认 900000 即 15 分钟）。 | | | ;; u=ms ;; def="900000"
+CLAUDE_CODE_WEBFETCH_DEADLINE_MS | WebFetch 下载截止时间 | tools | WebFetch 等待页面下载完成（含重定向）的最长时间（毫秒，默认 300000 即 5 分钟）。 | | | ;; u=ms ;; def="300000"
+CLAUDE_CODE_WEB_SEARCH_REFILLS_PER_HOUR | 搜索额度恢复速度 | tools | 会话 WebSearch 次数上限的恢复速度（次/小时）。交互会话默认 100，非交互会话默认 0（不恢复）。 | | | ;; type=integer ;; def="100"
+CLAUDE_CODE_WORKER_CHECKIN_SCHEDULE | 后台子代理检查间隔 | agents | CLAUDE_AUTO_BACKGROUND_TASKS 为 1 时，每次提醒 Claude 检查仍在运行的后台子代理前等待的秒数，可写多个逗号分隔的值。 | | | ;; type=string ;; u=秒 ;; ex="60,300,900"
+CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS | 工作流并发代理数 | agents | 单次工作流运行同时执行的代理数（1~256），默认最多 16（CPU 少时更少）。 | | 想降低瞬时 token 消耗或避免中转限流时调低 | type=integer ;; min=1 ;; max=256
+CLAUDE_CODE_WORKFLOW_PREFIX_STAGGER_MS | 工作流请求错峰 | agents | 共享提示缓存前缀的工作流代理，等待兄弟代理首个响应开始的最长时间（毫秒），以便命中缓存。 | | | ;; u=ms ;; tags=advanced
+CLAUDE_CODE_YOU_SHOULD_KNOW_DEBUG | You should know 调试 | debug | 设为 1 在输入框上方显示 You should know mod 最近三次检查的记录。 | | | ;; tags=internal
+CLAUDE_CONFIG_DIR | 配置目录 | paths | 覆盖配置目录（默认 ~/.claude），所有设置、会话历史和插件都存放在此。可用来同时运行多个相互隔离的账号。 | | 只能在系统环境变量中设置，写在这里无效 | def="~/.claude" ;; pn.windows=默认 %USERPROFILE%\\.claude
+CLAUDE_EFFORT | 当前推理强度（自动） | other | 由 Claude Code 在 Bash 子进程与 hook 命令中自动设置为当前推理强度（low / medium / high / xhigh / max）。 | | 由 Claude Code 自动设置 | tags=internal
+CLAUDE_ENABLE_BYTE_WATCHDOG | 字节级流监控 | network | 设为 1 强制开启字节级流式空闲监控，设为 0 强制关闭（同时关闭首字节截止时间）。 | | | ;; ef=0 ;; tags=advanced
+CLAUDE_ENABLE_BYTE_WATCHDOG_BEDROCK | Bedrock 字节级流监控 | provider | 设为 1 在 Amazon Bedrock 事件流响应上启用字节级空闲监控与首字节截止时间，默认关闭。 | | | ;; tags=advanced
+CLAUDE_ENABLE_STREAM_WATCHDOG | 事件级流监控 | network | 设为 0 强制关闭事件级流式空闲监控，设为 1 强制开启。不设置时所有提供方默认开启。 | | | ;; ef=0 ;; tags=advanced
+CLAUDE_ENV_FILE | 命令前执行的环境脚本 | tools | 一个 Shell 脚本路径，Claude Code 在每条 Bash 命令前于同一 Shell 中执行它，其中的 export 对命令可见。常用于持续激活 virtualenv / conda 环境。 | | Python 项目用它自动激活虚拟环境非常方便 | ex="~/.claude/env.sh"
+CLAUDE_JOB_DIR | 后台会话目录（自动） | other | 由 Claude Code 在每个后台会话中设为该会话的 ~/.claude/jobs/<id> 目录，临时文件可写到 $CLAUDE_JOB_DIR/tmp。 | | 由 Claude Code 自动设置 | tags=internal
+CLAUDE_PID | Claude 进程 ID（自动） | other | Claude Code 在它启动的子进程中设为自身进程 ID。 | | 由 Claude Code 自动设置 | tags=internal
+CLAUDE_REMOTE_CONTROL_SESSION_NAME_PREFIX | 远程会话名前缀 | remote | 未指定名称时自动生成的 Remote Control 会话名前缀，默认为主机名（如 myhost-graceful-unicorn）。 | | | ;; ex="work-pc"
+CLAUDE_STREAM_FIRST_BYTE_TIMEOUT_MS | 首字节超时 | network | 流式请求等待首个响应字节的截止时间（毫秒）。 | | 中转服务首字响应慢、经常超时重试时可调大 | u=ms
+CLAUDE_STREAM_IDLE_TIMEOUT_MS | 流式空闲超时 | network | 流式空闲监控关闭卡住连接前的超时（毫秒）。显式设置时最小 300000（5 分钟），更小的值会被提升。 | | | ;; u=ms ;; min=300000
+CLAUDE_SUBAGENT_BG_SHELL_MAX_MS | 子代理后台命令时长（旧） | agents | 已在 2.1.260 移除，现在无效。 | | | ;; dep=已无效果，可删除
+DEBUG | 调试模式 | debug | 设为 1 开启调试模式，等同于 --debug。日志写入 ~/.claude/debug/<会话 ID>.txt 或 CLAUDE_CODE_DEBUG_LOGS_DIR 指定的路径。 | | 排查问题时临时开启
+DISABLE_AUTOUPDATER | 禁用自动更新 | updates | 设为 1 关闭后台自动更新，手动 claude update 仍可用。要连手动更新也禁止，用 DISABLE_UPDATES。 | | 想手动掌控升级时机时开启
+DISABLE_UPDATES | 禁止所有更新 | updates | 设为 1 阻止所有更新，包括手动 claude update 和 claude install。比 DISABLE_AUTOUPDATER 更严格，适合自行分发版本的团队。 | | | ;; tags=enterprise
+FORCE_AUTOUPDATE_PLUGINS | 强制插件自动更新 | updates | 设为 1 即使通过 DISABLE_AUTOUPDATER 禁用了主程序自动更新，插件仍然自动更新。 | | |
+DISABLE_AUTO_COMPACT | 禁用自动压缩 | context | 设为 1 关闭接近上下文上限时的自动压缩和空闲压缩，手动 /compact 仍可用。 | | 不建议开启：上下文满了会直接报错
+DISABLE_COMPACT | 禁用全部压缩 | context | 设为 1 关闭所有压缩，包括自动压缩和手动 /compact。 | | 不建议开启
+DISABLE_COST_WARNINGS | 关闭费用提醒 | ui | 设为 1 关闭费用提醒消息。 | | |
+DISABLE_DOCTOR_COMMAND | 隐藏 /doctor | enterprise | 设为 1 隐藏 /doctor 环境检查技能及其别名 /checkup（不影响终端的 claude doctor 命令）。 | | | ;; tags=enterprise
+DISABLE_ERROR_REPORTING | 关闭错误上报 | privacy | 设为任意非空值（如 1）关闭错误上报。注意：设为 0 或 false 仍然是关闭，要恢复上报需删除此变量。 | true | 减少发往官方服务器的非必要请求；使用中转或网络受限时这些请求常常超时 | type=boolean ;; et=1
+DISABLE_TELEMETRY | 关闭遥测 | privacy | 设为任意非空值（如 1）关闭遥测（遥测事件不包含代码和提示内容）。注意：设为 0 或 false 仍然是关闭，要恢复需删除此变量。 | true | 保护隐私并减少非必要网络请求，不影响正常使用 | type=boolean ;; et=1
+DO_NOT_TRACK | 不追踪 | privacy | 设为 1 关闭遥测，效果同 DISABLE_TELEMETRY（也作用于功能开关拉取）。这是通用的标准变量，设为 0 表示允许遥测。 | | |
+DISABLE_EXTRA_USAGE_COMMAND | 隐藏额外用量购买 | enterprise | 设为 1 隐藏用于购买超出额度用量的 /usage-credits 命令。 | | | ;; tags=enterprise
+DISABLE_FEEDBACK_COMMAND | 禁用 /feedback | privacy | 设为 1 禁用 /feedback 命令和模型起草的反馈，同时禁用 /bug 和 /share。 | | |
+DISABLE_GROWTHBOOK | 禁止拉取功能开关（旧名） | privacy | 设为 1 关闭功能开关拉取（需要 2.1.124 及以上）。已被 CLAUDE_CODE_DISABLE_FEATURE_FLAGS 取代，除非还有 2.1.318 及更早版本的机器。 | | | ;; by=CLAUDE_CODE_DISABLE_FEATURE_FLAGS
+DISABLE_INSTALLATION_CHECKS | 关闭安装检查 | updates | 设为 1 关闭安装位置相关的警告。只在手动管理安装位置时使用，否则可能掩盖安装问题。 | | |
+DISABLE_INSTALL_GITHUB_APP_COMMAND | 隐藏 /install-github-app | enterprise | 设为 1 隐藏 /install-github-app 命令（使用第三方提供方时本来就隐藏）。 | | |
+DISABLE_INTERLEAVED_THINKING | 不发送交错思考头 | thinking | 设为 1 不发送 interleaved-thinking beta 请求头，适用于不支持交错思考的网关或提供方。 | | 中转报 interleaved-thinking 相关错误时开启
+DISABLE_LOGIN_COMMAND | 隐藏 /login | enterprise | 设为 1 隐藏 /login 命令，适合通过 API Key 或 apiKeyHelper 统一认证的环境。 | | |
+DISABLE_LOGOUT_COMMAND | 隐藏 /logout | enterprise | 设为 1 隐藏 /logout 命令。 | | |
+DISABLE_PROMPT_CACHING | 禁用提示缓存 | model | 设为 1 对所有模型禁用提示缓存（优先于按模型的设置）。会显著增加费用，一般只在网关不支持缓存时使用。 | | 不建议开启，费用和延迟都会上升
+DISABLE_PROMPT_CACHING_FABLE | 禁用 Fable 缓存 | model | 设为 1 为 Fable 模型禁用提示缓存。 | | |
+DISABLE_PROMPT_CACHING_HAIKU | 禁用 Haiku 缓存 | model | 设为 1 为默认 Haiku 模型禁用提示缓存。 | | |
+DISABLE_PROMPT_CACHING_OPUS | 禁用 Opus 缓存 | model | 设为 1 为默认 Opus 模型禁用提示缓存。 | | |
+DISABLE_PROMPT_CACHING_SONNET | 禁用 Sonnet 缓存 | model | 设为 1 为默认 Sonnet 模型禁用提示缓存。 | | |
+ENABLE_PROMPT_CACHING_1H | 1 小时提示缓存 | model | 设为 1 请求 1 小时的提示缓存，而不是默认 5 分钟。面向 API Key、Bedrock、Vertex、Foundry 等按量计费用户；订阅用户在额度内默认已是 1 小时。 | | 经常中途停顿超过 5 分钟再继续时更省钱（缓存写入单价更高）
+ENABLE_PROMPT_CACHING_1H_BEDROCK | Bedrock 1 小时缓存（旧） | model | 已弃用，请改用 ENABLE_PROMPT_CACHING_1H。 | | | ;; type=boolean ;; et=1 ;; dep=请改用 ENABLE_PROMPT_CACHING_1H ;; by=ENABLE_PROMPT_CACHING_1H
+FORCE_PROMPT_CACHING_5M | 强制 5 分钟缓存 | model | 设为 1 即使本应使用 1 小时缓存，也强制 5 分钟。优先于其他所有缓存时长设置。 | | |
+DISABLE_UPGRADE_COMMAND | 隐藏 /upgrade | enterprise | 设为 1 隐藏 /upgrade 命令。 | | |
+ENABLE_BETA_TRACING_DETAILED | 详细 Beta 追踪 | telemetry | 设为 1 并设置 BETA_TRACING_ENDPOINT，开启包含内容属性和 claude_code.hook span 的详细追踪。 | | | ;; type=boolean ;; et=1 ;; tags=advanced
+ENABLE_CLAUDEAI_MCP_SERVERS | claude.ai MCP 服务器 | mcp | 设为 false 不再获取 claude.ai 上配置的 MCP 服务器（登录用户默认开启）。按项目或组织禁用请用 disableClaudeAiConnectors 设置。 | | | ;; type=enum ;; enum=false:不获取
+ENABLE_TOOL_SEARCH | MCP 工具搜索 | mcp | 控制 MCP 工具搜索（延迟加载工具定义以节省上下文）：不设置或 true 时延迟加载 MCP 工具；auto 在工具定义超过上下文 10% 时才开启；auto:N 自定义阈值百分比；false 关闭。 | | MCP 工具很多时保持开启可大幅节省上下文；中转不支持时设为 false | ex="auto"
+FORCE_HYPERLINK | 强制可点击链接 | ui | 设为 1 在终端支持 OSC 8 超链接但未被检测到时，强制输出可点击链接。 | | |
+HTTP_PROXY | HTTP 代理 | network | 网络请求使用的 HTTP 代理服务器地址。 | | 需要代理访问 API 时设置，例如本机代理软件的端口 | ph=http://127.0.0.1:7890
+HTTPS_PROXY | HTTPS 代理 | network | HTTPS 请求使用的代理服务器地址（API 请求走这个）。 | | 需要代理访问 API 时设置 | ph=http://127.0.0.1:7890
+NO_PROXY | 不走代理的地址 | network | 直接连接、不经过代理的域名和 IP 列表（逗号分隔）。 | | | ;; ex="localhost,127.0.0.1,.internal.example.com"
+IS_DEMO | 演示模式 | privacy | 设为任意非空值（如 1）开启演示模式：在标题和 /status 中隐藏邮箱和组织名，并跳过引导。注意：设为 0 或 false 仍然开启。 | | 录屏、演示时开启 | type=boolean ;; et=1
+MAX_MCP_OUTPUT_TOKENS | MCP 输出 token 上限 | mcp | MCP 工具响应允许的最大 token 数（默认 25000），超过 10000 时会显示警告。 | | MCP 返回大数据被截断时调大 | def="25000"
+MAX_STRUCTURED_OUTPUT_RETRIES | 结构化输出重试次数 | agents | 非交互模式下回复不符合 --json-schema 时允许的尝试次数，用完仍无有效输出则失败。 | | | ;; type=integer ;; tags=sdk
+MAX_THINKING_TOKENS | 思考 token 预算 | thinking | 扩展思考的固定 token 预算，会被限制在本次最大输出 token 减 1 以内且不低于 1024。较新的模型使用自适应思考，一般无需设置。 | | 新模型保持不设置即可；旧模型需要更深思考时可设 31999 | u=tokens
+MCP_CLIENT_SECRET | MCP OAuth 客户端密钥 | mcp | 需要预配置凭据的 MCP 服务器的 OAuth 客户端密钥，用 --client-secret 添加服务器时可免交互输入。 | | | ;; s
+MCP_CONNECTION_NONBLOCKING | MCP 非阻塞启动 | mcp | 默认 MCP 服务器在后台连接、工具陆续可用；设为 0 则首个请求前等待服务器连接。 | | | ;; type=enum ;; enum=0:等待连接完成
+MCP_CONNECT_TIMEOUT_MS | MCP 阻塞连接等待 | mcp | 阻塞式 MCP 启动（MCP_CONNECTION_NONBLOCKING=0 或 alwaysLoad 的服务器）等待连接的时间（毫秒，默认 5000）。 | | | ;; u=ms ;; def="5000"
+MCP_DISCOVERY_CACHE | MCP 发现缓存 | mcp | 开启或关闭 MCP 发现缓存：开启后用过的远程 HTTP / SSE 服务器可显示 cached 状态，首次调用工具时才连接，加快启动。 | | | ;; ef=0
+MCP_DISCOVERY_CACHE_MAX_STALE_S | 发现缓存最长有效期 | mcp | 发现缓存条目的最长保留时间（秒，默认 14400 即 4 小时），过期则启动时重新连接。 | | | ;; u=秒 ;; def="14400"
+MCP_DISCOVERY_CACHE_STRIKES | 缓存刷新失败容忍次数 | mcp | 发现缓存后台刷新连续失败多少次后丢弃该条目（默认 1）。 | | | ;; type=integer ;; def="1"
+MCP_DISCOVERY_CACHE_TTL_S | 发现缓存刷新周期 | mcp | 发现缓存条目无需刷新即可使用的时间（秒，默认 900），之后仍使用但会在后台刷新。 | | | ;; u=秒 ;; def="900"
+MCP_OAUTH_CALLBACK_PORT | MCP OAuth 回调端口 | mcp | OAuth 重定向回调使用的固定端口，可代替添加 MCP 服务器时的 --callback-port。 | | | ;; type=integer ;; ex="8765"
+MCP_PROTOCOL_NEGOTIATION | MCP 协议协商 | mcp | 仅 v2 MCP 客户端：是否探测服务器是否支持 2026-07-28 协议版本。legacy 全部使用旧握手，auto 对支持的服务器类型进行探测。 | | | ;; type=enum ;; enum=auto:自动探测,legacy:旧握手 ;; tags=advanced
+MCP_REMOTE_SERVER_CONNECTION_BATCH_SIZE | 远程 MCP 并行连接数 | mcp | 启动时并行连接的远程 MCP 服务器（HTTP / SSE）最大数量（默认 20）。 | | | ;; type=integer ;; def="20"
+MCP_SDK_GENERATION | MCP 客户端版本 | mcp | 固定连接 MCP 服务器使用的客户端运行时：v1（MCP TypeScript SDK 1.x）或 v2（SDK 2.0）。默认 v2。 | | 某个 MCP 服务器在新版客户端下异常时可临时改为 v1 | type=enum ;; enum=v1:SDK 1.x,v2:SDK 2.0
+MCP_SERVER_CONNECTION_BATCH_SIZE | 本地 MCP 并行连接数 | mcp | 启动时并行连接的本地 MCP 服务器（stdio）最大数量（默认 3）。 | | | ;; type=integer ;; def="3"
+MCP_TIMEOUT | MCP 启动超时 | mcp | MCP 服务器启动的超时（毫秒，默认 30000 即 30 秒）。 | | 用 npx 启动的 MCP 首次下载较慢，可调到 60000 | def="30000"
+MCP_TOOL_TIMEOUT | MCP 工具执行超时 | mcp | MCP 工具执行的超时（毫秒，默认 100000000 约 28 小时）。HTTP、SSE 和 claude.ai 连接器的单个请求另有默认 60 秒超时。 | | | ;; def="100000000"
+OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT | OTel 属性长度上限 | telemetry | OpenTelemetry SDK 标准的属性值长度上限，Claude Code 取它与 CLAUDE_CODE_OTEL_CONTENT_MAX_LENGTH 中较小者截断内容属性。 | | | ;; type=integer
+OTEL_LOG_ASSISTANT_RESPONSES | 记录模型回复 | telemetry | 设为 1 在 assistant_response 日志事件中包含模型回复文本；不设置时跟随 OTEL_LOG_USER_PROMPTS；设为 0 始终隐去。 | | | ;; ef=0 ;; tags=security
+OTEL_LOG_MANAGED_SETTINGS | 记录托管设置 | telemetry | 设为 1 在 managed_settings_resolved 日志事件中加入脱敏后的托管设置及其 SHA-256 摘要。 | | | ;; tags=enterprise
+OTEL_LOG_RAW_API_BODIES | 记录原始 API 请求体 | telemetry | 以日志事件输出 Messages API 的请求与响应 JSON：1 为内联（按内容上限截断），file:<目录> 把完整内容写入目录。 | | 包含完整对话内容，注意数据安全 | tags=security,advanced ;; ex="file:/tmp/claude-api-bodies"
+OTEL_LOG_TOOL_CONTENT | 记录工具内容 | telemetry | 设为 1 在 tool.output span 事件中包含工具内容（需要开启追踪）。默认关闭以保护敏感数据。 | | | ;; tags=security
+OTEL_LOG_TOOL_DETAILS | 记录工具详情 | telemetry | 设为 1 包含工具输入参数、MCP 服务器名、工作流名、工具失败的原始错误等详细信息。 | | | ;; tags=security
+OTEL_LOG_USER_PROMPTS | 记录用户提示 | telemetry | 设为 1 在 OpenTelemetry 追踪和日志中包含用户提示文本（默认隐去）。只在 Shell、用户设置或托管设置中生效。 | | | ;; tags=security
+OTEL_METRICS_INCLUDE_ACCOUNT_UUID | 指标含账号 UUID | telemetry | 设为 false 从指标和事件属性中排除账号 UUID（默认包含）。 | | | ;; type=enum ;; enum=false:排除,true:包含
+OTEL_METRICS_INCLUDE_ENTRYPOINT | 指标含入口 | telemetry | 设为 true 在指标和事件属性中包含会话入口（默认不包含）。 | | | ;; type=enum ;; enum=true:包含,false:排除
+OTEL_METRICS_INCLUDE_REPOSITORY | 指标含仓库信息 | telemetry | 设为 true 用 vcs.* 属性标注会话所在仓库（默认不包含）。需要 2.1.269 及以上。 | | | ;; type=enum ;; enum=true:包含,false:排除
+OTEL_METRICS_INCLUDE_RESOURCE_ATTRIBUTES | 指标含资源属性 | telemetry | 设为 false 不把 OTEL_RESOURCE_ATTRIBUTES 的键加到指标标签上（默认包含）。 | | | ;; type=enum ;; enum=false:排除,true:包含
+OTEL_METRICS_INCLUDE_SESSION_ID | 指标含会话 ID | telemetry | 设为 false 从指标和事件属性中排除会话 ID（默认包含）。 | | | ;; type=enum ;; enum=false:排除,true:包含
+OTEL_METRICS_INCLUDE_VERSION | 指标含版本号 | telemetry | 设为 true 在指标和事件属性中包含 Claude Code 版本（默认不包含）。 | | | ;; type=enum ;; enum=true:包含,false:排除
+SLASH_COMMAND_TOOL_CHAR_BUDGET | 技能元数据字符预算 | context | 覆盖展示给 Skill 工具的技能元数据字符预算（默认为上下文窗口的 1%，后备值 8000 字符）。名称为兼容旧版保留。 | | | ;; type=integer ;; u=字符
+TASK_MAX_OUTPUT_LENGTH | 后台任务输出上限（旧） | agents | 已在 2.1.277 随 TaskOutput 工具一起移除，现在无效。 | | | ;; dep=已无效果，可删除
+USE_BUILTIN_RIPGREP | 使用内置 ripgrep | tools | 设为 0 使用系统安装的 rg，而不是 Claude Code 自带的 rg。 | | 内置 rg 在某些系统（如 Alpine、旧 glibc）上无法运行时设为 0 | type=enum ;; enum=0:使用系统 rg
+VERTEX_REGION_CLAUDE_3_5_HAIKU | Vertex 区域：3.5 Haiku | provider | 使用 Google Cloud Agent Platform 时，为 Claude 3.5 Haiku 单独指定区域。 | | | ;; ex="us-east5"
+VERTEX_REGION_CLAUDE_3_5_SONNET | Vertex 区域：3.5 Sonnet | provider | 为 Claude 3.5 Sonnet 单独指定 Vertex 区域。 | | | ;; ex="us-east5"
+VERTEX_REGION_CLAUDE_3_7_SONNET | Vertex 区域：3.7 Sonnet | provider | 为 Claude 3.7 Sonnet 单独指定 Vertex 区域。 | | | ;; ex="us-east5"
+VERTEX_REGION_CLAUDE_4_0_OPUS | Vertex 区域：Opus 4 | provider | 为 Claude Opus 4 单独指定 Vertex 区域。 | | | ;; ex="us-east5"
+VERTEX_REGION_CLAUDE_4_0_SONNET | Vertex 区域：Sonnet 4 | provider | 为 Claude Sonnet 4 单独指定 Vertex 区域。 | | | ;; ex="us-east5"
+VERTEX_REGION_CLAUDE_4_1_OPUS | Vertex 区域：Opus 4.1 | provider | 为 Claude Opus 4.1 单独指定 Vertex 区域。 | | | ;; ex="us-east5"
+VERTEX_REGION_CLAUDE_4_5_OPUS | Vertex 区域：Opus 4.5 | provider | 为 Claude Opus 4.5 单独指定 Vertex 区域。 | | | ;; ex="global"
+VERTEX_REGION_CLAUDE_4_5_SONNET | Vertex 区域：Sonnet 4.5 | provider | 为 Claude Sonnet 4.5 单独指定 Vertex 区域。 | | | ;; ex="global"
+VERTEX_REGION_CLAUDE_4_6_OPUS | Vertex 区域：Opus 4.6 | provider | 为 Claude Opus 4.6 单独指定 Vertex 区域。 | | | ;; ex="global"
+VERTEX_REGION_CLAUDE_4_6_SONNET | Vertex 区域：Sonnet 4.6 | provider | 为 Claude Sonnet 4.6 单独指定 Vertex 区域。 | | | ;; ex="global"
+VERTEX_REGION_CLAUDE_4_7_OPUS | Vertex 区域：Opus 4.7 | provider | 为 Claude Opus 4.7 单独指定 Vertex 区域。 | | | ;; ex="global"
+VERTEX_REGION_CLAUDE_4_8_OPUS | Vertex 区域：Opus 4.8 | provider | 为 Claude Opus 4.8 单独指定 Vertex 区域。 | | | ;; ex="global"
+VERTEX_REGION_CLAUDE_5_5_OPUS | Vertex 区域：Opus 5.5 | provider | 为 Claude Opus 5.5 单独指定 Vertex 区域（2.1.280 新增）。 | | | ;; ex="global" ;; since=2.1.280
+VERTEX_REGION_CLAUDE_5_5_SONNET | Vertex 区域：Sonnet 5.5 | provider | 为 Claude Sonnet 5.5 单独指定 Vertex 区域（2.1.284 新增）。 | | | ;; ex="global" ;; since=2.1.284
+VERTEX_REGION_CLAUDE_5_OPUS | Vertex 区域：Opus 5 | provider | 为 Claude Opus 5 单独指定 Vertex 区域（2.1.219 新增）。 | | | ;; ex="global" ;; since=2.1.219
+VERTEX_REGION_CLAUDE_5_SONNET | Vertex 区域：Sonnet 5 | provider | 为 Claude Sonnet 5 单独指定 Vertex 区域（2.1.197 新增）。 | | | ;; ex="global" ;; since=2.1.197
+VERTEX_REGION_CLAUDE_FABLE_5 | Vertex 区域：Fable 5 | provider | 为 Claude Fable 5 单独指定 Vertex 区域（2.1.170 新增）。 | | | ;; ex="global" ;; since=2.1.170
+VERTEX_REGION_CLAUDE_FABLE_5_1 | Vertex 区域：Fable 5.1 | provider | 为 Claude Fable 5.1 单独指定 Vertex 区域（2.1.257 新增）。 | | | ;; ex="global" ;; since=2.1.257
+VERTEX_REGION_CLAUDE_FABLE_5_2 | Vertex 区域：Fable 5.2 | provider | 为 Claude Fable 5.2 单独指定 Vertex 区域（2.1.321 新增）。 | | | ;; ex="global" ;; since=2.1.321
+VERTEX_REGION_CLAUDE_HAIKU_4_5 | Vertex 区域：Haiku 4.5 | provider | 为 Claude Haiku 4.5 单独指定 Vertex 区域。 | | | ;; ex="global"
+VERTEX_REGION_CLAUDE_HAIKU_5_5 | Vertex 区域：Haiku 5.5 | provider | 为 Claude Haiku 5.5 单独指定 Vertex 区域（2.1.293 新增）。 | | | ;; ex="global" ;; since=2.1.293

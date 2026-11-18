@@ -1,0 +1,4 @@
+# 统一用 LF 换行：Windows / macOS / Linux 上检出和打包的文件完全一致
+* text=auto eol=lf
+*.png binary
+*.ico binary

@@ -1,0 +1,17 @@
+# Codex .env 一句话说明：改这个变量有什么效果（显示在界面「?」的第一行）
+# 格式：key | 说明（尽量 30 字以内，最多 40 字）
+OPENAI_FEDERATION_RULE_ID | CI 或云主机免密钥登录时使用的规则 ID
+OPENAI_IDENTITY_TOKEN_FILE | 免密钥登录用的身份令牌文件位置
+OPENAI_WORKLOAD_IDENTITY_CONTEXT | 审计用的附加标识，不影响登录
+SSL_CERT_FILE | 公司网络出现证书错误时，指定公司根证书
+HTTPS_PROXY | 让 Codex 通过代理访问网络
+HTTP_PROXY | http:// 请求使用的代理
+NO_PROXY | 这些地址不走代理，如 localhost
+RUST_LOG | 日志详细程度，排查问题时设为 debug
+CODEX_HOME | Codex 数据目录，只能在系统环境变量中设置
+CODEX_SQLITE_HOME | 数据库目录，只能在系统环境变量中设置
+CODEX_NON_INTERACTIVE | 安装脚本不提问，直接用默认答案
+CODEX_INSTALL_DIR | 安装脚本把 codex 命令装到哪里
+CODEX_API_KEY | 非交互运行时使用的 API Key，只能在系统环境设置
+CODEX_ACCESS_TOKEN | 自动化流程使用的访问令牌，只能在系统环境设置
+CODEX_CA_CERTIFICATE | Codex 专用的证书，.env 中无效，可改用 SSL_CERT_FILE
